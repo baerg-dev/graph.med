@@ -13,8 +13,9 @@ were followed by sessions that could not, and nothing in between changed.
 
 The type of credential that was frozen was never established, which matters more than the
 outage: if it was a human PAT rather than an installation token, the agent was acting as
-an org member who sits on the `main-review` bypass list, and the review gate was
-ineffective while it was live. Assert the credential's *type*, not the commit's
+an org member — and since the ruleset's bypass list is empty, that would still not
+have let the agent merge, but it would have made the pushes attributable to a human
+rather than the bot. Assert the credential's *type*, not the commit's
 appearance ([[commit-author-is-not-evidence]]):
 
 ```bash

@@ -17,10 +17,14 @@ Hitting one is the system working, not an obstacle to route around.
 | Push directly to `main` | **No** — server-side rule, will fail |
 | Approve a pull request | **No** — you are the author |
 | Merge a pull request | **No** — requires a human approval first |
-| Force-push or delete `main` | **No** — blocked for everyone |
-| Modify `.github/`, `.claude/`, `CLAUDE.md`, `CODEOWNERS` | Only via PR with human review (CODEOWNERS) |
+| Force-push or delete `main` | **No** — the PR requirement refuses any direct push |
+| Modify `.claude/`, `CLAUDE.md` — your own instructions | Yes, like any other file — but say so in the PR |
 
-The last row has its own rule — see `governed-files.md`.
+No path is restricted: there is no CODEOWNERS file, and no file is off-limits to edit.
+The single gate is that every pull request to `main` needs one human approval, and the
+ruleset's bypass list is empty, so that applies to everyone equally. The last row still
+has its own rule — see `governed-files.md` — not because those files are protected, but
+because changing your own instructions is easy for a reviewer to miss.
 
 ## Working on the code
 
@@ -70,6 +74,7 @@ working correctly.
 | Symptom | Likely cause |
 |---|---|
 | `git push origin main` rejected | Working as designed. Open a PR. |
+| A force-push to `main` rejected | Same rule. The dedicated force-push ruleset currently matches no branches. |
 | `gh pr merge` rejected | Working as designed. A human approves and merges. |
 | 401 from GitHub | Host-side token pipeline. Report; do not work around. |
 | A fetch or package install fails | Sandbox egress policy. Report the domain. |

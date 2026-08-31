@@ -5,8 +5,8 @@ repository root describes the *project*; everything here describes *how work is 
 and by whom.
 
 These files are read by the agent, not enforced by it. The constraints they describe —
-branch protection, CODEOWNERS review, the sandbox's egress policy — are enforced by
-GitHub and by the sandbox host. A rule file that drifts from what those systems actually
+branch protection, the sandbox's egress policy — are enforced by GitHub and by the
+sandbox host. A rule file that drifts from what those systems actually
 do is worse than none, because it gets trusted.
 
 ## Layout
@@ -57,7 +57,7 @@ once. One fact per file, in the format `rules/memory.md` sets out, indexed there
 
 Being checked in is the point. Claude Code also keeps a per-machine memory outside the
 repository, but nobody reviews that and it does not travel. A fact here is versioned,
-shared, and — since CODEOWNERS covers `.claude/` — approved by a human before it counts.
+shared, and approved by a human before it counts — because every pull request is.
 
 ## The sandbox
 
@@ -68,6 +68,7 @@ the root covers the same environment from the contributor's side.
 
 ## Changing anything in here
 
-This directory is covered by CODEOWNERS: changes land only through a pull request a
-human approves. Say explicitly in the description what a change permits that was not
-permitted before, and do not bundle it with unrelated work. See `rules/governed-files.md`.
+Anything here is editable — there is no CODEOWNERS file and no per-path restriction.
+Changes land the way every change does: a pull request a human approves. Say explicitly
+in the description what a change permits that was not permitted before, and do not bundle
+it with unrelated work. See `rules/governed-files.md`.

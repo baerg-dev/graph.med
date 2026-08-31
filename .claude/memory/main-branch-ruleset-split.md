@@ -1,23 +1,30 @@
 ---
 name: main-branch-ruleset-split
-description: The default branch is protected by two separate rulesets on purpose, because ruleset bypass is all-or-nothing.
+description: What actually protects the default branch — one ruleset requiring review, and a second that is active but matches no branches.
 metadata:
   type: project
 ---
 
-`main-review` — pull request required, one approval, stale approvals dismissed on push,
-approval required of the most recent reviewable push — bypasses for human org members.
-`main-safety` — block force pushes, restrict deletions — has an **empty** bypass list and
-binds org owners too. Both are Active, not "Evaluate". Separately, the org setting
-"Allow GitHub Actions to create and approve pull requests" must stay unticked.
+Verified against the API on 2026-08-31:
 
-**Why:** a bypass actor skips the *entire* ruleset it appears on, so splitting keeps the
-two irreversible operations absolute while leaving humans unblocked for ordinary work.
-"Approval of the most recent push" specifically prevents getting a clean diff approved,
-then appending commits and merging on the stale approval. If Actions could approve PRs, a
-workflow would satisfy the review requirement and the gate would quietly cease to exist.
+| Ruleset | Enforcement | Targets | Bypass | Rules |
+|---|---|---|---|---|
+| `main-require-review` | active | `~DEFAULT_BRANCH` | **empty** | `pull_request`: 1 approval, dismiss stale on push, require approval of most recent push, extra approval for unattributed changes |
+| `main-block-force-delete` | active | **nothing** — `ref_name.include` is `[]` | empty | `deletion`, `non_fast_forward` |
 
-**How to apply:** a rejected `git push origin main` or `gh pr merge` is this design
-working ([[security-enforced-outside-model]]) — do not retry with other flags or look for
-another route. Any proposal to add an app, bot or deploy key to a bypass list is a
-decision for the user, never a workaround to reach for.
+`gh api repos/<org>/<repo>/rules/branches/main` reports exactly one rule in force:
+`pull_request`. The second ruleset contributes nothing, because a ruleset with an empty
+include list matches no branch. Note also `require_code_owner_review: false`, and there is
+no CODEOWNERS file in the repository ([[no-path-based-restrictions]]).
+
+**Why:** the intended design is two rulesets, so that the irreversible operations stay
+absolute even where a bypass exists. Only the first one is doing anything. The practical
+exposure is small — the `pull_request` rule already refuses any direct push to the default
+branch, force-pushes included, and GitHub will not delete a default branch — but the
+documented second layer is not there, and nothing would catch it if the first were ever
+relaxed.
+
+**How to apply:** a rejected `git push origin main` or `gh pr merge` is the
+`pull_request` rule working ([[security-enforced-outside-model]]) — do not retry with
+other flags. Do not claim force-push or deletion protection is in place on the strength of
+the ruleset existing; check `rules/branches/main`, which reports what is actually applied.

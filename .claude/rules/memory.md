@@ -11,9 +11,9 @@ things that were only ever said out loud. One fact per file.
 This is not Claude Code's per-machine memory. That lives outside the repository, is
 private to one machine, and nobody reviews it. **Project memory is checked in**, so it is
 versioned, it survives the sandbox, every contributor and every agent sees the same
-facts, and — because `.claude/` is covered by CODEOWNERS — a memory only becomes part of
-the project when a human approves the pull request that adds it. A claim recorded here
-has been read by someone.
+facts, and a memory only becomes part of the project when a human approves the pull
+request that adds it — as with every other change. A claim recorded here has been read by
+someone.
 
 Which one to use: if a reviewer should see it, or another machine needs it, it belongs
 here. Machine-local quirks belong in per-machine memory.
@@ -30,8 +30,9 @@ pre-emptively.
 | `frozen-secret-failure.md` | A secret stored as a value keeps being served after it expires; `(stored)` in `sbx secret ls` is the signature. |
 | `commit-author-is-not-evidence.md` | The bot avatar is cosmetic; push actor and PR author are the only identity facts. |
 | `host-key-account-split.md` | The account that launches the sandbox cannot read the App private key, by assertion. |
-| `main-branch-ruleset-split.md` | Two branch rulesets, deliberately, because bypass is all-or-nothing. |
-| `agent-instruction-sources.md` | A parent-directory `CLAUDE.md` is loaded every session and no CODEOWNERS rule reaches it. |
+| `main-branch-ruleset-split.md` | What actually protects `main`: one working ruleset, and one that matches no branches. |
+| `agent-instruction-sources.md` | A parent-directory `CLAUDE.md` is loaded every session, outside the repo and outside review. |
+| `no-path-based-restrictions.md` | No path is owned or off-limits; the only gate is human approval of every PR. |
 | `push-failure-triage.md` | Telling the kinds of push failure apart; what is normal inside the sandbox and what is an alarm. |
 
 ## Writing one
