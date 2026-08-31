@@ -9,13 +9,16 @@ The agent is assumed exploitable by indirect prompt injection: it holds all thre
 the "lethal trifecta" — repository and local data, untrusted content (READMEs, dependency
 trees, fetched pages, issue bodies), and egress via git, shell and MCP. So `CLAUDE.md` and
 everything in `.claude/rules/` are documentation, not controls. The real boundaries are
-server-side branch rulesets ([[main-branch-ruleset-split]]) and OS-level container
-isolation.
+server-side branch rulesets ([[main-branch-ruleset-split]]), the microVM, and the
+host-side proxy. Under sbx the first leg is materially narrower than a container-based
+design: the GitHub credential is not in the environment at all
+([[github-app-token-pipeline]]), so there is no credential in the VM to read.
 
 Explicitly *not* defended against, and accepted: exfiltration through allowlisted
 `github.com` (a commit, branch or gist is a viable channel, and the repository is public
 anyway), a malicious dependency reading container contents, and the agent producing
-plausible-but-wrong code that passes review.
+plausible-but-wrong code that passes review. The proxy does not inspect TLS payloads, so
+reachable `github.com` remains a viable exfil channel by design.
 
 **Why:** following instructions is the model's core function, so instruction-hardening
 can never be a security boundary. Writing the accepted non-goals down keeps effort off

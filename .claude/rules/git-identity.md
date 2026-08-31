@@ -19,8 +19,10 @@ git config --global user.email "321302308+baerg-dev-agentic-coding-bot[bot]@user
 ```
 
 A grey silhouette instead of the bot avatar on GitHub means the email is wrong. Fix it
-rather than ignoring it — that mismatch usually indicates the identity plumbing is not
-what it appears to be.
+rather than ignoring it. The inference runs only in that direction: a *correct* avatar
+proves nothing, because `user.email` renders the bot regardless of which credential
+actually pushed. The server-side facts are the push actor and the PR author — see
+`.claude/memory/commit-author-is-not-evidence.md`.
 
 **The bot is deliberately a different party from the repository owner.** GitHub will
 not let an author approve their own pull request, so this separation is what makes the

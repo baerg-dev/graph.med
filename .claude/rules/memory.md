@@ -25,11 +25,14 @@ pre-emptively.
 
 | Memory | The fact |
 |---|---|
-| `security-enforced-outside-model.md` | The agent is assumed prompt-injectable; guarantees come from GitHub and the OS, never from rule files. |
-| `github-app-token-pipeline.md` | The git credential is a short-lived App installation token delivered by mount — never a PAT or `gh auth token`. |
+| `security-enforced-outside-model.md` | The agent is assumed prompt-injectable; guarantees come from GitHub, the microVM and the proxy, never from rule files. |
+| `github-app-token-pipeline.md` | The credential never enters the sandbox: sbx stores a resolving source and the host proxy injects it. |
+| `frozen-secret-failure.md` | A secret stored as a value keeps being served after it expires; `(stored)` in `sbx secret ls` is the signature. |
+| `commit-author-is-not-evidence.md` | The bot avatar is cosmetic; push actor and PR author are the only identity facts. |
 | `host-key-account-split.md` | The account that launches the sandbox cannot read the App private key, by assertion. |
 | `main-branch-ruleset-split.md` | Two branch rulesets, deliberately, because bypass is all-or-nothing. |
-| `push-failure-triage.md` | Telling the three kinds of push failure apart; why unpushed commits are usually safe. |
+| `agent-instruction-sources.md` | A parent-directory `CLAUDE.md` is loaded every session and no CODEOWNERS rule reaches it. |
+| `push-failure-triage.md` | Telling the kinds of push failure apart; what is normal inside the sandbox and what is an alarm. |
 
 ## Writing one
 

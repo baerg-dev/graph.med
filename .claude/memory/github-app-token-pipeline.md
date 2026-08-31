@@ -1,22 +1,32 @@
 ---
 name: github-app-token-pipeline
-description: The agent's git credential is a short-lived GitHub App installation token delivered by file mount — never a PAT, never `gh auth token`.
+description: The git credential is a GitHub App installation token that never enters the sandbox — sbx stores a resolving source and the host proxy injects it.
 metadata:
   type: project
 ---
 
-The App private key never leaves the host admin account ([[host-key-account-split]]). A
-timer mints a `ghs_…` installation token — one hour, scoped to this one repository — and
-writes it to a tmpfs drop directory. That **directory** is bind-mounted read-only into the
-agent container, where a git credential helper reads the file per operation. The agent
-never handles the token as a value.
+The App private key stays in the host admin account ([[host-key-account-split]]) and a
+timer mints a `ghs_…` installation token — one hour, this repository only — into a tmpfs
+file on the host. That file is **not** mounted into the sandbox. Instead the path is
+registered as a resolving *source*:
 
-**Why:** a user PAT acts as the human who owns it, which would make the bot and the
-reviewer one GitHub identity and deadlock the review gate instead of enforcing it
-([[main-branch-ruleset-split]]). The mount is a directory because each refresh replaces
-the inode — a file mount pins the container to a token that expired an hour ago.
+```bash
+sbx secret set github --command 'cat /run/agent-token/token' --refresh on-demand
+```
 
-**How to apply:** never suggest `gh auth token`, `sbx secret set github`, a personal
-access token, or a token in a remote URL (git writes it to `.git/config` in plaintext).
-If pushing fails, triage it with [[push-failure-triage]] and report which link of the
-chain is missing rather than proposing a substitute credential.
+sbx resolves it on the host, keeps it in the OS keychain, and the proxy injects it into
+outbound requests. Inside the VM the agent sees only a placeholder — there is no token
+file, no credential helper, and nothing to read, log, or exfiltrate.
+
+**Why:** `--command` stores a source rather than a value, which is what preserves the
+40-minute rotation; a pasted value freezes and the keychain goes on serving a dead
+credential ([[frozen-secret-failure]]). `--refresh on-demand` is mandatory because the
+`55m` default would cache a resolve made at minute 39 of a 60-minute token until minute
+94. A user PAT is doubly wrong: it acts as the human, collapsing the two-party review
+gate ([[main-branch-ruleset-split]]).
+
+**How to apply:** never suggest `gh auth token`, a PAT, `sbx secret set -t/--token`, a
+token in a remote URL, or writing this token into `/etc/sandbox-persistent.sh` — that
+last one puts it inside the VM and discards the whole benefit. Expect `/run/agent-token`
+to be **absent** in the sandbox; its presence would be the anomaly. Triage failures with
+[[push-failure-triage]].

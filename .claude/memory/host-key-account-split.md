@@ -16,6 +16,11 @@ or anything it runs — would mint tokens indefinitely, and the one-hour expiry 
 decorative. This is the trust root of the whole design; compromise of the admin account
 is an accepted risk with no layer beneath it short of an HSM or a hosted signer.
 
+The split reaches the sandbox because `sbx secret set --command` resolves **as the user
+who invoked sbx**: registering the credential source as the agent account — which can read
+the token by group but not the key — keeps the boundary intact end to end
+([[github-app-token-pipeline]]).
+
 **How to apply:** never propose relocating the key, reading it, or running the minting
 script from the agent's account. Treat "just put the key somewhere the agent can reach
 it" as breaking the design, not as a fix for a credential problem.
