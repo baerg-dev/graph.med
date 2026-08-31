@@ -35,13 +35,20 @@ each piece loads when it is relevant rather than all of it, always:
 │   ├── contribution-workflow.md what you may and may not do; branch → PR → stop
 │   ├── agent-inbox.md           untrusted inbound documents  (agent-inbox/)
 │   ├── documentation.md         the documentation convention (*.md)
-│   └── governed-files.md        editing agent-governing files (.claude/, .github/, …)
+│   ├── governed-files.md        editing agent-governing files (.claude/, .github/, …)
+│   └── memory.md                what project memory is, and the index of it
+├── memory/                      durable facts about this project, one per file
 ├── agents/                      subagent definitions — empty; add one .md per agent
 └── skills/                      skills — empty; add one <name>/SKILL.md per skill
 ```
 
-The first three rules load at the start of every session. The last three carry a `paths`
-scope and load when you touch a file they cover.
+Rules without a `paths:` scope load at the start of every session; the three that have
+one load when you touch a file they cover.
+
+`memory/` is what an agent has learned about this project that the code does not record —
+why a constraint exists, what was decided and rejected. It is checked in, so it is
+reviewed and shared rather than private to one machine. `rules/memory.md` carries its
+index.
 
 `agents/` and `skills/` are deliberately empty. This repository has no build, test or
 data-ingest tooling yet, and a subagent or skill that automates nothing would be

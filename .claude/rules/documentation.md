@@ -12,6 +12,10 @@ ports, the `sbx` commands themselves. The rules under `.claude/rules/` cover wha
 agent needs: identity, credentials, and what it may and may not do. When you add a
 documentation file, give it one.
 
+This applies to files that describe the project or how it is worked on. The memory files
+under `.claude/memory/` are exempt: each states a single fact, and a sandbox section in
+every one of them would be five copies of something that already has a home.
+
 When the sandbox's behaviour changes, update **every** such section rather than only
 the nearest one. A stale description of the environment is worse than no description,
 because it gets trusted.

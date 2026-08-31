@@ -14,6 +14,7 @@ do is worse than none, because it gets trusted.
 | Path | What it holds |
 |---|---|
 | `rules/` | Topic-scoped instructions. One `.md` per topic. |
+| `memory/` | Durable facts about this project. One `.md` per fact. |
 | `agents/` | Subagent definitions, one `.md` each. Currently empty. |
 | `skills/` | Skills, one `<skill-name>/SKILL.md` each. Currently empty. |
 
@@ -35,6 +36,7 @@ decided by one frontmatter key:
 | `agent-inbox.md` | `agent-inbox/**` |
 | `documentation.md` | `**/*.md` |
 | `governed-files.md` | `.claude/**`, `.github/**`, `CLAUDE.md`, `CODEOWNERS` |
+| `memory.md` | — always |
 
 Three things worth knowing before adding one:
 
@@ -46,6 +48,16 @@ Three things worth knowing before adding one:
   adding one, open a file it covers and confirm it is in context.
 - **A rule is read in full when it loads.** One topic per file; keep it short. `**/*.md`
   is about as broad as a scope should get.
+
+## Memory
+
+`memory/` records what an agent has learned about this project and cannot re-derive from
+the code — why a constraint exists, what was decided against, what someone explained
+once. One fact per file, in the format `rules/memory.md` sets out, indexed there.
+
+Being checked in is the point. Claude Code also keeps a per-machine memory outside the
+repository, but nobody reviews that and it does not travel. A fact here is versioned,
+shared, and — since CODEOWNERS covers `.claude/` — approved by a human before it counts.
 
 ## The sandbox
 
