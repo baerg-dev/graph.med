@@ -27,10 +27,9 @@ pre-emptively.
 |---|---|
 | `security-enforced-outside-model.md` | The agent is assumed prompt-injectable; guarantees come from GitHub, the microVM and the proxy, never from rule files. |
 | `github-app-token-pipeline.md` | The credential never enters the sandbox: sbx stores a resolving source and the host proxy injects it. |
-| `frozen-secret-failure.md` | A secret stored as a value keeps being served after it expires; `(stored)` in `sbx secret ls` is the signature. |
 | `commit-author-is-not-evidence.md` | The bot avatar is cosmetic; push actor and PR author are the only identity facts. |
 | `host-key-account-split.md` | The account that launches the sandbox cannot read the App private key, by assertion. |
-| `main-branch-ruleset-split.md` | What actually protects `main`: one working ruleset, and one that matches no branches. |
+| `main-branch-protection.md` | What is in force on `main`: one pull-request rule, bypass list empty. |
 | `no-path-based-restrictions.md` | No path is owned or off-limits; the only gate is human approval of every PR. |
 | `push-failure-triage.md` | Telling the kinds of push failure apart; what is normal inside the sandbox and what is an alarm. |
 

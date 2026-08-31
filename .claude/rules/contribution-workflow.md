@@ -74,7 +74,7 @@ working correctly.
 | Symptom | Likely cause |
 |---|---|
 | `git push origin main` rejected | Working as designed. Open a PR. |
-| A force-push to `main` rejected | Same rule. The dedicated force-push ruleset currently matches no branches. |
+| A force-push to `main` rejected | Same rule — a force-push is still a direct push. |
 | `gh pr merge` rejected | Working as designed. A human approves and merges. |
 | 401 from GitHub | Host-side token pipeline. Report; do not work around. |
 | A fetch or package install fails | Sandbox egress policy. Report the domain. |

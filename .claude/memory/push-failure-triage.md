@@ -8,8 +8,8 @@ metadata:
 | Symptom | Meaning |
 |---|---|
 | `could not read Username for 'https://github.com'` | No credential reached git — the proxy injected nothing. |
-| `401 Bad credentials` | Something was sent and GitHub rejected it: an expired or frozen secret ([[frozen-secret-failure]]), or an unsubstituted placeholder. |
-| Push to `main`, or `gh pr merge`, rejected | Not a credential problem at all — the review gate ([[main-branch-ruleset-split]]). |
+| `401 Bad credentials` | Something was sent and GitHub rejected it — an expired credential, or a placeholder the proxy did not substitute. |
+| Push to `main`, or `gh pr merge`, rejected | Not a credential problem at all — the review gate ([[main-branch-protection]]). |
 
 What is normal inside the sandbox, and what is not:
 
@@ -20,10 +20,8 @@ What is normal inside the sandbox, and what is not:
   `ghs_`/`ghp_` value in the environment is an alarm, not a fix.
 - A token in `/etc/sandbox-persistent.sh` — always wrong.
 
-Two host-side causes worth knowing before theorising: a secret registered as a literal
-value rather than a source, and the boot window — after a reboot the token directory is
-recreated empty and the refresh loop sleeps a full 40 minutes after a failed mint, so
-there can be **no token at all** for that long, with no signal inside the VM.
+The cause is usually host-side and invisible from in here, so check what the credential
+itself says ([[commit-author-is-not-evidence]]) before theorising about the chain.
 
 Before treating unpushed work as at risk, check the workspace mode: if `/run/sandbox/source`
 does not exist the workspace is bind-mounted **direct** from the host, so commits are

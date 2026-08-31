@@ -15,10 +15,9 @@ gh api repos/<org>/<repo>/activity \
   --jq '.[] | [.timestamp,.actor.login,.activity_type] | @tsv'
 ```
 
-**Why:** this was assumed away once already. The avatar was the only identity signal
-being checked, so a possibly wrong-type credential went unnoticed for as long as it was
-live ([[frozen-secret-failure]]). A correct avatar is consistent with a human PAT having
-done the push.
+**Why:** a correct avatar is equally consistent with a human PAT having done the push, so
+it distinguishes nothing. Only an assertion about the live credential does — which is what
+the two calls above are for.
 
 **How to apply:** never offer a correct-looking commit or avatar as evidence that the
 identity plumbing is sound. A *wrong* avatar still signals a misconfigured `user.email`

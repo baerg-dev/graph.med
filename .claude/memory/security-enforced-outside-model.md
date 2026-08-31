@@ -9,7 +9,7 @@ The agent is assumed exploitable by indirect prompt injection: it holds all thre
 the "lethal trifecta" — repository and local data, untrusted content (READMEs, dependency
 trees, fetched pages, issue bodies), and egress via git, shell and MCP. So `CLAUDE.md` and
 everything in `.claude/rules/` are documentation, not controls. The real boundaries are
-server-side branch rulesets ([[main-branch-ruleset-split]]), the microVM, and the
+server-side branch rulesets ([[main-branch-protection]]), the microVM, and the
 host-side proxy. Under sbx the first leg is materially narrower than a container-based
 design: the GitHub credential is not in the environment at all
 ([[github-app-token-pipeline]]), so there is no credential in the VM to read.

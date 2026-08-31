@@ -19,11 +19,11 @@ outbound requests. Inside the VM the agent sees only a placeholder — there is 
 file, no credential helper, and nothing to read, log, or exfiltrate.
 
 **Why:** `--command` stores a source rather than a value, which is what preserves the
-40-minute rotation; a pasted value freezes and the keychain goes on serving a dead
-credential ([[frozen-secret-failure]]). `--refresh on-demand` is mandatory because the
+40-minute rotation; a stored value cannot rotate, so the keychain goes on serving a
+credential that has expired, with no error anywhere. `--refresh on-demand` is mandatory because the
 `55m` default would cache a resolve made at minute 39 of a 60-minute token until minute
 94. A user PAT is doubly wrong: it acts as the human, collapsing the two-party review
-gate ([[main-branch-ruleset-split]]).
+gate ([[main-branch-protection]]).
 
 **How to apply:** never suggest `gh auth token`, a PAT, `sbx secret set -t/--token`, a
 token in a remote URL, or writing this token into `/etc/sandbox-persistent.sh` — that

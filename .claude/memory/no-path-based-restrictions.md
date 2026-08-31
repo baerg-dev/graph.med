@@ -16,7 +16,7 @@ file is off-limits to edit.
 
 **Why:** the gate is not "which files may be touched" but "nothing reaches `main` without
 a human approving it" — and that holds for every path equally, because the ruleset's
-bypass list is empty ([[main-branch-ruleset-split]]). Adding CODEOWNERS would change who
+bypass list is empty ([[main-branch-protection]]). Adding CODEOWNERS would change who
 must review a given path; it would not change whether review happens.
 
 **How to apply:** do not tell the user that a path is protected by CODEOWNERS, and do not
