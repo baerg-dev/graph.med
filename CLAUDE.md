@@ -12,6 +12,16 @@ Project-specific guidance — data sources and their licenses, graph schema,
 validator, setup and test instructions — belongs here once it exists. Do not
 document tooling that does not exist.
 
+## Documentation convention
+
+Every documentation file in this repository carries a section on the sandbox,
+pitched at that file's audience. `README.md` covers what a contributor needs —
+mounts, egress, published ports, the `sbx` commands themselves. This file covers
+what an agent needs: identity, credentials, and what it may and may not do. When
+you add a documentation file, give it one. When the sandbox's behaviour changes,
+update every such section rather than only the nearest one — a stale description
+of the environment is worse than no description, because it gets trusted.
+
 ---
 
 # Agent environment and contribution workflow
