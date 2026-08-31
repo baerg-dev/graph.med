@@ -37,7 +37,8 @@ What that means in practice for a contributor:
   ```
 
 Agent-specific rules — bot identity, credentials, what an agent may and may not
-do — are in [`CLAUDE.md`](CLAUDE.md).
+do — are in [`.claude/`](.claude/README.md); [`CLAUDE.md`](CLAUDE.md) describes the
+project itself.
 
 ## Sharing files with the project
 
