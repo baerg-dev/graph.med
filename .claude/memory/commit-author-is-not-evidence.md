@@ -1,24 +1,18 @@
 ---
 name: commit-author-is-not-evidence
-description: The bot avatar on a commit is cosmetic and forgeable; the push actor and PR author are the only server-side identity facts.
+description: A commit's author line is display only — it is not evidence about which credential produced the commit.
 metadata:
   type: project
 ---
 
-`user.email` set to the bot address renders the bot's avatar regardless of which
-credential actually pushed. It is display, not identity. The facts GitHub records
-server-side are the push actor and the PR author:
+`user.name` and `user.email` decide what a commit *looks* like on GitHub. They are set
+locally and say nothing about how it was authenticated. The identity that matters is
+recorded server-side, in the push and pull-request records.
 
-```bash
-gh pr list --state all --json number,author,createdAt
-gh api repos/<org>/<repo>/activity \
-  --jq '.[] | [.timestamp,.actor.login,.activity_type] | @tsv'
-```
+**Why:** an author line that looks correct is consistent with several different things
+having produced it, so it distinguishes nothing. A *wrong* one is still worth fixing — it
+means the local config is off — but the inference only runs in that direction.
 
-**Why:** a correct avatar is equally consistent with a human PAT having done the push, so
-it distinguishes nothing. Only an assertion about the live credential does — which is what
-the two calls above are for.
-
-**How to apply:** never offer a correct-looking commit or avatar as evidence that the
-identity plumbing is sound. A *wrong* avatar still signals a misconfigured `user.email`
-and is worth fixing — but the inference only runs in that direction.
+**How to apply:** never offer a correct-looking commit as evidence that the setup is
+sound. If identity genuinely needs establishing, that is a question for the maintainer to
+answer from the repository's server-side records, not something to infer from a diff.

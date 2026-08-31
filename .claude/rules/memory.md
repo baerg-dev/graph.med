@@ -25,13 +25,12 @@ pre-emptively.
 
 | Memory | The fact |
 |---|---|
-| `security-enforced-outside-model.md` | The agent is assumed prompt-injectable; guarantees come from GitHub, the microVM and the proxy, never from rule files. |
-| `github-app-token-pipeline.md` | The credential never enters the sandbox: sbx stores a resolving source and the host proxy injects it. |
-| `commit-author-is-not-evidence.md` | The bot avatar is cosmetic; push actor and PR author are the only identity facts. |
-| `host-key-account-split.md` | The account that launches the sandbox cannot read the App private key, by assertion. |
-| `main-branch-protection.md` | What is in force on `main`: one pull-request rule, bypass list empty. |
-| `no-path-based-restrictions.md` | No path is owned or off-limits; the only gate is human approval of every PR. |
-| `push-failure-triage.md` | Telling the kinds of push failure apart; what is normal inside the sandbox and what is an alarm. |
+| `security-enforced-outside-model.md` | Guarantees are enforced outside the model, never by the agent obeying a rule file. |
+| `credential-handling.md` | The agent holds no credential; the host authenticates on its behalf. Never substitute one. |
+| `main-branch-protection.md` | The default branch takes changes only through an approved pull request. |
+| `editing-your-own-instructions.md` | Editing the files that instruct you is allowed; saying so in the PR is the obligation. |
+| `commit-author-is-not-evidence.md` | A commit's author line is display only, not evidence about the setup. |
+| `push-failure-triage.md` | Which failures are host-side, which are the design working, and why commits are usually safe. |
 
 ## Writing one
 

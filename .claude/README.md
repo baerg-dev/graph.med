@@ -68,7 +68,7 @@ the root covers the same environment from the contributor's side.
 
 ## Changing anything in here
 
-Anything here is editable — there is no CODEOWNERS file and no per-path restriction.
-Changes land the way every change does: a pull request a human approves. Say explicitly
+Anything here is editable. Changes land the way every change does: a pull request a
+human approves. Say explicitly
 in the description what a change permits that was not permitted before, and do not bundle
 it with unrelated work. See `rules/governed-files.md`.

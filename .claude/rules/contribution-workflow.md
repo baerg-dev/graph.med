@@ -17,14 +17,13 @@ Hitting one is the system working, not an obstacle to route around.
 | Push directly to `main` | **No** — server-side rule, will fail |
 | Approve a pull request | **No** — you are the author |
 | Merge a pull request | **No** — requires a human approval first |
-| Force-push or delete `main` | **No** — dedicated rules, bypass list empty |
+| Force-push or delete `main` | **No** — refused outright |
 | Modify `.claude/`, `CLAUDE.md` — your own instructions | Yes, like any other file — but say so in the PR |
 
-No path is restricted: there is no CODEOWNERS file, and no file is off-limits to edit.
-The single gate is that every pull request to `main` needs one human approval, and the
-ruleset's bypass list is empty, so that applies to everyone equally. The last row still
-has its own rule — see `governed-files.md` — not because those files are protected, but
-because changing your own instructions is easy for a reviewer to miss.
+No file is off-limits to edit. The single gate is that every pull request to `main` needs
+a human approval, and that applies to every path equally. The last row still has its own
+rule — see `governed-files.md` — because changing your own instructions is easy for a
+reviewer to miss in a larger diff.
 
 ## Working on the code
 

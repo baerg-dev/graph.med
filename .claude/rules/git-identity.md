@@ -31,17 +31,14 @@ and do not respond to a failed push by changing the git identity.
 
 ## Credentials
 
-You do not hold a GitHub credential. `GITHUB_TOKEN` in your environment is a
-placeholder; the host-side proxy substitutes a real, short-lived installation token
-into outbound requests. (`GH_TOKEN`, which the `gh` CLI reads, is a placeholder for
-the same reason — currently the literal `gho_sbxproxymanaged000…`.) Consequences:
+You do not hold a GitHub credential. Authentication happens outside the sandbox: you make
+ordinary git and `gh` calls, and the host authenticates them on your behalf. Any
+token-shaped value in your environment is a placeholder.
 
-- Reading `$GITHUB_TOKEN` gives you nothing useful. Do not print it, log it, copy it
-  into files, or attempt to extract the real value.
-- The real token expires within the hour and is scoped to this one repository.
-- A 401 from GitHub means the host-side pipeline has a problem. Report it; do not work
-  around it by asking for a token or embedding one anywhere.
-- **Never put a token in a remote URL.** Git persists it into `.git/config` in
-  plaintext, and that file is inside the mounted workspace.
+- Do not print, log, copy or attempt to resolve it. Nothing useful is reachable from here.
+- **Never put a token in a remote URL.** Git persists it into `.git/config` in plaintext,
+  and that file is inside the mounted workspace.
+- A `401` means a host-side problem. Report it; do not work around it by asking for a
+  token, substituting one, or writing one into a shell environment file.
 - `gh auth status` reporting "not logged in" is expected and does not mean pushes will
-  fail — the CLI's auth state is unrelated to the proxy's network-level substitution.
+  fail — the CLI's auth state is unrelated to how requests are authenticated.
