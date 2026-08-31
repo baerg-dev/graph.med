@@ -1,0 +1,4 @@
+# Documents synced in from a cloud remote on the host (see CLAUDE.md).
+# The directory is kept; nothing that lands in it is ever committed.
+agent-inbox/*
+!agent-inbox/.keep
