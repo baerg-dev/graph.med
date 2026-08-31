@@ -31,7 +31,6 @@ pre-emptively.
 | `commit-author-is-not-evidence.md` | The bot avatar is cosmetic; push actor and PR author are the only identity facts. |
 | `host-key-account-split.md` | The account that launches the sandbox cannot read the App private key, by assertion. |
 | `main-branch-ruleset-split.md` | What actually protects `main`: one working ruleset, and one that matches no branches. |
-| `agent-instruction-sources.md` | A parent-directory `CLAUDE.md` is loaded every session, outside the repo and outside review. |
 | `no-path-based-restrictions.md` | No path is owned or off-limits; the only gate is human approval of every PR. |
 | `push-failure-triage.md` | Telling the kinds of push failure apart; what is normal inside the sandbox and what is an alarm. |
 
