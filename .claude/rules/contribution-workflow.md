@@ -17,7 +17,7 @@ Hitting one is the system working, not an obstacle to route around.
 | Push directly to `main` | **No** — server-side rule, will fail |
 | Approve a pull request | **No** — you are the author |
 | Merge a pull request | **No** — requires a human approval first |
-| Force-push or delete `main` | **No** — the PR requirement refuses any direct push |
+| Force-push or delete `main` | **No** — dedicated rules, bypass list empty |
 | Modify `.claude/`, `CLAUDE.md` — your own instructions | Yes, like any other file — but say so in the PR |
 
 No path is restricted: there is no CODEOWNERS file, and no file is off-limits to edit.
