@@ -1,0 +1,8 @@
+id: statements/glukokortikoid-pankreas-leberchirurgie
+type: statement
+lang: de
+label: In der Pankreas- und Leberchirurgie kann eine perioperative Glukokortikoidgabe erwogen werden.
+slots:
+  population: concepts/pankreas-und-leberchirurgie
+  action: concepts/perioperative-glukokortikoidgabe
+source: modelling
