@@ -1,318 +1,583 @@
 # Graph Representation — how knowledge is stored in this repository
 
-> **Status: design intent (v0.1).** No validator, no schema, and no CI exist in
-> this repository yet. Statements below that a check runs, or that a change "does
-> not pass", describe the model this repository is being built to — not behaviour
-> anyone can rely on today.
+> **Status: design intent (v0.2).** A first schema exists (`schema/schema.yaml`),
+> but no validator and no CI exist in this repository yet. Statements below that a
+> check runs, or that a change "does not pass", describe the model this repository
+> is being built to — not behaviour anyone can rely on today.
 
- 
-This file explains the approach behind every graph in this repository. It is written for humans who review changes and for AI agents that read or write graph data. It fixes *concepts and rules*; it does not prescribe a file format or a schema. The concrete schemas live next to the data and are the authority on syntax.
- 
-If you are an agent about to add or change content: read this file, then the schema referenced by the graph you are working on, then the existing entities in that graph. Never invent structure that neither this file nor the schema describes.
- 
+This file explains the approach behind the knowledge in this repository. It is
+written for humans who review changes and for AI agents that read or write graph
+data. It fixes *concepts and rules*; the one schema (`schema/schema.yaml`, §9) is
+the authority on syntax.
+
+If you are an agent about to add or change content: read this file, then the
+schema, then the existing entities in the namespaces you are working in. Never
+invent structure that neither this file nor the schema describes.
+
 ---
- 
+
 ## 1. One sentence
- 
-Everything is an **entity with a URL**; relations are **typed tuples** between URLs; every statement carries **provenance** that points back to where it came from; graphs are **independent namespaces** that may reference each other; review is a **signed attestation** by an agent over an entity's content hash; a **schema per graph kind** says which types, properties and relations are allowed.
- 
+
+Everything is an **entity with a URL** in **one pool**; knowledge lives in two
+layers — source-anchored **claims** with deterministic identity, and a **semantic
+layer** of concepts, statements and structure that claims *support* or *contest*;
+relations are **typed tuples**; every statement carries **provenance**; a
+**graph is a versioned view** over the pool — a filter plus an as-of point,
+validated when a version is cut; review is a **signed attestation** by an agent
+over a content hash; **one schema** governs the whole pool.
+
 ---
- 
+
 ## 2. Entities and URLs
- 
-An entity is anything we want to talk about or point at: a recommendation, a decision point, a variable, a code in a classification, a source document, a graph itself. Every entity has exactly one identifier of the form
- 
+
+An entity is anything we want to talk about or point at: a claim extracted from a
+source, a medical concept, a statement, a decision point, a source document, an
+agent, a view. Every entity has exactly one identifier of the form
+
 ```
-<graph-id>/<entity-id>
+<namespace>/<entity-id>
 ```
- 
-The graph id is the namespace; the entity id is unique within it. Identifiers are short, ASCII, stable, and never encode meaning that might change (no titles, no page numbers).
- 
-Finer things are addressed by extending the path:
- 
+
+Namespaces exist to mint identity, not to own content. The pool has a fixed set
+of them, declared in the schema:
+
 ```
-<graph-id>/                          the graph's own metadata entity
-<graph-id>/<entity-id>               an entity
-<graph-id>/<entity-id>/<property>    one property of that entity
-<graph-id>@<version>/<entity-id>     the entity as it was in a specific version of the graph
+sources/         source documents                       identity: chosen slug + version
+claims/          source-anchored extraction units       identity: derived (see cascade)
+concepts/        uncoded medical concepts               identity: minted
+statements/      propositions claims bear evidence on   identity: minted
+pathways/        structural nodes of one composition    identity: minted within the pathway
+views/           view definitions and their cuts        identity: chosen slug
+agents/          people, organisations, software runs   identity: chosen slug
+attestations/    signed review records                  identity: sequential
+<terminology>/   one namespace per classification release (icd10gm-2026/, ops-2026/)
+                                                        identity: the code itself
 ```
- 
-The property-level address is what feedback, provenance and reviews point at ("the grade of this recommendation is wrong", not "this recommendation is wrong"). Nothing is stored under a property address; it is an address that the resolution rules in §5 answer for.
- 
-Identity is the URL, never the file. How entities are distributed over files is a storage and diff-ergonomics decision that the model does not depend on.
- 
-**Canonical form.** Every entity has exactly one canonical serialisation (deterministic key order and encoding, fixed by the repository's validator and never changed without a migration). The hash of that form identifies the entity's content at a version and is what signatures cover (§6). Authors never compute it; the validator does.
- 
+
+**The identity cascade.** Identity is deterministic wherever it can be, minted
+only where it must be — because deterministic identity makes duplicates
+impossible by construction, while minted identity requires judgment and review:
+
+1. **Terminology concepts** take their id from the classification release:
+   `icd10gm-2026/K57.3`. Two agents cannot mint duplicate nodes for a coded
+   concept; the code is the id.
+2. **Claims** derive their id from what anchors them:
+   `claims/<source-id>/<hash>` where the hash is computed (by the validator, never
+   by hand) over the locator and the verbatim quote. Two agents extracting the
+   same passage produce the same claim.
+3. **Edges** derive their id from `(from, kind, to)` plus an explicit
+   discriminator only when parallel edges of the same kind exist.
+4. **Uncoded concepts and statements** are minted — opaque, stable, ASCII slugs
+   that never encode meaning that might change. Minting is preceded by search:
+   an agent must look for an existing entity, and for a codable one, before
+   inventing an id (§11).
+5. **Structural nodes** are minted freely within their pathway namespace;
+   duplication there is harmless because they carry no evidence.
+
+Finer things are addressed by extending the path, and view cuts are addressed
+with `@`:
+
+```
+<namespace>/<entity-id>              an entity
+<namespace>/<entity-id>/<property>   one property of that entity
+views/<view-id>                      the view, floating: evaluated as of now
+views/<view-id>@<cut>                a cut: the frozen, validated version
+```
+
+The property-level address is what feedback, provenance and reviews point at
+("the grade of this claim is wrong", not "this claim is wrong"). Nothing is
+stored under a property address; it is an address the resolution rules in §6
+answer for.
+
+Identity is the URL, never the file. How entities are distributed over files is
+a storage and diff-ergonomics decision that the model does not depend on.
+
+**Canonical form.** Every entity has exactly one canonical serialisation
+(deterministic key order and encoding, fixed by the validator and never changed
+without a migration). The hash of that form identifies the entity's content at a
+point in time and is what signatures cover (§8) and what staleness detection
+compares (§5, §8). Authors never compute it; the validator does.
+
 ---
- 
-## 3. Graphs are independent namespaces
- 
-A graph is a self-contained, independently versioned unit: its own metadata entity, its own nodes, its own edges, its own schema reference. A graph is complete and valid on its own. There is no monolith; there are many graphs side by side, and most of them never touch each other.
- 
-Examples of graphs that coexist in the same URL space:
- 
-- a clinical guideline turned into a decision pathway (`088-010OL/…`),
-- a second guideline, unrelated to the first (`003-001/…`),
-- a classification such as ICD-10-GM or OPS, one node per code (`icd10gm-2026/…`),
-- a topic taxonomy used for coverage maps,
-- a hospital SOP,
-- a set of cross-graph links (see §7).
-Graphs of different *kinds* declare different schemas (§8). Graphs of the same kind share one.
- 
-**Versioning.** An unadorned URL means "the current version". A graph version is a tag on the repository, not a parallel copy. Edges that cross graph boundaries pin the version they were written against (`003-001@2.0/…`) so that an update on either side surfaces as a stale link rather than silently changing meaning.
- 
+
+## 3. Two layers: claims and semantics
+
+The pool separates *what sources say* from *what we hold to be the knowledge*.
+
+### 3.1 Claims — the evidence layer
+
+A **claim** is a source-anchored extraction unit: one place in one source,
+carrying the locator, the verbatim quote, and the structured content readable at
+that place — a recommendation's grade, verb and direction, a criterion's
+threshold, a definition. Claims are **immutable** once extracted (a correction
+is an edit with history, §7; the source said what it said), their identity is
+deterministic (§2), and they are **never merged**. A claim asserts nothing on
+its own about what is true; it asserts what a source states at a location.
+
+### 3.2 The semantic layer
+
+Three kinds of entity, kept apart because different edges attach to them:
+
+- **Concepts** — the vocabulary: *pancreatic resection*, *intraabdominal
+  drainage*. Thin: labels, a definition, and `codes_as` edges into terminology
+  namespaces. A concept cannot be contested; it means, it does not claim.
+- **Statements** — propositions with a truth claim: "after pancreatic
+  resection, the drain can be removed early when the drain amylase indicates a
+  low fistula risk." Statements are what claims *support* or *contest*. A
+  statement has a **slot shape** declared by the schema (population, action,
+  condition, outcome — filled with concept URLs), which makes "is this the same
+  statement?" an almost-computable question and keeps granularity honest: **a
+  statement is the smallest unit that can be independently supported or
+  contested.**
+- **Structure** — decision questions, branches, outcomes, explicit gaps: the
+  pathway machinery. Structural nodes assert nothing about the world; they
+  arrange statements into something navigable, and they are pure modelling.
+
+### 3.3 Stored versus derived
+
+A semantic entity stores almost nothing: labels, definition, type, slots.
+Everything evidential is **derived** from its claim links and never written by
+hand: its source set (via `supports`), its conflict status (via `contests`), its
+effective grade (computed from supporting claims by a schema-declared policy —
+a grade always originates in a document, §6.5), and its review state (via
+attestations, §8). A hand-written evidence property on a statement is the same
+violation as a hand-written review status.
+
+### 3.4 How new evidence arrives
+
+A new document produces new claims — deterministically, without judgment. The
+editorial act is linking: each claim gets a `supports` or `contests` edge to the
+statement it bears on, or a new statement is minted when none fits. Where a
+claim agrees, the statement's evidence grows and the statement itself is
+untouched. Where it disagrees, the conflict is *surfaced*, never resolved by
+recency (§7). Sameness is an edge, not an identity decision: a wrong link is
+rerouted or deleted under review; there is no merge that has to be unpicked.
+
 ---
- 
-## 4. Edges are typed tuples
- 
+
+## 4. One pool, many views
+
+There is no monolith and there are no owned graphs; there is one pool, and there
+are **views**: named selections over it. What v0.1 called "a graph" is a view.
+
+A view is an entity (`views/<view-id>`) whose definition is a **filter** — a
+membership rule over the pool: by pathway namespace, by source set, by concept
+subtree, by schema compliance, or an explicit list. How filters are expressed is
+schema-governed and deliberately minimal for now (§13).
+
+**Versioning.** The unadorned view URL is *floating*: the filter evaluated
+against the pool as of now. A **cut** freezes it:
+
+```
+views/<view-id>@<n>  =  filter + as-of commit + frozen member list + validation
+```
+
+Because the pool's history is append-only through git (§7), a cut is stable
+forever: its member list, the members' content hashes, and therefore the cut's
+own canonical hash never change. Cuts are what get cited, exported, and attested
+(§8). The repository commit is the pool-wide as-of point; no per-item version
+bookkeeping exists.
+
+**Completeness lives at the cut.** A view intended as a decision pathway must
+pass the structural validation for pathways *at cut time* — every branch has its
+outcomes, every referenced statement is a member, nothing dangles. A filter that
+amputates a branch fails validation and the cut is not made. This is where
+v0.1's "a graph is complete and valid on its own" guarantee now lives — on the
+only object that can actually honour it.
+
+---
+
+## 5. Edges are typed tuples
+
 An edge is
- 
+
 ```
 (from-URL, kind, to-URL, properties?)
 ```
- 
-`kind` is a short verb from the vocabulary of the graph's schema. Properties on the tuple are for information that belongs to the relation itself — a guard condition on a branch, a rationale on a link between two guidelines, and always the edge's provenance (§5). An edge is identified by its triple unless it is given an explicit id (only needed when two parallel edges of the same kind exist).
- 
-An edge whose endpoints have different graph ids is a **cross-graph edge**. There is no separate mechanism for these; they are the same tuples, with two extra rules: endpoints are version-pinned, and the schema says which kinds are allowed to cross.
- 
-Edges express two very different things and the vocabulary keeps them apart:
- 
-- **structure within the knowledge** — a decision branches to an outcome, a text fragment refines a recommendation, a sub-category is broader than a category;
-- **semantic links to other graphs** — a mention of a diagnosis *codes as* a node in the ICD graph; a recommendation in one guideline *specializes* one in another.
-Codes from classifications are never bare strings inside a property. A code is a node in the classification's graph and coding is an edge to it, so the link can carry its own provenance and can dangle visibly when the classification changes.
- 
+
+with a derived id (§2). `kind` comes from the schema's vocabulary, which keeps
+the different jobs of edges apart:
+
+- **evidence** — `supports`, `contests`: claim → statement. The only edges that
+  carry evidential weight.
+- **body-text relations** — `refines`, `supplements`, `limits`: claim → claim.
+  Body text never inherits a recommendation's grade; the edge says how they
+  relate.
+- **coding** — `codes_as`: concept → terminology concept. Codes are never bare
+  strings inside a property; a code is a node and coding is an edge, so the link
+  carries provenance and dangles visibly when a classification changes.
+- **structure** — `sequence`, `branch` (with a `guard` property), `about`:
+  among structural nodes and from them to the statements they arrange.
+- **cross-source semantics** — `specializes`, `complements`, `conflicts`:
+  statement → statement. Our assertions, always `modelling`, with rationale and
+  date.
+
+**Staleness without version pins.** An edge whose meaning depends on its
+endpoints' content records the endpoints' content hashes at assertion time. When
+an endpoint's current hash differs, the edge is **stale**: surfaced for
+re-evaluation, its derived weight downgraded — not silently applied, and not a
+blocker (§8). This replaces v0.1's `@version` pinning of cross-graph edges; the
+mechanism is the same one attestations use.
+
 ---
- 
-## 5. Provenance
- 
-Provenance answers "where does this statement come from". It is the central guarantee of this repository: a human must be able to jump from any statement to the exact passage that justifies it, and a machine must be able to verify that the passage exists.
- 
-### 5.1 Sources are entities
- 
-Every source document — a PDF, a web page, a classification release — is itself an entity with a URL, a version, a location on the web, a content hash and licence information. Provenance points *into* sources with a locator whose syntax depends on the media type: a page for PDFs, a text anchor for HTML, a code for a classification.
- 
+
+## 6. Provenance
+
+Provenance answers "where does this statement come from". It is the central
+guarantee of this repository: a human must be able to jump from any statement to
+the exact passage that justifies it, and a machine must be able to verify that
+the passage exists.
+
+### 6.1 Sources are entities
+
+Every source document — a PDF, a web page, a classification release — is an
+entity in `sources/` with a version, its public URL, a content hash and licence
+information. Sources are **referenced, never rehosted**: the repository and its
+links are the only assets (see `README.md`, "Source documents"). Provenance
+points *into* sources with a locator whose syntax depends on the media type:
+
 ```
-pomgat-lv-1.0#page=61
-bfarm-icd10gm-2026#code=K57.3
-some-website#:~:text=exact%20phrase
+sources/pomgat-lv-1.0#page=61        a PDF page — physical page, what viewers navigate by
+sources/bfarm-icd10gm-2026#code=K57.3 a code in a classification
+sources/some-website#:~:text=exact%20phrase   an HTML text anchor
 ```
- 
-The build layer turns these into clickable deep links using the standard fragment conventions of the target format. Authors never write the final link; they write the locator.
- 
-### 5.2 A provenance reference
- 
-A reference is a locator, optionally with a short verbatim **quote** from that place:
- 
+
+The build layer turns these into links using the fragment conventions of the
+target format (`#page=N&search=<quote>` for PDFs — viewers that understand
+`search` highlight the quote, the rest land on the page). Authors never write
+the final link; they write the locator.
+
+### 6.2 A reference is a locator plus a verbatim quote
+
 ```yaml
-{at: pomgat-lv-1.0#page=61, quote: "Nach Pankreasresektionen sollte eine intraabdominelle Drainage"}
+{at: sources/pomgat-lv-1.0#page=61, quote: "kann die Einlage einer intraabdominellen"}
 ```
- 
-The quote is short (a clause, not a paragraph). It serves three purposes at once: it lets the viewer highlight the passage, it lets a reviewer confirm at a glance that the right sentence is meant, and it lets the validator check automatically that the text really appears at the stated location. A statement whose quote cannot be found where it claims to be does not pass.
- 
-A property may have **several** references — a statement made in a summary box and refined in the body text, or present in both the long and short version of a document. Provenance values are therefore lists; a single reference is shorthand for a list of one.
- 
-### 5.3 Two kinds of provenance value
- 
+
+The quote is short (a clause, not a paragraph) and **must be a verbatim
+substring of the source's extracted text** — it is three things at once: the
+highlight target for a reader, the reviewer's at-a-glance check, and the
+validator's exact match. A paraphrase breaks all three. A statement whose quote
+cannot be found where it claims to be is invalid. Provenance values are lists; a
+single reference is shorthand for a list of one.
+
+### 6.3 Two kinds of provenance value
+
 - a reference (or list of references) into a source — "the source says this";
-- the marker **`modelling`** — "the source contains no such statement; this was asserted by the person or agent who built the graph".
-`modelling` is the honest value for synthesised things: a decision question that reformulates several sentences into one branch, an enumeration the source never names, the negative branch a source only implies, every cross-graph link. It is never a way to skip provenance; it is provenance of a different kind, and the export records it as attribution to an agent instead of derivation from a passage.
- 
-### 5.4 Default on the entity, override per property
- 
-Every node and every edge carries a default `source`. Any property whose origin differs from the default gets its own entry under `provenance`, keyed by the property name:
- 
-```yaml
-- id: 088-010OL/drain_panc_removal_q
-  type: decision
-  label: "Frühe Drainageentfernung möglich?"
-  criteria: {any: [ … ]}
-  source: {at: pomgat-lv-1.0#page=63, quote: "frühe Drainageentfernung"}
-  provenance:
-    label: modelling
-    criteria:
-      - {at: pomgat-lv-1.0#page=63, quote: "unter 5000 U/L an POD 1"}
-      - {at: pomgat-lv-1.0#page=63, quote: "unter dem Dreifachen der Serumkonzentration"}
-```
- 
-Resolution for the address `088-010OL/drain_panc_removal_q/criteria`: the override if present, otherwise the entity default.
- 
-### 5.5 The schema decides which properties need provenance
- 
-Not every property has a source. Identifiers, types and reviewer notes are ours. The schema of each graph kind states, per property, whether provenance is **required** (must resolve to a passage, never `modelling`), **optional** (passage or `modelling`), or **not applicable**. This is where domain rules such as "a recommendation grade must always come from the document, never from the extractor" are enforced mechanically rather than by discipline.
- 
-### 5.6 Who did it
- 
-Which extraction run produced a graph is recorded on the graph's metadata entity as a reference to an agent (§6). Who reviewed what is recorded as attestations (§6), never as a hand-written field on the entity. Review state is derived from attestations and can be gated per type by the schema — for example, content types that cannot be safely extracted without human judgment may not be merged until a qualified human has attested to them.
- 
+- the marker **`modelling`** — "no source states this; it was asserted by the
+  person or agent who built it".
+
+Claims carry references by construction — a claim *is* its anchor plus content.
+Semantic and structural entities are typically `modelling`: a statement's
+wording, a slot assignment, every structural node, every cross-source edge.
+`modelling` is never a way to skip provenance; it is provenance of a different
+kind, recorded as attribution to an agent instead of derivation from a passage.
+
+### 6.4 Default on the entity, override per property
+
+Every entity and every edge carries a default `source`. Any property whose
+origin differs gets its own entry under `provenance`, keyed by the property
+name. Resolution for `claims/pomgat-lv-1.0/ab12cd34/grade`: the override if
+present, otherwise the entity default.
+
+### 6.5 The schema decides which properties need provenance
+
+Not every property has a source. Identifiers, types and labels are ours. The
+schema states, per type and property, whether provenance is **required** (must
+resolve to a passage, never `modelling`), **optional**, or **not applicable**.
+Domain rules such as "a recommendation grade must always come from the
+document, never from the extractor" are enforced here mechanically — which is
+also why a statement's effective grade is *derived* from its supporting claims
+(§3.3) and never written on the statement.
+
+### 6.6 Who did it
+
+Which extraction run produced which claims is recorded as attribution to an
+agent (§8). Who reviewed what is recorded as attestations, never as a
+hand-written field. Review state is derived.
+
 ---
- 
-## 6. Agents, attestations and review
- 
-People, organisations and software runs are entities like everything else, in their own namespace (e.g. `agents/…`). An agent entity has an opaque, stable id; how the agent authenticates — a repository login, an ORCID, a hospital single sign-on, a signing key — is a set of *identity claims* and *verification methods* attached to the agent, which can be added, rotated or replaced without touching anything that refers to the agent.
- 
-An **attestation** is an entity that records that an agent makes a claim about a subject at a specific content version, and signs it:
- 
+
+## 7. History, editing and schema evolution
+
+**Files hold current state; git is the edit history.** The commit is the
+timestamp, the author and the atomic as-of point for the whole pool — no
+in-data timestamps duplicate it. The data is laid out so that this history can
+be *extracted* later (one entity per file, property-level diffs legible) when
+the pool moves out of git.
+
+**Supersede versus contest.** Two very different events must never be
+conflated:
+
+- **Supersede** — a correction within the same editorial line: an extraction
+  error fixed, a label improved. This is an *edit*: the file changes, the old
+  value lives in git history, attestations on the old content go stale.
+- **Contest** — a source that disagrees. This is *new data*: a new claim and a
+  `contests` edge. Both sides stay visible with their evidence; the conflict is
+  surfaced on the statement. **Recency never resolves disagreement** — a newer
+  document does not overwrite a stronger one (§11.4).
+
+An agent asserting a change chooses which of the two it is, and the choice is
+reviewable in the diff: an edit to an existing entity claims "same editorial
+line"; new entities and edges claim "new evidence".
+
+**Schema evolution.** The schema is edited first, in its own change; data edits
+then comply with the schema as of their commit. Nothing is retroactively
+invalid: an entity untouched since an older schema version remains valid *as of
+its last edit*. The drift this creates is deliberate and **visible**: a view can
+demand "compliant with the current schema", and the entities that fall out of it
+are precisely the migration worklist. Migrations are explicit, reviewed edits —
+never silent rewrites.
+
+---
+
+## 8. Agents, attestations and review
+
+People, organisations and software runs are entities in `agents/`. An agent
+entity has an opaque, stable id; how the agent authenticates — a repository
+login, an ORCID, a signing key — is a set of *identity claims* and
+*verification methods* attached to the agent, replaceable without touching
+anything that refers to it.
+
+An **attestation** records that an agent makes a claim about a subject at a
+specific content state, and signs it:
+
 ```yaml
 - id: attestations/0001
   type: attestation
-  subject: 088-010OL@0.3.0/drain_panc_abdominal      # an entity, or an entity/property
-  subject_hash: "sha256:9f2c…"                        # hash of the subject's canonical form (§2)
-  claim: expert_reviewed                              # expert_reviewed | validated | disputed | …
+  subject: statements/drain-early-removal-low-risk
+  subject_hash: "sha256:9f2c…"        # hash of the subject's canonical form (§2)
+  scope: with_evidence                 # content | with_evidence (statement + its current claim set)
+  claim: expert_reviewed               # expert_reviewed | validated | disputed | …
   by: agents/mkoch
-  date: 2026-08-25
+  date: 2026-09-05
   proof: {type: …, verification_method: agents/mkoch#key-1, value: "…"}
 ```
- 
+
 Rules that follow:
- 
-- **Review state is derived, not asserted.** An entity's status is whatever its valid attestations support. Nobody writes `validated` into an entity.
-- **A changed entity invalidates its attestations.** If the canonical hash no longer matches, the attestation is *stale* and the derived status drops until someone re-attests. This is the same mechanism as version-pinned cross-graph edges (§7), applied to review.
-- **The signature covers the subject hash**, so the proof never sits inside the entity it certifies, and the same attestation format works whether the key came from a local key pair, a browser passkey, or a short-lived certificate bound to an external identity provider. Only the proof type and the verification method differ.
-- **Authority is governance, not data.** Which agents may issue which claims is a role on the agent, granted through the repository's governance process and checked by the validator. The graph records who attested; it does not decide who may.
-- **A service acting for a human** (a review website, a bot opening pull requests) is itself an agent and acts *on behalf of* the human; the human's key signs the attestation, the service's key signs the commit.
-Signed commits in the repository history are complementary: they protect the changesets. Attestations protect the statements.
- 
+
+- **Review state is derived, not asserted.** An entity's status is whatever its
+  valid attestations support. Nobody writes `validated` into an entity.
+- **A changed subject invalidates its attestations.** If the canonical hash no
+  longer matches, the attestation is *stale* and the derived status drops until
+  someone re-attests. With `scope: with_evidence`, the hash covers the composed
+  snapshot of the statement *plus its evidence edges*, so a new contesting claim
+  stales an expert review — the expert vouched for a conclusion given its
+  evidence basis.
+- **Verification is an attestation.** The `validated` claim records that a quote
+  was checked against the source — made at extraction time while the downloaded
+  copy is at hand, or whenever a source is re-fetched. It additionally records
+  the **source's content hash** it verified against, so a changed source never
+  leaves silently orphaned verifications. `validated` is a mechanical claim and
+  may be signed by a software agent's own key; `expert_reviewed` may not.
+- **Stale downgrades; invalid blocks.** Staleness — of an attestation or an
+  edge (§5) — lowers the derived status of the affected item and lands in a
+  report. It never blocks an unrelated change, otherwise any source or
+  statement update would freeze everything that references it. *Invalid* —
+  a quote that fails verification against a source at hand, a schema violation
+  at edit time, a cut that fails completeness — blocks.
+- **Authority is governance, not data.** Which agents may issue which claims is
+  a role on the agent, granted through the repository's governance process and
+  checked by the validator.
+- **A service acting for a human** is itself an agent acting *on behalf of* the
+  human; the human's key signs the attestation, the service's key signs the
+  commit. Signed commits protect the changesets; attestations protect the
+  statements.
+
 ---
- 
-## 7. Linking graphs without merging them
- 
-Graphs stay separate; relations between them are ordinary cross-graph edges (§4). Three properties make this safe:
- 
-1. **The edge says what it is.** Its kind (e.g. *specializes*, *complements*, *conflicts*, *codes as*) carries the semantics; no free-text interpretation is needed to act on it.
-2. **The edge is modelling.** No source document states a relation between two documents, so cross-graph edges carry `modelling` provenance plus a rationale and a date. They are our assertions, isolated and individually reviewable, and they never alter the graphs they connect.
-3. **Endpoints are pinned.** When either graph moves to a new version, the edge becomes stale and is surfaced for re-evaluation rather than silently applied.
-Whether the cross-graph edges of a domain are stored inside one of the graphs, in a dedicated link graph, or elsewhere is a storage choice. Semantically they are one thing: tuples whose endpoints live in different namespaces.
- 
+
+## 9. One schema
+
+`schema/schema.yaml` is the single schema for the whole pool. v0.1 had a schema
+per graph kind because graphs owned their nodes; views own nothing, so there is
+nothing for a per-view schema to govern. Instead:
+
+- the schema declares the **namespaces**, the **node types** with their
+  properties and provenance requirements (§6.5), the **edge kinds** with the
+  types they may connect, the **slot shapes** of statement types, and the
+  **structural validations** a view kind must pass at cut time (§4);
+- schema changes land **before** the data that uses them (§7);
+- the schema is versioned by its own history like everything else.
+
+What a pathway needed a "graph kind" for — its node types, its edge vocabulary,
+its completeness rules — is now a *view kind* inside the one schema.
+
 ---
- 
-## 8. Schemas: one per graph kind
- 
-The core of this approach knows nothing about any domain. It defines entities, URLs, tuples, provenance, versions and review. Everything else — which node types exist, which properties each type requires or forbids, which edge kinds exist and between which types they may run, which vocabularies are allowed, which properties need provenance — is a **schema for a graph kind**. Every graph declares which schema it conforms to.
- 
-Schemas are ordinary, versioned artefacts in the repository. A schema may extend another (an SOP schema may relax the grading requirements of a guideline-pathway schema). A new domain means a new schema, not a change to the core.
- 
-A schema is validated in two layers, and readers should expect both:
- 
-- **shape checks** that a standard schema validator can perform: required and forbidden properties per type, enumerations, expression grammars, URL syntax;
-- **graph and semantic checks** that need the whole graph or other graphs: all URLs resolve, quotes are found at their locators, edge endpoints have permitted types, cross-graph edges are pinned, structural properties such as acyclicity or branch coverage hold. These are declared alongside the schema and executed by the repository's validator.
-Every change to the repository runs both layers. A change that fails either is not merged.
- 
----
- 
-## 9. Illustration: a clinical guideline pathway
- 
-The first graph kind in this repository turns a clinical guideline into a decision pathway. It is one instantiation of the approach, shown here so that the abstract rules above have a concrete face.
- 
-Node types distinguish, by construction, what carries a formal grade from what does not: a *recommendation* (graded, from a recommendation box) versus an ungraded *step*; a machine-evaluable *decision* versus a *clinical judgment* a clinician must make; body-text content that *refines*, *supplements* or *limits* a recommendation without ever inheriting its grade; an explicit *gap* where the guideline states that no recommendation can be given; and *variables* the decisions are evaluated on. Edges include guarded *branches*, deliberate *loops*, references between chapters, the three body-text relations, *codes as* links into classification graphs, and the cross-guideline kinds *complements*, *specializes* and *conflicts*.
- 
-A slice of one guideline, in the shape the rules above imply:
- 
+
+## 10. Illustration: a guideline's drainage recommendations
+
+A slice of real content in the shape the rules above imply — the source is the
+POMGAT S3 guideline (AWMF 088-010OL), quotes verified against the document.
+
 ```yaml
-# nodes
-- id: 088-010OL/drain_panc_abdominal
-  type: recommendation
-  label: "Nach Pankreasresektion intraabdominelle Drainage anlegen"
-  grade: B
-  verb: sollte
-  direction: for
-  evidence: low
-  consensus: strong_consensus
+# ── source ────────────────────────────────────────────────────────────────
+- id: sources/pomgat-lv-1.0
+  type: source
+  title: "S3-Leitlinie Perioperatives Management bei gastrointestinalen Tumoren (POMGAT), Langversion 1.0"
+  awmf_register: "088-010OL"
+  url: "https://register.awmf.org/assets/guidelines/008-010OLl_S3_Perioperatives-Management-bei-gastrointestinalen-Tumoren-POMGAT_2023-12.pdf"
+  content_hash: "sha256:…"
+  license: "© Leitlinienprogramm Onkologie; referenced, not rehosted"
+
+# ── claims (phase one: deterministic, verifiable against the source) ──────
+- id: claims/pomgat-lv-1.0/7c31a2f0        # hash over (locator, quote); validator-checked
+  type: claim
+  kind: recommendation
   recommendation_no: "6.5"
-  source: {at: pomgat-lv-1.0#page=61, quote: "Nach Pankreasresektionen sollte eine intraabdominelle Drainage"}
+  grade: "0"
+  verb: kann
+  direction: for
+  consensus: strong_consensus
+  source: {at: sources/pomgat-lv-1.0#page=61, quote: "kann die Einlage einer intraabdominellen"}
   provenance:
-    consensus: {at: pomgat-lv-1.0#page=61, quote: "Starker Konsens"}
- 
-- id: 088-010OL/drain_panc_remove_early
-  type: step
-  label: "Drainage bis zum 4. postoperativen Tag entfernen"
-  source: {at: pomgat-lv-1.0#page=63, quote: "bis zum 4. postoperativen Tag"}
- 
-- id: 088-010OL/fr_k1_amylase
-  type: text_fragment
-  klasse: 1
-  text: "Die frühe Entfernung setzt ein geringes Fistelrisiko voraus, operationalisiert über die Drainage-Amylase."
-  source: {at: pomgat-lv-1.0#page=63, quote: "Definition ist zwischen den Studien uneinheitlich"}
- 
-# edges  (from, kind, to, properties)
-- [088-010OL/drain_panc_abdominal, sequence, 088-010OL/drain_panc_removal_q, {source: modelling}]
-- [088-010OL/drain_panc_removal_q, branch, 088-010OL/drain_panc_remove_early,
-   {guard: true, source: {at: pomgat-lv-1.0#page=63, quote: "bei geringem Fistelrisiko"}}]
-- [088-010OL/fr_k1_amylase, refines, 088-010OL/drain_panc_abdominal, {source: modelling}]
-- [088-010OL/drain_panc_abdominal, codes_as, ops-2026/5-52, {source: modelling}]
-- [003-001@2.0/vte_prophylaxe_dauer, conflicts, 088-010OL@0.3.0/vte_prophylaxe_dauer_gi,
-   {rationale: "unterschiedliche Prophylaxe-Dauer bei unterschiedlichem Stand", as_of: 2026-08-24, source: modelling}]
+    consensus: {at: sources/pomgat-lv-1.0#page=61, quote: "Starker Konsens"}
+
+- id: claims/pomgat-lv-1.0/e945b1d8
+  type: claim
+  kind: recommendation
+  recommendation_no: "6.7"
+  grade: "0"
+  verb: kann
+  direction: for
+  source: {at: sources/pomgat-lv-1.0#page=63, quote: "kann die abdominelle Drainage im frühen postoperativen"}
+
+- id: claims/pomgat-lv-1.0/1f80c3aa
+  type: claim
+  kind: criterion
+  source: {at: sources/pomgat-lv-1.0#page=64, quote: "unter 5000 U/L am ersten postop. Tag"}
+
+# ── semantic layer (phase two: linking, all modelling) ────────────────────
+- id: concepts/pankreasresektion
+  type: concept
+  label: "Pankreasresektion"
+  source: modelling
+
+- id: statements/drain-early-removal-low-risk
+  type: statement
+  label: "Nach Pankreasresektion kann die Drainage früh entfernt werden, wenn das Sekret ein geringes Fistelrisiko anzeigt"
+  slots:
+    population: concepts/pankreasresektion
+    action: concepts/drainage-entfernung
+    condition: concepts/geringes-fistelrisiko
+  source: modelling
+
+# ── structure (the pathway arranging the statements) ──────────────────────
+- id: pathways/pomgat-drains/removal_q
+  type: decision
+  label: "Frühe Drainageentfernung möglich?"
+  source: modelling
+
+# ── edges (derived ids; endpoint hashes recorded for staleness) ───────────
+- [claims/pomgat-lv-1.0/e945b1d8, supports, statements/drain-early-removal-low-risk, {source: modelling}]
+- [claims/pomgat-lv-1.0/1f80c3aa, refines,  claims/pomgat-lv-1.0/e945b1d8, {source: modelling}]
+- [concepts/pankreasresektion, codes_as, ops-2026/5-52, {source: modelling}]
+- [pathways/pomgat-drains/removal_q, about, statements/drain-early-removal-low-risk, {source: modelling}]
+
+# ── a view: the pathway as a citable unit ─────────────────────────────────
+- id: views/pomgat-drains
+  type: view
+  view_kind: pathway
+  filter: {pathway: pathways/pomgat-drains, closure: [about, supports, refines, codes_as]}
+  cuts:
+    - {cut: 1, as_of: "<commit>", members_hash: "sha256:…", validated: true}
 ```
- 
-And the classification it links to, which is simply another graph:
- 
-```yaml
-- id: ops-2026/5-52
-  type: category
-  code: "5-52"
-  label: "Operationen am Pankreas"
-  source: bfarm-ops-2026#code=5-52
-```
- 
-Things to notice: the grade and its companions appear only on the *recommendation*; the body-text fragment is tied to the recommendation by an edge, not by anything inside either node; every edge has provenance, `modelling` where the document is silent; the classification code is a URL, not a string; only the cross-guideline edge carries version pins; no entity carries a review status — that is derived from attestations (§6).
- 
+
+Things to notice: the grade sits on the *claim*, extracted verbatim from the
+recommendation box, and the statement carries no grade at all — its effective
+grade is derived; the criterion is a claim of its own, related by an edge, never
+inheriting the grade; the classification code is a URL; a second guideline
+discussing early drain removal would add claims and `supports`/`contests` edges
+to the *same statement* — the statement's evidence grows without the statement
+changing; and the view's cut, not any entity, is the thing a publication would
+cite.
+
 ---
- 
-## 10. Rules of conduct for agents writing to this repository
- 
-1. **Read before writing.** The schema declared by the target graph and the entities already present define the vocabulary. Do not add types, kinds or properties that the schema does not know.
-2. **Every statement needs provenance.** If the source says it, cite the passage with a quote you have actually verified at that location. If the source does not say it, write `modelling`. Never guess a page.
-3. **Underestimate, never upgrade.** Content without a formal rating in the source must never receive one in the graph. When unsure whether something is graded, it is not.
-4. **Do not resolve conflicts silently.** Two sources that disagree are represented as a *conflicts* relation with both sides sourced, not as one chosen answer.
-5. **Prefer an explicit gap to an invented answer.** If the source covers a situation with "no recommendation possible", say so with a gap node; if it does not cover the situation at all, leave nothing.
-6. **Stay inside your namespace.** Changes to one graph do not edit another. Relations to other graphs are cross-graph edges with pinned versions.
-7. **Keep identifiers stable.** Renaming or removing an entity is a versioned change with a changelog entry, because other graphs may point at it.
-8. **Run the validator** and treat its output as the review's first comment. A change that does not validate is not proposed.
-9. **Do not set review status.** Agents submit content; humans attest to it. An agent never writes a review state, an attestation, or a signature on behalf of a person.
+
+## 11. Rules of conduct for agents writing to this repository
+
+1. **Read before writing.** This file, the schema, then the existing entities in
+   your namespaces. Do not add types, kinds or properties the schema does not
+   know.
+2. **Extract first, link second.** Phase one mints claims — mechanical,
+   verifiable line-by-line against the source. Phase two links them to the
+   semantic layer — judgment, all `modelling`. Keep the phases apart; ideally
+   they are separate, separately reviewable changes.
+3. **Search before minting.** Before creating a concept or statement, look for
+   an existing one, and for a codable one. Mint only what no terminology and no
+   existing entity covers; flag near-duplicates for review instead of deciding
+   sameness silently.
+4. **Contest, never overwrite.** A source that disagrees with existing content
+   is new claims plus `contests` edges — both sides sourced, conflict surfaced.
+   Editing an entity asserts a correction within the same editorial line, and
+   nothing else. Recency resolves nothing.
+5. **Every statement needs provenance.** If the source says it, cite the passage
+   with a verbatim quote you have verified at that location. If the source does
+   not say it, write `modelling`. Never guess a page.
+6. **Underestimate, never upgrade.** Content without a formal rating in the
+   source gets none in the graph. Grades live on claims; derived values are
+   computed, not written.
+7. **Prefer an explicit gap to an invented answer.** If the source says "no
+   recommendation possible", model the gap; if it is silent, leave nothing.
+8. **Keep identifiers stable.** Renaming or removing an entity is a reviewed,
+   history-preserving change; other entities point at it.
+9. **Run the validator** and treat its output as the review's first comment. A
+   change that does not validate is not proposed.
+10. **Do not set review status.** Agents submit content; attestations decide
+    status. An agent never writes a review state or signs on behalf of a person.
+
 ---
- 
-## 11. Relation to established conventions
- 
-The model is a labelled property graph with linked-data identifiers and W3C-style provenance. Readers from either tradition should find it familiar; the mapping is:
- 
+
+## 12. Relation to established conventions
+
+The model is a labelled property graph with linked-data identifiers and
+W3C-style provenance. The mapping:
+
 | concept here | convention |
 |---|---|
-| entity with URL, `type` | Linked Data: resources have IRIs (compact ids expand under a base), `type` is `rdf:type` |
-| `(from, kind, to, props)` | labelled property graph (GQL / openCypher / Gremlin): typed relationships that carry properties |
-| graph as namespace | RDF named graphs / datasets |
-| provenance reference with locator and quote | W3C Web Annotation (`SpecificResource`, `FragmentSelector`, `TextQuoteSelector`); PROV-O `wasDerivedFrom`; PDF locators per RFC 8118, HTML locators per URL Text Fragments |
-| `modelling` | PROV-O `wasAttributedTo` an agent with no `wasDerivedFrom` |
-| codes as nodes, coding as edge | SKOS concepts and mappings; FHIR `Coding` |
-| agents, attestations, proofs | PROV-O `Agent`/`actedOnBehalfOf`; W3C Data Integrity proofs (Verifiable Credentials) |
-| schema per graph kind | SHACL/ShEx shapes, JSON Schema, plus application-level graph checks |
- 
-Four things are compact conventions of this repository rather than idioms of any one standard, and are mapped explicitly on export: properties on edges and per-property provenance (RDF-star or reification in RDF; native in property graphs), the `modelling` marker, `@version` pinning in URLs (versioned named graphs, `canonical|version` in FHIR), and property-level addresses. No inference semantics are assumed: relations are asserted, not entailed.
- 
----
- 
-## 12. What this approach deliberately leaves open
- 
-- **File format and layout.** YAML, JSON, JSON Lines or anything else that round-trips to the same entities and tuples is acceptable; the schema of a graph kind states what its graphs use.
-- **View layer.** How graphs are rendered, laid out or queried is a separate concern built on top of the data; nothing in the data depends on it.
-- **Export projections.** Because every entity has a URL, every relation is a typed tuple and every statement has provenance, the data maps cleanly onto standard forms — linked-data provenance and annotation vocabularies, domain interchange standards such as HL7 FHIR for the clinical case, diagram formats for review. These are generated from the data, never authored.
----
- 
-## 13. What the environment bounds
+| entity with URL, `type` | Linked Data: resources have IRIs, `type` is `rdf:type` |
+| `(from, kind, to, props)` | labelled property graph (GQL / openCypher / Gremlin) |
+| claim (locator + verbatim quote + content) | nanopublications; W3C Web Annotation (`SpecificResource`, `TextQuoteSelector`); PROV-O `wasDerivedFrom`; PDF locators per RFC 8118 |
+| statement with slots, evidence derived | Wikidata statements with references and ranks; SKOS for the concept layer |
+| view, cut | RDF named graphs / datasets; a cut is a versioned release of one |
+| `modelling` | PROV-O `wasAttributedTo` with no `wasDerivedFrom` |
+| codes as nodes, coding as edge | SKOS mappings; FHIR `Coding` |
+| agents, attestations, proofs | PROV-O agents; W3C Data Integrity proofs |
+| one schema | SHACL/ShEx shapes plus application-level checks |
 
-Provenance is only as verifiable as the sources within reach. Work on this repository
-happens inside a sandbox that mounts nothing but the workspace and blocks outbound
-network by default, and source documents are never committed (`README.md`), so a quote
-can be checked only against a source present in the workspace — it cannot be fetched to
-settle the question, and a fresh clone contains no sources at all.
-
-How verification is discharged under that bound is not yet decided: it may be
-best-effort wherever the source is at hand, or performed once by an agent that had the
-source and recorded as an attestation (§6). Until it is decided, §5.2's "the validator
-checks the quote" is intent, not a guarantee.
-
-The environment itself is described once, elsewhere: `README.md` for contributors,
-`.claude/rules/environment/sandbox-environment.md` for agents.
+No inference semantics are assumed: relations are asserted, not entailed.
 
 ---
- 
-Version 0.1 · 2026-08-25
 
+## 13. What this approach deliberately leaves open
+
+- **File format and layout.** YAML as shown, but anything that round-trips to
+  the same entities and tuples is acceptable; one entity per file is a
+  diff-ergonomics choice, not a rule.
+- **The view-filter language.** The schema starts with a minimal set of filter
+  forms; how far it grows toward a query language is undecided
+  (`docs/open-questions.md`).
+- **Statement slot vocabularies and grade derivation.** Which slot shape each
+  statement type needs, and how supporting claims' grades compose, are open —
+  they are medically sensitive and will be settled against real content.
+- **Export projections.** FHIR, RDF, diagram formats — generated from the
+  data, never authored.
+
+---
+
+## 14. What the environment bounds
+
+Sources are referenced, never committed and never rehosted — the repository and
+its links to public sources are the only assets (`README.md`; the reasoning in
+`.claude/memory/design/sources-referenced-never-rehosted.md`). A quote is
+therefore checked against a source when an agent has the downloaded bytes at
+hand — at extraction, or on a re-fetch — and the check is recorded as a
+`validated` attestation (§8), which is the durable evidence once the copy is
+gone. If a public source later changes or vanishes, its content hash detects
+this loudly, stale attestations downgrade the affected items, and the graph
+degrades to "verified, on record" — never to unfalsifiable.
+
+The environment itself is described once, elsewhere: `README.md` for
+contributors, `.claude/rules/environment/sandbox-environment.md` for agents.
+
+---
+
+Version 0.2 · 2026-09-05
