@@ -25,12 +25,12 @@ pre-emptively.
 
 | Memory | The fact |
 |---|---|
-| `security-enforced-outside-model.md` | Guarantees are enforced outside the model, never by the agent obeying a rule file. |
-| `credential-handling.md` | The agent holds no credential; the host authenticates on its behalf. Never substitute one. |
-| `main-branch-protection.md` | The default branch takes changes only through an approved pull request. |
-| `editing-your-own-instructions.md` | Editing the files that instruct you is allowed; saying so in the PR is the obligation. |
-| `commit-author-is-not-evidence.md` | A commit's author line is display only, not evidence about the setup. |
-| `push-failure-triage.md` | Which failures are host-side, which are the design working, and why commits are usually safe. |
+| `environment/security-enforced-outside-model.md` | Guarantees are enforced outside the model, never by the agent obeying a rule file. |
+| `environment/credential-handling.md` | The agent holds no credential; the host authenticates on its behalf. Never substitute one. |
+| `environment/main-branch-protection.md` | The default branch takes changes only through an approved pull request. |
+| `conventions/editing-your-own-instructions.md` | Editing the files that instruct you is allowed; saying so in the PR is the obligation. |
+| `environment/commit-author-is-not-evidence.md` | A commit's author line is display only, not evidence about the setup. |
+| `environment/push-failure-triage.md` | Which failures are host-side, which are the design working, and why commits are usually safe. |
 
 ## Writing one
 
@@ -49,6 +49,9 @@ metadata:
 **How to apply:** <what to do differently because of it>
 ```
 
+File the memory in the subdirectory of the level it belongs to — `environment/`,
+`conventions/`, `design/` (created with its first fact) — as
+`conventions/documentation.md` defines them.
 Link related memories with `[[their-name]]`. Add a row to the index above in the same
 commit — a memory absent from the index is a memory nobody will open.
 
