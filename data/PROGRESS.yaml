@@ -31,10 +31,13 @@ sources:
          note: "13 boxes (5.1–5.13; 5.7 has none) → 18 recommendation + 1 fact + 2 gap_notice + 1 criterion claims; compound grades A/B, B/0 split per sentence by verb; 19 statements, 25 concepts (+3 reused), 23 edges; done 2026-09-05"}
       - {id: ch07a, chapters: "7.1–7.3", pages: 75-90, status: done,
          note: "13 boxes (7.1–7.13) → 12 recommendation (7.7 split per sentence) + 1 fact (7.11, evidence-based statement) + 1 gap_notice (7.8) + 1 criterion (p. 88) claims; 13 statements, 16 concepts (+3 reused), 16 edges; done 2026-09-05"}
-      - {id: ch07b, chapters: "7.4–7.7", pages: 91-111, status: pending}
+      - {id: ch07b, chapters: "7.4.1",   pages: 91-102, status: done,
+         note: "11 boxes (7.14–7.24, pharmacological POI prevention/therapy) → 11 recommendation claims, 8 of them against; 11 statements, 14 concepts (+2 reused), 11 edges; done 2026-09-05. Chunk re-scoped from 7.4–7.7 (18 boxes) at the 7.4.1/7.4.2 boundary; remainder is ch07c"}
+      - {id: ch07c, chapters: "7.4.2–7.7", pages: 103-111, status: pending,
+         note: "7 boxes (7.25–7.31: coffee, chewing gum, acupuncture, mobilisation, respiratory therapy, abdominal binder)"}
       - {id: ch08, chapters: "8.1–8.2", pages: 112-121, status: pending}
       - {id: ch09, chapters: "9",       pages: 122-124, status: pending}
-    next: ch07b
+    next: ch07c
     deferred:
       - evidence profiles (the per-outcome GRADE symbol tables in evidence-based
         boxes) are not yet modelled; the schema has no shape for them — raise as
@@ -58,7 +61,13 @@ sources:
         distal pancreatectomy — a gap notice outside any box — and p. 79 allows
         a secondary nasogastric tube on delayed gastric emptying after liver
         resection; p. 84 defers balanced analgesia to the S3 guideline on acute
-        perioperative pain)
+        perioperative pain; ch07b body text carries five gap notices outside
+        any box — methylnaltrexone p. 92, local anaesthetics i.v./
+        intra-abdominal p. 93, propranolol p. 94, laxatives p. 100, each "für
+        andere viszeralonkologische Operationen … keine Empfehlung", and
+        dexmedetomidine p. 95, where the commission explicitly withheld a
+        recommendation because of the 2022 Rote-Hand-Brief — plus the p. 92
+        note that alvimopan is effective but not licensed in Germany)
       - cross-statement edges (specializes/complements) not yet asserted; ch07a
         has the first candidates — 7.12 (TAP block in minimally invasive
         colorectal surgery) and 7.13 (peripheral regional analgesia in general)
