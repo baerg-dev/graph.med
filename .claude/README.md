@@ -17,7 +17,7 @@ do is worse than none, because it gets trusted.
 | `rules/conventions/` | How work is done in this repository. One `.md` per topic. |
 | `memory/` | Durable facts about this project, filed by level. One `.md` per fact. |
 | `agents/` | Subagent definitions, one `.md` each. Currently empty. |
-| `skills/` | Skills, one `<skill-name>/SKILL.md` each. Currently empty. |
+| `skills/` | Skills, one `<skill-name>/SKILL.md` each. One so far: `handover/`. |
 
 The levels — environment, conventions, design — and what each owes the reader are
 defined in `rules/conventions/documentation.md`. Design lives in `docs/` at the

@@ -29,7 +29,8 @@ defined in `.claude/rules/conventions/documentation.md`.
 
 This file describes the **project** and maps the rest. Design lives in `docs/`:
 `docs/graph-representation.md` is the authority on how knowledge is represented —
-entities, URLs, provenance, attestations, review. How an agent is expected to operate
+entities, URLs, provenance, attestations, review — and `docs/open-questions.md`
+carries what is not yet decided: the handover between sessions. How an agent is expected to operate
 lives in `.claude/`, filed by level, so that each piece loads when it is relevant
 rather than all of it, always:
 
@@ -49,7 +50,8 @@ rather than all of it, always:
 │   ├── environment/
 │   └── conventions/
 ├── agents/                      subagent definitions — empty; add one .md per agent
-└── skills/                      skills — empty; add one <name>/SKILL.md per skill
+└── skills/
+    └── handover/                end a session: update docs/open-questions.md
 ```
 
 Rules without a `paths:` scope load at the start of every session; the two that have
@@ -60,9 +62,12 @@ record — why a constraint exists, what was decided and rejected. It is checked
 it is reviewed and shared rather than private to one machine.
 `rules/conventions/memory.md` carries its index.
 
-`agents/` and `skills/` are deliberately empty. This repository has no build, test or
-data-ingest tooling yet, and a subagent or skill that automates nothing would be
-guidance pretending to be capability. Add one when there is a real, repeated task for
-it — then say in the pull request what it does and what it is allowed to touch.
+`agents/` is deliberately empty, and `skills/` holds exactly one skill. This
+repository has no build, test or data-ingest tooling yet, and a subagent or skill
+that automates nothing would be guidance pretending to be capability. The exception
+earned its place: ending a session with open questions is a real, repeated task, and
+the `handover` skill maintains `docs/open-questions.md` for it. Add another only for
+another such task — then say in the pull request what it does and what it is allowed
+to touch.
 
 One fact, one home: guidance that belongs in a rule is not restated here.
