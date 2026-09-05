@@ -35,9 +35,10 @@ sources:
          note: "11 boxes (7.14–7.24, pharmacological POI prevention/therapy) → 11 recommendation claims, 8 of them against; 11 statements, 14 concepts (+2 reused), 11 edges; done 2026-09-05. Chunk re-scoped from 7.4–7.7 (18 boxes) at the 7.4.1/7.4.2 boundary; remainder is ch07c"}
       - {id: ch07c, chapters: "7.4.2–7.7", pages: 103-111, status: done,
          note: "7 boxes (7.25–7.31: coffee, chewing gum, acupuncture, mobilisation, respiratory therapy, abdominal binder) → 9 recommendation claims (7.25, 7.28 split per sentence); 9 statements, 13 concepts (+4 reused), 11 edges; done 2026-09-05"}
-      - {id: ch08, chapters: "8.1–8.2", pages: 112-121, status: pending}
+      - {id: ch08, chapters: "8.1–8.2", pages: 112-121, status: done,
+         note: "7 boxes (8.1–8.7: mPOM per organ, specialised perioperative nurse) → 7 recommendation claims; 7 statements, 4 concepts (+4 reused), 7 edges; done 2026-09-05"}
       - {id: ch09, chapters: "9",       pages: 122-124, status: pending}
-    next: ch08
+    next: ch09
     deferred:
       - evidence profiles (the per-outcome GRADE symbol tables in evidence-based
         boxes) are not yet modelled; the schema has no shape for them — raise as
@@ -72,7 +73,13 @@ sources:
         minimally invasive liver or pancreatic resection, and pp. 108–109
         explain why early mobilisation got no evidence-based grade — an
         isolated recommendation was "nicht möglich" given the heterogeneity —
-        which is the rationale behind 7.29's EK, not a separate gap)
+        which is the rationale behind 7.29's EK, not a separate gap; ch08
+        body text p. 121 says that for the specialised nurse "zu anderen
+        Organ-Entitäten (Ösophagus, Magen, Leber und Pankreas) kann bei
+        fehlender Evidenz keine Empfehlung abgegeben werden" — which sits in
+        tension with box 8.7, an EK "kann erwogen werden" for exactly those
+        organs; the box was extracted as printed, the body-text gap is left
+        for the enrichment pass and should be read together with 8.7)
       - cross-statement edges (specializes/complements) not yet asserted; ch07a
         has the first candidates — 7.12 (TAP block in minimally invasive
         colorectal surgery) and 7.13 (peripheral regional analgesia in general)
