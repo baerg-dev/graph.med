@@ -16,7 +16,7 @@ sources:
       later enrichment passes — see deferred.
     chunks:
       - {id: ch06, chapters: "6.1–6.2", pages: 58-74,  status: done,
-         note: "15 boxes (6.1–6.15) + 1 criterion claim; 15 statements, 18 concepts; done 2026-09-05"}
+         note: "15 boxes (6.1–6.15) + 1 criterion claim; 15 statements, 23 concepts; done 2026-09-05"}
       - {id: ch04, chapters: "4.1–4.5", pages: 26-39,  status: pending}
       - {id: ch05, chapters: "5.1–5.7", pages: 40-57,  status: pending}
       - {id: ch07a, chapters: "7.1–7.3", pages: 75-90, status: pending}

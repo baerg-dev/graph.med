@@ -1,0 +1,64 @@
+- - claims/pomgat-lv-1.0/13417577
+  - supports
+  - statements/drainage-transthorakale-oesophagektomie
+  - source: modelling
+- - claims/pomgat-lv-1.0/b8e9cbf0
+  - supports
+  - statements/keine-zervikale-drainage-oesophagektomie
+  - source: modelling
+- - claims/pomgat-lv-1.0/d0f4cc98
+  - supports
+  - statements/keine-abdominelle-drainage-oesophagektomie
+  - source: modelling
+- - claims/pomgat-lv-1.0/917c29e8
+  - supports
+  - statements/keine-abdominelle-drainage-gastrektomie
+  - source: modelling
+- - claims/pomgat-lv-1.0/4caf2208
+  - supports
+  - statements/drainage-pankreasresektion-optional
+  - source: modelling
+- - claims/pomgat-lv-1.0/f5c48e4c
+  - supports
+  - statements/externe-pankreasgangdrainage-pankreaskopfresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/6b9239a9
+  - supports
+  - statements/fruehe-drainageentfernung-pankreasresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/1385fc7e
+  - supports
+  - statements/keine-drainage-unkomplizierte-leberresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/ce5cbcd4
+  - supports
+  - statements/drainage-komplexe-leberresektion-optional
+  - source: modelling
+- - claims/pomgat-lv-1.0/70766ab8
+  - supports
+  - statements/keine-drainage-kolorektale-resektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/39dc0e87
+  - supports
+  - statements/keine-transanale-drainage-rektumresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/29b83a17
+  - supports
+  - statements/icg-pruefung-magenschlauch
+  - source: modelling
+- - claims/pomgat-lv-1.0/66d26c1c
+  - supports
+  - statements/dichtigkeitspruefung-rektumanastomose
+  - source: modelling
+- - claims/pomgat-lv-1.0/10cc4dcb
+  - supports
+  - statements/perfusionspruefung-kolorektale-anastomose
+  - source: modelling
+- - claims/pomgat-lv-1.0/4b7d783e
+  - supports
+  - statements/icg-pruefung-kolorektale-anastomose
+  - source: modelling
+- - claims/pomgat-lv-1.0/8349aa77
+  - refines
+  - claims/pomgat-lv-1.0/6b9239a9
+  - source: modelling
