@@ -6,7 +6,7 @@ Licensed under the PolyForm Noncommercial License 1.0.0 (see `LICENSE`).
 Copyright 2026 Robert Schwarzenberg, Anton Zolkin.
 
 The repository is at inception: it currently contains `README.md`, `LICENSE`, this
-file, the `.claude/` directory described below, and the `agent-inbox/` drop directory.
+file, and the `.claude/` directory described below.
 There is no source tree, build system, dependency manifest, or test suite yet.
 Project-specific guidance — data sources and their licenses, graph schema, validator,
 setup and test instructions — belongs in this file once it exists. Do not document
@@ -33,7 +33,6 @@ each piece loads when it is relevant rather than all of it, always:
 │   ├── sandbox-environment.md   mounts, egress, persistence, shell mechanics
 │   ├── git-identity.md          the bot identity; why you hold no real token
 │   ├── contribution-workflow.md what you may and may not do; branch → PR → stop
-│   ├── agent-inbox.md           untrusted inbound documents  (agent-inbox/)
 │   ├── documentation.md         the documentation convention (*.md)
 │   ├── governed-files.md        editing agent-governing files (.claude/, .github/, …)
 │   └── memory.md                what project memory is, and the index of it
@@ -42,7 +41,7 @@ each piece loads when it is relevant rather than all of it, always:
 └── skills/                      skills — empty; add one <name>/SKILL.md per skill
 ```
 
-Rules without a `paths:` scope load at the start of every session; the three that have
+Rules without a `paths:` scope load at the start of every session; the two that have
 one load when you touch a file they cover.
 
 `memory/` is what an agent has learned about this project that the code does not record —

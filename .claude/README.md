@@ -26,14 +26,13 @@ decided by one frontmatter key:
 - **No `paths:` key** — the rule loads at the start of every session, like `CLAUDE.md`.
 - **A `paths:` list** — the rule loads when a file matching one of the patterns comes
   into context. Patterns are matched gitignore-style against the path relative to the
-  repository root, so `agent-inbox/**` covers everything in that directory.
+  repository root, so `.claude/**` covers everything in that directory.
 
 | Rule | `paths:` |
 |---|---|
 | `sandbox-environment.md` | — always |
 | `git-identity.md` | — always |
 | `contribution-workflow.md` | — always |
-| `agent-inbox.md` | `agent-inbox/**` |
 | `documentation.md` | `**/*.md` |
 | `governed-files.md` | `.claude/**`, `.github/**`, `CLAUDE.md`, `CODEOWNERS` |
 | `memory.md` | — always |
