@@ -1,0 +1,158 @@
+# The one schema for the graph.med pool.
+#
+# Authority on syntax; concepts and rules live in docs/graph-representation.md.
+# Graphs are views (spec §4) and own nothing, so there is exactly one schema.
+# Schema changes land BEFORE the data that uses them (spec §7); data validates
+# against the schema as of its commit.
+#
+# Status mirrors the spec: design intent. No validator enforces this file yet.
+
+schema: graph.med
+version: 0.1.0
+
+# ── namespaces ──────────────────────────────────────────────────────────────
+# Namespaces mint identity; they do not own content (spec §2).
+namespaces:
+  sources:       {identity: slug-with-version}         # e.g. pomgat-lv-1.0
+  claims:        {identity: derived}                   # claims/<source-id>/<hash8(locator|quote)>
+  concepts:      {identity: minted}                    # search before minting; code if possible
+  statements:    {identity: minted}
+  pathways:      {identity: minted-within-pathway}     # pathways/<pathway-id>/<entity-id>
+  views:         {identity: slug}
+  agents:        {identity: slug}
+  attestations:  {identity: sequential}
+  terminologies:                                       # one namespace per release; codes are ids
+    - icd10gm-2026
+    - ops-2026
+
+# ── provenance requirement levels (spec §6.5) ───────────────────────────────
+# required        must resolve to a source passage; never `modelling`
+# optional        passage or `modelling`
+# not_applicable  ours (identifiers, labels, types); no provenance recorded
+
+# ── node types ──────────────────────────────────────────────────────────────
+node_types:
+
+  source:
+    properties:
+      title:         {type: string,  required: true,  provenance: not_applicable}
+      url:           {type: url,     required: true,  provenance: not_applicable}
+      content_hash:  {type: sha256,  required: true,  provenance: not_applicable}
+      license:       {type: string,  required: true,  provenance: not_applicable}
+      media_type:    {type: string,  required: false, provenance: not_applicable}
+      awmf_register: {type: string,  required: false, provenance: not_applicable}
+
+  claim:
+    # Immutable, source-anchored extraction unit (spec §3.1). The entity default
+    # `source` (locator + verbatim quote) is the anchor and is always required.
+    identity: derived   # hash over (locator, quote); computed by tooling, checked by the validator
+    properties:
+      kind:              {type: enum, values: [recommendation, criterion, definition, fact, gap_notice],
+                          required: true,  provenance: not_applicable}
+      recommendation_no: {type: string, required: false, provenance: required}
+      grade:             {type: enum, values: ["A", "B", "0", "EK"],
+                          required: false, provenance: required}   # never from the extractor
+      verb:              {type: enum, values: [soll, sollte, kann], required: false, provenance: required}
+      direction:         {type: enum, values: [for, against],       required: false, provenance: required}
+      consensus:         {type: enum, values: [consensus, strong_consensus],
+                          required: false, provenance: required}
+
+  concept:
+    properties:
+      label:       {type: string, required: true,  provenance: not_applicable}
+      definition:  {type: string, required: false, provenance: optional}
+
+  statement:
+    # Slot values are concept URLs. Granularity rule: the smallest unit that can
+    # be independently supported or contested (spec §3.2).
+    properties:
+      label:  {type: string, required: true, provenance: not_applicable}
+      slots:
+        population: {type: concept-url, required: false}
+        action:     {type: concept-url, required: false}
+        condition:  {type: concept-url, required: false}
+        outcome:    {type: concept-url, required: false}
+    derived:   # computed, never written by hand (spec §3.3)
+      - sources          # via incoming `supports`
+      - conflict_status  # via incoming `contests`
+      - effective_grade  # policy: OPEN QUESTION (docs/open-questions.md → grade-derivation)
+      - review_state     # via attestations
+
+  # structural node types (pathways/ namespace; all pure modelling)
+  decision:
+    properties:
+      label:    {type: string, required: true,  provenance: not_applicable}
+      criteria: {type: object, required: false, provenance: optional}
+  outcome:
+    properties:
+      label: {type: string, required: true, provenance: not_applicable}
+  gap:
+    # an explicit "no recommendation possible" in the source (spec §11.7)
+    properties:
+      label: {type: string, required: true, provenance: required}
+
+  agent:
+    properties:
+      label:                {type: string, required: true,  provenance: not_applicable}
+      identity_claims:      {type: list,   required: false, provenance: not_applicable}
+      verification_methods: {type: list,   required: false, provenance: not_applicable}
+
+  attestation:
+    properties:
+      subject:      {type: url,    required: true}
+      subject_hash: {type: sha256, required: true}
+      scope:        {type: enum, values: [content, with_evidence], required: true}
+      claim:        {type: enum, values: [expert_reviewed, validated, disputed], required: true}
+      by:           {type: agent-url, required: true}
+      date:         {type: date,   required: true}
+      source_hash:  {type: sha256, required: false}  # required when claim = validated (spec §8)
+      proof:        {type: object, required: true}
+
+  view:
+    properties:
+      view_kind: {type: enum, values: [pathway, selection], required: true}
+      filter:    {type: object, required: true}   # forms: see view_filters below
+      cuts:      {type: list,   required: false}  # {cut, as_of, members_hash, validated}
+
+# ── edge kinds ──────────────────────────────────────────────────────────────
+# Edge id: derived from (from, kind, to) + optional discriminator (spec §2, §5).
+# Every edge carries provenance; `modelling` where no document states the relation.
+edge_kinds:
+  supports:    {from: claim,     to: statement}
+  contests:    {from: claim,     to: statement}
+  refines:     {from: claim,     to: claim}
+  supplements: {from: claim,     to: claim}
+  limits:      {from: claim,     to: claim}
+  codes_as:    {from: concept,   to: terminology-concept}
+  sequence:    {from: [decision, outcome], to: [decision, outcome, gap]}
+  branch:      {from: decision,  to: [decision, outcome, gap],
+                properties: {guard: {type: any, required: true, provenance: optional}}}
+  about:       {from: [decision, outcome, gap], to: statement}
+  specializes: {from: statement, to: statement, provenance: modelling-only,
+                properties: {rationale: {required: true}, as_of: {required: true}}}
+  complements: {from: statement, to: statement, provenance: modelling-only,
+                properties: {rationale: {required: true}, as_of: {required: true}}}
+  conflicts:   {from: statement, to: statement, provenance: modelling-only,
+                properties: {rationale: {required: true}, as_of: {required: true}}}
+
+# ── view filters (minimal starting forms; spec §13) ─────────────────────────
+view_filters:
+  pathway:   # a pathway namespace plus the closure over the named edge kinds
+    example: {pathway: pathways/pomgat-drains, closure: [about, supports, refines, codes_as]}
+  selection: # explicit membership or property predicates; deliberately minimal
+    example: {sources: [sources/pomgat-lv-1.0], modified_after: "2026-01-01"}
+
+# ── cut validations per view kind (spec §4) ─────────────────────────────────
+cut_validations:
+  pathway:
+    - every branch edge's endpoints are members
+    - every structural node's `about` targets are members
+    - every member statement has at least one member supporting claim
+    - no dangling slot or codes_as reference among members
+  selection: []
+
+# ── conventions ─────────────────────────────────────────────────────────────
+conventions:
+  keys: english                       # controlled-vocabulary VALUES may stay source-language (soll/sollte/kann)
+  quotes: verbatim-substring          # of the source's extracted text (spec §6.2)
+  pdf_pages: physical                 # #page=N counts PDF pages, not printed numbers
