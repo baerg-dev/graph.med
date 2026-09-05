@@ -1,0 +1,105 @@
+# Parsing progress — the handover between parsing sessions.
+# Maintained by the parse-next-chunk skill; hand-editing is just as valid.
+# One chunk is processed per session; a chunk is done when its claims are
+# extracted (phase one) AND linked into the semantic layer (phase two), and
+# the PROGRESS entry records what was deferred.
+#
+# Terminal state: when the last chunk of a pass is done, the session sets the
+# source's `next` to null and its `status` to `done`. The skill checks this
+# before anything else and reports "done" instead of parsing. A later pass
+# (body-text enrichment, evidence profiles, codes_as) is a human decision:
+# register it by bumping `pass`, redefining `scope_policy`, resetting the
+# chunk list and setting `status: in_progress` again.
+
+sources:
+  pomgat-lv-1.0:
+    entity: sources/pomgat-lv-1.0
+    status: done             # in_progress | done — pass 1 finished 2026-09-05
+    pass: 1                  # which pass the chunk list below belongs to
+    chunking: by chapter; printed page = physical page (verified, offset 0)
+    scope_policy: >
+      Pass 1 extracts the recommendation boxes (plus criteria the box text
+      directly depends on). Body-text fragments (refines/supplements/limits),
+      the evidence profiles (GRADE outcome tables), and codes_as links await
+      later enrichment passes — see deferred.
+    chunks:
+      - {id: ch06, chapters: "6.1–6.2", pages: 58-74,  status: done,
+         note: "15 boxes (6.1–6.15) + 1 criterion claim; 15 statements, 23 concepts; done 2026-09-05"}
+      - {id: ch04, chapters: "4.1–4.5", pages: 26-39,  status: done,
+         note: "10 boxes (4.1–4.10) → 16 recommendation claims (multi-sentence boxes split per sentence) + 2 gap_notice claims (4.3, 4.6) + 2 criterion claims (p. 27); 16 statements, 24 concepts, 20 edges; done 2026-09-05"}
+      - {id: ch05, chapters: "5.1–5.7", pages: 40-57,  status: done,
+         note: "13 boxes (5.1–5.13; 5.7 has none) → 18 recommendation + 1 fact + 2 gap_notice + 1 criterion claims; compound grades A/B, B/0 split per sentence by verb; 19 statements, 25 concepts (+3 reused), 23 edges; done 2026-09-05"}
+      - {id: ch07a, chapters: "7.1–7.3", pages: 75-90, status: done,
+         note: "13 boxes (7.1–7.13) → 12 recommendation (7.7 split per sentence) + 1 fact (7.11, evidence-based statement) + 1 gap_notice (7.8) + 1 criterion (p. 88) claims; 13 statements, 16 concepts (+3 reused), 16 edges; done 2026-09-05"}
+      - {id: ch07b, chapters: "7.4.1",   pages: 91-102, status: done,
+         note: "11 boxes (7.14–7.24, pharmacological POI prevention/therapy) → 11 recommendation claims, 8 of them against; 11 statements, 14 concepts (+2 reused), 11 edges; done 2026-09-05. Chunk re-scoped from 7.4–7.7 (18 boxes) at the 7.4.1/7.4.2 boundary; remainder is ch07c"}
+      - {id: ch07c, chapters: "7.4.2–7.7", pages: 103-111, status: done,
+         note: "7 boxes (7.25–7.31: coffee, chewing gum, acupuncture, mobilisation, respiratory therapy, abdominal binder) → 9 recommendation claims (7.25, 7.28 split per sentence); 9 statements, 13 concepts (+4 reused), 11 edges; done 2026-09-05"}
+      - {id: ch08, chapters: "8.1–8.2", pages: 112-121, status: done,
+         note: "7 boxes (8.1–8.7: mPOM per organ, specialised perioperative nurse) → 7 recommendation claims; 7 statements, 4 concepts (+4 reused), 7 edges; done 2026-09-05"}
+      - {id: ch09, chapters: "9",       pages: 122-124, status: done,
+         note: "0 recommendation boxes (Qualitätsindikatoren, Tabelle 7: QI 1–4) → 1 definition claim (unkomplizierte Leberresektion, p. 123) refining box 6.8 and written onto concepts/leberresektion-unkompliziert as a sourced definition; 0 statements, 0 new concepts (+1 enriched), 1 edge; done 2026-09-05. Last chunk of pass 1 — the QIs themselves are deferred"}
+    next: null               # pass 1 complete: chapters 4–9 done; chapters 1–3 and 10–12 carry no boxes
+    deferred:
+      - evidence profiles (the per-outcome GRADE symbol tables in evidence-based
+        boxes) are not yet modelled; the schema has no shape for them — raise as
+        an open question when a consumer needs them
+      - codes_as links (e.g. concepts/pankreasresektion → ops-2026/5-52) await
+        a terminology import; none exists in the pool yet
+      - no pathway/view authored yet; chapter 6 is recommendations, not a
+        decision pathway — a views/ cut becomes worthwhile once a chapter's
+        statements form one
+      - gap_notice claims (ch04 boxes 4.3, 4.6; ch05 boxes 5.10, 5.13; ch07a box 7.8) are extracted but have no
+        semantic-layer link — no edge kind fits; see open-questions → gap-notices
+      - body-text enrichment pass over done chunks (refines/supplements/limits
+        beyond the criterion claims in ch06 and ch04; ch04 body text p. 27 also
+        recommends continuing calcium antagonists for angina and pausing them
+        for hypertension on the day of surgery — a body-text recommendation
+        outside any box, left for the enrichment pass; likewise ch05 §5.7
+        sedierende Prämedikation, which has no box at all — its body text
+        weighs benzodiazepines case by case and names melatonin an alternative;
+        ch07a body text p. 78 declines to recommend on nasogastric tubes after
+        pylorus-preserving pancreatic head resection, pancreato-gastrostomy and
+        distal pancreatectomy — a gap notice outside any box — and p. 79 allows
+        a secondary nasogastric tube on delayed gastric emptying after liver
+        resection; p. 84 defers balanced analgesia to the S3 guideline on acute
+        perioperative pain; ch07b body text carries five gap notices outside
+        any box — methylnaltrexone p. 92, local anaesthetics i.v./
+        intra-abdominal p. 93, propranolol p. 94, laxatives p. 100, each "für
+        andere viszeralonkologische Operationen … keine Empfehlung", and
+        dexmedetomidine p. 95, where the commission explicitly withheld a
+        recommendation because of the 2022 Rote-Hand-Brief — plus the p. 92
+        note that alvimopan is effective but not licensed in Germany; ch07c
+        body text p. 105 notes there are no RCT data on chewing gum after
+        minimally invasive liver or pancreatic resection, and pp. 108–109
+        explain why early mobilisation got no evidence-based grade — an
+        isolated recommendation was "nicht möglich" given the heterogeneity —
+        which is the rationale behind 7.29's EK, not a separate gap; ch08
+        body text p. 121 says that for the specialised nurse "zu anderen
+        Organ-Entitäten (Ösophagus, Magen, Leber und Pankreas) kann bei
+        fehlender Evidenz keine Empfehlung abgegeben werden" — which sits in
+        tension with box 8.7, an EK "kann erwogen werden" for exactly those
+        organs; the box was extracted as printed, the body-text gap is left
+        for the enrichment pass and should be read together with 8.7)
+      - quality indicators (ch09, Tabelle 7, pp. 122–124) — four QIs, each a
+        numerator/denominator measure with a Qualitätsziel and a Referenz-
+        Empfehlung that restates an already-extracted box — QI 1 → statements/
+        keine-drainage-kolorektale-resektion (box 6.9), QI 2 → statements/
+        keine-drainage-unkomplizierte-leberresektion (6.8), QI 3 → statements/
+        magensonde-entfernung-vor-narkoseausleitung-kolorektal (7.1) although its
+        denominator also covers gastrectomy/partial gastrectomy and elective liver
+        resection (the -magenresektion and -leberresektion statements), QI 4 →
+        statements/dauerkatheter-entfernung-24h-kolorektal plus
+        dauerkatheter-verlaengert-bei-harnverhaltrisiko (7.5/7.6) with a denominator
+        narrowed to "onkologische Kolonresektion". No claim kind and no edge kind
+        fits a QI (it is a measure derived from a recommendation, not evidence for
+        it), so nothing was extracted — see open-questions → quality-indicators.
+        Also unextracted from ch09 are the chapter's definition of Qualitätsindikatoren
+        (p. 122), the note that none of the four is documented in the cancer
+        registries' onkologischer Basisdatensatz (Stand 03/2022), and the ICD-10
+        codes C18/C20 in QI 1's denominator — the first explicit codes in the
+        source, a codes_as candidate once icd10gm-2026 is imported
+      - cross-statement edges (specializes/complements) not yet asserted; ch07a
+        has the first candidates — 7.12 (TAP block in minimally invasive
+        colorectal surgery) and 7.13 (peripheral regional analgesia in general)
+        against 7.9/7.10 (epidural analgesia) — left until a view needs them

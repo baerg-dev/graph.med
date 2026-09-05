@@ -1,0 +1,196 @@
+- id: claims/pomgat-lv-1.0/833d22a3
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.1'
+  label: Nach transthorakaler Ösophagektomie und gastraler Rekonstruktion sollte zur Dekompression des hochgezogenen Magens
+    intraoperativ eine doppellumige Magensonde eingelegt werden.
+  grade: EK
+  verb: sollte
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=75
+    quote: Nach transthorakaler Ösophagektomie und gastraler Rekonstruktion sollte zur
+- id: claims/pomgat-lv-1.0/10423e92
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.2'
+  label: Die nasogastrale Magensonde kann im frühen postoperativen Verlauf innerhalb der ersten 48 Stunden entfernt werden.
+  grade: EK
+  verb: kann
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=75
+    quote: Die nasogastrale Magensonde kann im frühen postoperativen Verlauf innerhalb
+- id: claims/pomgat-lv-1.0/25a12d88
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.3'
+  label: Nach Gastrektomie oder Magenteilresektion soll eine intraoperativ eingelegte Magensonde vor Narkoseausleitung gezogen
+    werden.
+  grade: A
+  verb: soll
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=77
+    quote: Nach Gastrektomie oder Magenteilresektion soll eine intraoperativ eingelegte
+- id: claims/pomgat-lv-1.0/6d1139d0
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.4'
+  label: Nach Pankreaskopfresektion als klassische Whipple-OP kann die nasogastralen Sonde am Ende der OP gezogen werden.
+  grade: EK
+  verb: kann
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=78
+    quote: Nach Pankreaskopfresektion als klassische Whipple-OP kann die nasogastralen
+- id: claims/pomgat-lv-1.0/a5a87bd9
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.5'
+  label: Bei elektiven Leberresektionen soll eine intraoperativ eingelegte Magensonde vor Narkoseausleitung gezogen werden.
+  grade: A
+  verb: soll
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=78
+    quote: Bei elektiven Leberresektionen soll eine intraoperativ eingelegte Magensonde vor
+- id: claims/pomgat-lv-1.0/b871a426
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.6'
+  label: Bei elektiven kolorektalen Eingriffen soll eine nasogastrale Sonde vor Narkoseausleitung gezogen werden.
+  grade: EK
+  verb: soll
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=79
+    quote: Bei elektiven kolorektalen Eingriffen soll eine nasogastrale Sonde vor
+- id: claims/pomgat-lv-1.0/93a72721
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.7'
+  label: Der transurethrale Dauerkatheter soll bei kolorektalen Resektionen innerhalb der ersten 24 Stunden entfernt werden.
+  grade: EK
+  verb: soll
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=80
+    quote: Der transurethrale Dauerkatheter soll bei kolorektalen Resektionen innerhalb der
+- id: claims/pomgat-lv-1.0/36973ab5
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.7'
+  label: Bei Risikofaktoren für einen Harnverhalt (männliches Geschlecht, tiefe anteriore Rektumresektion, Rektumexstirpation)
+    kann eine verlängerte Ableitung bis zum 3. postoperativen Tag erfolgen.
+  grade: EK
+  verb: kann
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=80
+    quote: Bei Risikofaktoren für einen Harnverhalt (männliches Geschlecht, tiefe anteriore
+- id: claims/pomgat-lv-1.0/f07134b0
+  type: claim
+  lang: de
+  kind: gap_notice
+  recommendation_no: '7.8'
+  label: Zum Harnableitungs-Management bei nicht-kolorektalen Resektionen sowie zur Anlage einer suprapubischen Harnableitung
+    kann mangels ausreichender Evidenz keine Empfehlung ausgesprochen werden.
+  grade: EK
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=80
+    quote: Zum Harnableitungs-Management bei nicht-kolorektalen Resektionen sowie zur
+- id: claims/pomgat-lv-1.0/d556cbf1
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.9'
+  label: Eine kontinuierliche Epiduralanalgesie sollte intra- und postoperativ zur perioperativen Analgesie bei offenen viszeralchirurgischen,
+    onkologischen Eingriff eingesetzt werden.
+  grade: B
+  verb: sollte
+  direction: for
+  consensus: konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=82
+    quote: Eine kontinuierliche Epiduralanalgesie sollte intra- und postoperativ zur
+- id: claims/pomgat-lv-1.0/5871558c
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.10'
+  label: Bei MIC-Eingriffen kann dann eine Epiduralanalgesie eingesetzt werden, wenn deren Einsatz aufgrund von Risiko-Konstellationen
+    (lange OP-Zeiten, zu erwartender hoher postoperativer Opioidverbrauch) Erfolg verspricht.
+  grade: EK
+  verb: kann
+  direction: for
+  consensus: konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=82
+    quote: Bei MIC-Eingriffen kann dann eine Epiduralanalgesie eingesetzt werden, wenn
+- id: claims/pomgat-lv-1.0/51f44d3f
+  type: claim
+  lang: de
+  kind: fact
+  recommendation_no: '7.11'
+  label: Im Vergleich zu peripheren Regionalanalgesieverfahren ist die Epiduralanalgesie bei viszeralchirurgischen, onkologischen
+    Eingriffen - nicht stratifiziert nach Organsystemen und unabhängig vom OP-Zugang - überlegen.
+  consensus: konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=85
+    quote: Im Vergleich zu peripheren Regionalanalgesieverfahren ist die Epiduralanalgesie
+- id: claims/pomgat-lv-1.0/fac02f97
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.12'
+  label: Bei minimalinvasiven Kolonresektionen oder (tiefen) anterioren Rektumresektionen kann zur perioperativen Analgesie
+    ein TAP-Block (Transversus abdominis plane block) als Alternative zur EA verwendet werden.
+  grade: '0'
+  verb: kann
+  direction: for
+  consensus: konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=87
+    quote: Rektumresektionen kann zur perioperativen Analgesie ein TAP-Block (Transversus
+- id: claims/pomgat-lv-1.0/b0e0ee65
+  type: claim
+  lang: de
+  kind: criterion
+  label: 'In Anbetracht der gleichwertigen analgetischen Wirkung und der deutlichen Verringerung der EA-assoziierten Nebenwirkungen
+    kann daher bei minimalinvasiven kolorektalen Eingriffen (Ausnahme: Rektumexstirpationen) eine TAP-Blockade mit kontinuierlicher
+    Applikation eines Lokalanästhetikums verwendet werden.'
+  source:
+    at: sources/pomgat-lv-1.0#page=88
+    quote: 'minimalinvasiven kolorektalen Eingriffen (Ausnahme: Rektumexstirpationen) eine'
+- id: claims/pomgat-lv-1.0/12b2d1f0
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.13'
+  label: Ein peripheres Regionalanalgesieverfahren kann zur perioperativen Analgesie bei onkologisch-viszeralchirurgischen
+    Eingriffen eingesetzt werden.
+  grade: '0'
+  verb: kann
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=89
+    quote: Ein peripheres Regionalanalgesieverfahren kann zur perioperativen Analgesie bei

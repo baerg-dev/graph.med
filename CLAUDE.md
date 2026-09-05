@@ -7,8 +7,9 @@ Copyright 2026 Robert Schwarzenberg, Anton Zolkin.
 
 The repository is at inception: it currently contains `README.md`, `LICENSE`, this
 file, the design documentation under `docs/`, the one schema for the data pool
-(`schema/schema.yaml`), and the `.claude/` directory described below. There is no
-source tree, build system, dependency manifest, or test suite yet.
+(`schema/schema.yaml`), the pool itself under `data/` (layout in `data/README.md`,
+parsing progress in `data/PROGRESS.yaml`), and the `.claude/` directory described
+below. There is no build system, dependency manifest, or test suite yet.
 Project-specific guidance — data sources and their licenses, setup and test
 instructions — belongs in this file once it exists. Do not document tooling that does
 not exist.
@@ -54,7 +55,8 @@ rather than all of it, always:
 │   └── conventions/
 ├── agents/                      subagent definitions — empty; add one .md per agent
 └── skills/
-    └── handover/                end a session: update docs/open-questions.md
+    ├── handover/                end a session: update docs/open-questions.md
+    └── parse-next-chunk/        continue parsing a source: one chunk, then hand over
 ```
 
 Rules without a `paths:` scope load at the start of every session; the two that have
@@ -65,12 +67,12 @@ record — why a constraint exists, what was decided and rejected. It is checked
 it is reviewed and shared rather than private to one machine.
 `rules/conventions/memory.md` carries its index.
 
-`agents/` is deliberately empty, and `skills/` holds exactly one skill. This
-repository has no build, test or data-ingest tooling yet, and a subagent or skill
-that automates nothing would be guidance pretending to be capability. The exception
-earned its place: ending a session with open questions is a real, repeated task, and
-the `handover` skill maintains `docs/open-questions.md` for it. Add another only for
-another such task — then say in the pull request what it does and what it is allowed
-to touch.
+`agents/` is deliberately empty, and `skills/` holds exactly two skills. A subagent
+or skill that automates nothing would be guidance pretending to be capability; both
+exceptions earned their place as real, repeated tasks. `handover` ends a session by
+maintaining `docs/open-questions.md`. `parse-next-chunk` continues parsing a
+registered source into `data/` — one chunk per session, ending with an updated
+`data/PROGRESS.yaml` and a pull request. Add another only for another such task —
+then say in the pull request what it does and what it is allowed to touch.
 
 One fact, one home: guidance that belongs in a rule is not restated here.

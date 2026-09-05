@@ -1,0 +1,9 @@
+id: statements/tap-block-mic-kolorektal
+type: statement
+lang: de
+label: Bei minimalinvasiven Kolonresektionen oder (tiefen) anterioren Rektumresektionen kann zur perioperativen Analgesie
+  ein TAP-Block als Alternative zur Epiduralanalgesie verwendet werden.
+slots:
+  population: concepts/minimalinvasive-kolorektale-resektion
+  action: concepts/tap-block
+source: modelling
