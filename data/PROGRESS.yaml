@@ -21,11 +21,12 @@ sources:
          note: "10 boxes (4.1–4.10) → 16 recommendation claims (multi-sentence boxes split per sentence) + 2 gap_notice claims (4.3, 4.6) + 2 criterion claims (p. 27); 16 statements, 24 concepts, 20 edges; done 2026-09-05"}
       - {id: ch05, chapters: "5.1–5.7", pages: 40-57,  status: done,
          note: "13 boxes (5.1–5.13; 5.7 has none) → 18 recommendation + 1 fact + 2 gap_notice + 1 criterion claims; compound grades A/B, B/0 split per sentence by verb; 19 statements, 25 concepts (+3 reused), 23 edges; done 2026-09-05"}
-      - {id: ch07a, chapters: "7.1–7.3", pages: 75-90, status: pending}
+      - {id: ch07a, chapters: "7.1–7.3", pages: 75-90, status: done,
+         note: "13 boxes (7.1–7.13) → 12 recommendation (7.7 split per sentence) + 1 fact (7.11, evidence-based statement) + 1 gap_notice (7.8) + 1 criterion (p. 88) claims; 13 statements, 16 concepts (+3 reused), 16 edges; done 2026-09-05"}
       - {id: ch07b, chapters: "7.4–7.7", pages: 91-111, status: pending}
       - {id: ch08, chapters: "8.1–8.2", pages: 112-121, status: pending}
       - {id: ch09, chapters: "9",       pages: 122-124, status: pending}
-    next: ch07a
+    next: ch07b
     deferred:
       - evidence profiles (the per-outcome GRADE symbol tables in evidence-based
         boxes) are not yet modelled; the schema has no shape for them — raise as
@@ -35,7 +36,7 @@ sources:
       - no pathway/view authored yet; chapter 6 is recommendations, not a
         decision pathway — a views/ cut becomes worthwhile once a chapter's
         statements form one
-      - gap_notice claims (ch04 boxes 4.3, 4.6; ch05 boxes 5.10, 5.13) are extracted but have no
+      - gap_notice claims (ch04 boxes 4.3, 4.6; ch05 boxes 5.10, 5.13; ch07a box 7.8) are extracted but have no
         semantic-layer link — no edge kind fits; see open-questions → gap-notices
       - body-text enrichment pass over done chunks (refines/supplements/limits
         beyond the criterion claims in ch06 and ch04; ch04 body text p. 27 also
@@ -43,4 +44,14 @@ sources:
         for hypertension on the day of surgery — a body-text recommendation
         outside any box, left for the enrichment pass; likewise ch05 §5.7
         sedierende Prämedikation, which has no box at all — its body text
-        weighs benzodiazepines case by case and names melatonin an alternative)
+        weighs benzodiazepines case by case and names melatonin an alternative;
+        ch07a body text p. 78 declines to recommend on nasogastric tubes after
+        pylorus-preserving pancreatic head resection, pancreato-gastrostomy and
+        distal pancreatectomy — a gap notice outside any box — and p. 79 allows
+        a secondary nasogastric tube on delayed gastric emptying after liver
+        resection; p. 84 defers balanced analgesia to the S3 guideline on acute
+        perioperative pain)
+      - cross-statement edges (specializes/complements) not yet asserted; ch07a
+        has the first candidates — 7.12 (TAP block in minimally invasive
+        colorectal surgery) and 7.13 (peripheral regional analgesia in general)
+        against 7.9/7.10 (epidural analgesia) — left until a view needs them
