@@ -17,7 +17,18 @@ session; editing it by hand is just as valid.
 ## quote-verification  (graph-representation.md §5.2, §13)
 **Question:** How is quote verification discharged when source documents cannot be committed to the repository?
 **Options:** best-effort validator check wherever the source happens to be present · a committed quote-index per source (hashes of normalized spans, verifiable offline) · verification as a signed attestation (§6) by an agent that had the source
-**Leaning:** verification-as-attestation — the §6 machinery already exists, property-level addresses (§2) give it a subject, and staleness comes free when the content hash changes; the validator still checks directly whenever a source is at hand. A quote-index can be added later if offline re-verification is needed. (2026-09-05)
+**Leaning:** verification-as-attestation, now load-bearing: sources are never
+committed or rehosted (`.claude/memory/design/sources-referenced-never-rehosted.md`),
+so the validator checks a quote directly at extraction time — while the agent's
+downloaded copy is at hand — or whenever a source is re-fetched, and the signed
+attestation is the durable evidence in between. If a public source later vanishes
+(the AWMF register removes superseded documents), the graph degrades from
+"verifiable by anyone" to "verified, on record", never to unfalsifiable. Two
+refinements: the attestation should record the source content hash it verified
+against (a corrected source entity must not leave silently orphaned verifications),
+and `validated` may be signed by a software agent's own key — it is a mechanical
+claim, unlike `expert_reviewed`. A quote-index can still be added later if offline
+re-verification is needed. (2026-09-05)
 **Settled by:** spec v0.2.
 
 ## graph-versioning  (graph-representation.md §3)
@@ -47,11 +58,5 @@ session; editing it by hand is just as valid.
 ## spec-v0.2-consistency  (graph-representation.md, several sections)
 **Question:** Consistency fixes agreed in review, pending application.
 **Options:** — (agreed, not controversial)
-**Leaning:** do all of them in v0.2: sources get a namespace like every other entity (`sources/pomgat-lv-1.0#page=61`); §9 declares `drain_panc_removal_q`, which two of its edges reference; state the key-language rule (keys English, controlled-vocabulary values may stay source-language — `klasse:` is the lone violation); keep the two-key `source:`/`provenance:` form as defined in §5.4. (2026-09-05)
+**Leaning:** do all of them in v0.2: sources get a namespace like every other entity (`sources/pomgat-lv-1.0#page=61`); §9 declares `drain_panc_removal_q`, which two of its edges reference; state the key-language rule (keys English, controlled-vocabulary values may stay source-language — `klasse:` is the lone violation); keep the two-key `source:`/`provenance:` form as defined in §5.4. Added 2026-09-05, after checking the POMGAT Langversion 1.0 itself: correct the example quotes against the document — §5.2 quotes "Nach Pankreasresektionen sollte eine intraabdominelle Drainage", but PDF p. 61 says "Nach Pankreasresektion **kann** die Einlage einer intraabdominellen Drainage **erwogen werden**" (a recommendation-grade error, precisely the class quote-verification exists to catch; the §5.4 criteria quotes are also paraphrases and sit on p. 64, not 63); state that a quote must be a *verbatim substring* of the source's extracted text — it is the highlight target, the reviewer's check and the validator's match at once, so paraphrase breaks all three; state that `#page=` counts physical PDF pages (what browser viewers navigate by), not printed page numbers. (2026-09-05)
 **Settled by:** spec v0.2.
-
-## inbound-documents  (README.md "Source documents")
-**Question:** How do source documents reach a working copy, now that the agent-inbox drop directory is removed and sources are never committed?
-**Options:** cloud drop folder synced by the maintainer (the removed design) · maintainer-managed sync outside the repo · per-source fetch with an egress allowlist entry · undecided
-**Leaning:** none yet — deliberately deferred. Whatever is chosen must keep third-party licensing out of the git history and credentials out of the workspace. (2026-09-05)
-**Settled by:** a decision on the contribution pipeline; touches `README.md` and possibly a new environment rule.
