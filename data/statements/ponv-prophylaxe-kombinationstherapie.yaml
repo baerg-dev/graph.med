@@ -1,0 +1,9 @@
+id: statements/ponv-prophylaxe-kombinationstherapie
+type: statement
+lang: de
+label: Die PONV-Prophylaxe sollte als Kombinationstherapie aus verschiedenen Medikamentenklassen mit hohem oder moderatem
+  Vertrauen in die Evidenz erfolgen.
+slots:
+  population: concepts/ponv-risikofaktoren
+  action: concepts/antiemetische-kombinationstherapie
+source: modelling
