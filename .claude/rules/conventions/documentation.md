@@ -28,9 +28,10 @@ stray sentence of another level does not split one topic into two files —
 What each level owes the reader:
 
 - **Environment and Conventions describe what exists.** Present tense, verified. Do
-  not document tooling that does not exist — no build system, dependency manifest,
-  test suite or validator exists yet, and a convention cannot require running one. A
-  stale description of the environment is worse than none, because it gets trusted.
+  not document tooling that does not exist. What exists is listed in `CLAUDE.md`
+  ("Checks"): the validator and the `uv` manifest — no build system or test suite
+  beyond that. A stale description of the environment is worse than none, because
+  it gets trusted.
 - **Design describes intent.** Describing what is not yet built is its purpose — and
   for exactly that reason a design document states its status at the top, so it can
   never be mistaken for a description of current behaviour.
