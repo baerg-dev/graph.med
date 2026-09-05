@@ -1,0 +1,49 @@
+# Validates the pool under data/ against schema/schema.yaml on every pull
+# request and on every push to main (i.e. after a merge). Two jobs:
+#   schema  — structure, ids, enums, provenance, claim hashes, edges (offline)
+#   quotes  — downloads each source (hash-checked) and verifies every quote is a
+#             verbatim substring of the cited physical page; needs network and
+#             poppler, so it runs separately and is reported on its own.
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schema:
+    name: data against schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run --frozen tools/validate.py
+
+  quotes:
+    name: quotes against the sources
+    needs: schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils
+      - name: cache downloaded sources by content hash
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/graph.med/sources
+          key: sources-${{ hashFiles('data/sources/*.yaml') }}
+      - run: uv run --frozen tools/validate.py --verify-quotes
