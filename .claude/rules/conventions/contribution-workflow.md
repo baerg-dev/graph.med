@@ -32,7 +32,9 @@ reviewer to miss in a larger diff.
 2. **One reviewable idea per branch.** Use a descriptive name (`fix/validator-timeout`,
    `feat/export-json`). Unrelated changes go in separate branches.
 3. **Run the checks locally before proposing.** Treat their output as the first comment
-   on your own PR. A change that does not pass is not proposed.
+   on your own PR. A change that does not pass is not proposed. The checks and their
+   commands are listed in `CLAUDE.md` under "Checks"; CI runs the same ones on every
+   pull request and every push to `main`.
 4. **Keep diffs small.** A human has to read this. If a change cannot be reviewed in
    one sitting, split it.
 
@@ -74,6 +76,7 @@ working correctly.
 |---|---|
 | `git push origin main` rejected | Working as designed. Open a PR. |
 | A force-push to `main` rejected | Same rule — a force-push is still a direct push. |
+| A push touching `.github/workflows/` refused for lack of `workflows` permission | Workflow files are human-only. Hand the file over in the PR — see `environment/git-identity.md`. |
 | `gh pr merge` rejected | Working as designed. A human approves and merges. |
 | 401 from GitHub | Host-side token pipeline. Report; do not work around. |
 | A fetch or package install fails | Sandbox egress policy. Report the domain. |

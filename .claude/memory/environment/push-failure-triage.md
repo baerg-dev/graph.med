@@ -10,6 +10,7 @@ metadata:
 | git asks for a username | No credential reached git. Host-side; nothing to fix from in here. |
 | `401` from git or `gh` | A credential was sent and refused. Also host-side. |
 | Push to the default branch, or a merge, refused | Not a credential problem — the review gate ([[main-branch-protection]]). |
+| Push refused for lack of `workflows` permission | Not a credential problem — the App deliberately cannot change CI. Hand the workflow file over in the PR (`rules/environment/git-identity.md`). |
 
 The first two are reported, never worked around ([[credential-handling]]). The third is
 not a failure at all.
