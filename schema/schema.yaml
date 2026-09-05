@@ -8,7 +8,7 @@
 # Status mirrors the spec: design intent. No validator enforces this file yet.
 
 schema: graph.med
-version: 0.1.0
+version: 0.2.0
 
 # ── namespaces ──────────────────────────────────────────────────────────────
 # Namespaces mint identity; they do not own content (spec §2).
@@ -41,12 +41,16 @@ node_types:
       license:       {type: string,  required: true,  provenance: not_applicable}
       media_type:    {type: string,  required: false, provenance: not_applicable}
       awmf_register: {type: string,  required: false, provenance: not_applicable}
+      lang:          {type: bcp47,   required: false, provenance: not_applicable}
 
   claim:
     # Immutable, source-anchored extraction unit (spec §3.1). The entity default
     # `source` (locator + verbatim quote) is the anchor and is always required.
     identity: derived   # hash over (locator, quote); computed by tooling, checked by the validator
     properties:
+      lang:              {type: bcp47,  required: true,  provenance: not_applicable}  # language of quote/label
+      label:             {type: string, required: true,  provenance: optional}
+                          # the full extracted text (a recommendation sentence), source language, never translated
       kind:              {type: enum, values: [recommendation, criterion, definition, fact, gap_notice],
                           required: true,  provenance: not_applicable}
       recommendation_no: {type: string, required: false, provenance: required}
@@ -54,11 +58,12 @@ node_types:
                           required: false, provenance: required}   # never from the extractor
       verb:              {type: enum, values: [soll, sollte, kann], required: false, provenance: required}
       direction:         {type: enum, values: [for, against],       required: false, provenance: required}
-      consensus:         {type: enum, values: [consensus, strong_consensus],
+      consensus:         {type: enum, values: [konsens, starker_konsens, mehrheitliche_zustimmung],
                           required: false, provenance: required}
 
   concept:
     properties:
+      lang:        {type: bcp47,  required: true,  provenance: not_applicable}
       label:       {type: string, required: true,  provenance: not_applicable}
       definition:  {type: string, required: false, provenance: optional}
 
@@ -66,6 +71,7 @@ node_types:
     # Slot values are concept URLs. Granularity rule: the smallest unit that can
     # be independently supported or contested (spec §3.2).
     properties:
+      lang:   {type: bcp47,  required: true, provenance: not_applicable}
       label:  {type: string, required: true, provenance: not_applicable}
       slots:
         population: {type: concept-url, required: false}
@@ -81,14 +87,17 @@ node_types:
   # structural node types (pathways/ namespace; all pure modelling)
   decision:
     properties:
+      lang:     {type: bcp47,  required: true,  provenance: not_applicable}
       label:    {type: string, required: true,  provenance: not_applicable}
       criteria: {type: object, required: false, provenance: optional}
   outcome:
     properties:
+      lang:  {type: bcp47,  required: true, provenance: not_applicable}
       label: {type: string, required: true, provenance: not_applicable}
   gap:
     # an explicit "no recommendation possible" in the source (spec §11.7)
     properties:
+      lang:  {type: bcp47,  required: true, provenance: not_applicable}
       label: {type: string, required: true, provenance: required}
 
   agent:
@@ -117,6 +126,7 @@ node_types:
 # ── edge kinds ──────────────────────────────────────────────────────────────
 # Edge id: derived from (from, kind, to) + optional discriminator (spec §2, §5).
 # Every edge carries provenance; `modelling` where no document states the relation.
+# An edge with textual properties (rationale, guard) declares `lang` for them.
 edge_kinds:
   supports:    {from: claim,     to: statement}
   contests:    {from: claim,     to: statement}
@@ -153,6 +163,11 @@ cut_validations:
 
 # ── conventions ─────────────────────────────────────────────────────────────
 conventions:
-  keys: english                       # controlled-vocabulary VALUES may stay source-language (soll/sollte/kann)
+  keys: english                       # structural keys are English; they are ours, not content
+  language: source-language           # ALL content values (labels, quotes, text) stay in the source
+                                      # language, never translated at extraction; every entity and edge
+                                      # carrying text declares `lang` (BCP 47). Enum values are schema
+                                      # vocabulary, slugified from the source language (soll/sollte/kann,
+                                      # konsens/starker_konsens). Translations are a build-layer concern.
   quotes: verbatim-substring          # of the source's extracted text (spec §6.2)
   pdf_pages: physical                 # #page=N counts PDF pages, not printed numbers

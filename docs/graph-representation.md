@@ -92,6 +92,13 @@ answer for.
 Identity is the URL, never the file. How entities are distributed over files is
 a storage and diff-ergonomics decision that the model does not depend on.
 
+**Language.** Content stays in the source language — labels, quotes, statement
+texts are never translated at extraction. Every entity and edge that carries
+text declares `lang` (BCP 47, e.g. `de`). Structural keys are English (they are
+ours, not content); enum values are schema vocabulary slugified from the source
+language (`soll`/`sollte`/`kann`, `konsens`/`starker_konsens`). Translation is
+a build-layer concern, never a data concern.
+
 **Canonical form.** Every entity has exactly one canonical serialisation
 (deterministic key order and encoding, fixed by the validator and never changed
 without a migration). The hash of that form identifies the entity's content at a
