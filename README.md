@@ -40,44 +40,13 @@ Agent-specific rules — bot identity, credentials, what an agent may and may no
 do — are in [`.claude/`](.claude/README.md); [`CLAUDE.md`](CLAUDE.md) describes the
 project itself.
 
-## Sharing files with the project
+## Source documents
 
-Source documents — papers, guidelines, reports — are **not committed to this
-repository**. They travel through a cloud drop folder instead, which keeps
-third-party material and its licensing out of the Git history.
-
-**To send a document in:** open the upload link and drag the file onto the page.
-You need no account, no Git and no terminal.
-
-> **Upload link:** _not yet created — see "Current status" below._
-
-**What happens to it:** the folder behind that link is synced one way onto a
-maintainer's machine, into `agent-inbox/` inside this repository. That directory
-is gitignored, so nothing in it is ever committed and it is empty in a fresh
-clone. The sandbox reads those files as ordinary local files — no network access
-and no credentials are involved on the sandbox side.
-
-**Maintainer side**, once per machine:
-
-```bash
-rclone config                                              # authorize the remote
-rclone copy <remote>:graph.med-inbox ./agent-inbox         # then run on a timer
-```
-
-The sync is deliberately one-way. A bidirectional sync would propagate a local
-deletion back to the cloud, where it could destroy someone else's submission.
-
-**Please do not send** anything patient-identifiable, and nothing under terms
-that forbid redistribution. An open upload link is the wrong channel for either.
-
-### Current status
-
-The provider is not fixed yet. It needs two things: a file-request feature so
-contributors can upload without an account, and an `rclone` backend so the
-maintainer side can sync. Dropbox, OneDrive, Box and pCloud all qualify. Google
-Drive does not — it has no anonymous upload path.
-
-Once a remote and an upload link exist, they replace the placeholder above.
+Source documents — papers, guidelines, classification releases — are **not
+committed to this repository**. Third-party material carries its own licensing
+and does not belong in the history of a PolyForm-licensed repository. The route
+by which such documents reach a working copy is deliberately not decided yet;
+until it is, there is none.
 
 ## License
 

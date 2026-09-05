@@ -34,6 +34,3 @@ Consequences of the above that come up when actually running something:
 - **Services you start are not reachable from the host** until the user publishes the
   port from the host side. Bind to `0.0.0.0` or `::`, never `127.0.0.1`, or
   publishing cannot reach them.
-
-Files from outside arrive through the workspace, never over the network — see
-`agent-inbox.md`.
