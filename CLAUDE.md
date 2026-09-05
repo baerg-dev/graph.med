@@ -6,8 +6,9 @@ Licensed under the PolyForm Noncommercial License 1.0.0 (see `LICENSE`).
 Copyright 2026 Robert Schwarzenberg, Anton Zolkin.
 
 The repository is at inception: it currently contains `README.md`, `LICENSE`, this
-file, the design documentation under `docs/`, and the `.claude/` directory described
-below. There is no source tree, build system, dependency manifest, or test suite yet.
+file, the design documentation under `docs/`, the one schema for the data pool
+(`schema/schema.yaml`), and the `.claude/` directory described below. There is no
+source tree, build system, dependency manifest, or test suite yet.
 Project-specific guidance — data sources and their licenses, setup and test
 instructions — belongs in this file once it exists. Do not document tooling that does
 not exist.
@@ -29,7 +30,9 @@ defined in `.claude/rules/conventions/documentation.md`.
 
 This file describes the **project** and maps the rest. Design lives in `docs/`:
 `docs/graph-representation.md` is the authority on how knowledge is represented —
-entities, URLs, provenance, attestations, review — and `docs/open-questions.md`
+one pool of source-anchored claims and a semantic layer, graphs as versioned views,
+provenance, attestations, review — with `schema/schema.yaml` as the authority on
+syntax, and `docs/open-questions.md`
 carries what is not yet decided: the handover between sessions. How an agent is expected to operate
 lives in `.claude/`, filed by level, so that each piece loads when it is relevant
 rather than all of it, always:
