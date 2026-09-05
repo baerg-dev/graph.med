@@ -17,13 +17,14 @@ sources:
     chunks:
       - {id: ch06, chapters: "6.1–6.2", pages: 58-74,  status: done,
          note: "15 boxes (6.1–6.15) + 1 criterion claim; 15 statements, 23 concepts; done 2026-09-05"}
-      - {id: ch04, chapters: "4.1–4.5", pages: 26-39,  status: pending}
+      - {id: ch04, chapters: "4.1–4.5", pages: 26-39,  status: done,
+         note: "10 boxes (4.1–4.10) → 16 recommendation claims (multi-sentence boxes split per sentence) + 2 gap_notice claims (4.3, 4.6) + 2 criterion claims (p. 27); 16 statements, 24 concepts, 20 edges; done 2026-09-05"}
       - {id: ch05, chapters: "5.1–5.7", pages: 40-57,  status: pending}
       - {id: ch07a, chapters: "7.1–7.3", pages: 75-90, status: pending}
       - {id: ch07b, chapters: "7.4–7.7", pages: 91-111, status: pending}
       - {id: ch08, chapters: "8.1–8.2", pages: 112-121, status: pending}
       - {id: ch09, chapters: "9",       pages: 122-124, status: pending}
-    next: ch04
+    next: ch05
     deferred:
       - evidence profiles (the per-outcome GRADE symbol tables in evidence-based
         boxes) are not yet modelled; the schema has no shape for them — raise as
@@ -33,5 +34,10 @@ sources:
       - no pathway/view authored yet; chapter 6 is recommendations, not a
         decision pathway — a views/ cut becomes worthwhile once a chapter's
         statements form one
+      - gap_notice claims (ch04 boxes 4.3, 4.6) are extracted but have no
+        semantic-layer link — no edge kind fits; see open-questions → gap-notices
       - body-text enrichment pass over done chunks (refines/supplements/limits
-        beyond the single criterion claim in ch06)
+        beyond the criterion claims in ch06 and ch04; ch04 body text p. 27 also
+        recommends continuing calcium antagonists for angina and pausing them
+        for hypertension on the day of surgery — a body-text recommendation
+        outside any box, left for the enrichment pass)
