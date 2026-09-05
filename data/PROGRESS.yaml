@@ -3,11 +3,19 @@
 # One chunk is processed per session; a chunk is done when its claims are
 # extracted (phase one) AND linked into the semantic layer (phase two), and
 # the PROGRESS entry records what was deferred.
+#
+# Terminal state: when the last chunk of a pass is done, the session sets the
+# source's `next` to null and its `status` to `done`. The skill checks this
+# before anything else and reports "done" instead of parsing. A later pass
+# (body-text enrichment, evidence profiles, codes_as) is a human decision:
+# register it by bumping `pass`, redefining `scope_policy`, resetting the
+# chunk list and setting `status: in_progress` again.
 
 sources:
   pomgat-lv-1.0:
     entity: sources/pomgat-lv-1.0
-    status: in_progress
+    status: in_progress      # in_progress | done
+    pass: 1                  # which pass the chunk list below belongs to
     chunking: by chapter; printed page = physical page (verified, offset 0)
     scope_policy: >
       Pass 1 extracts the recommendation boxes (plus criteria the box text

@@ -11,10 +11,15 @@ second chunk; the value of this loop is that every session ends reviewable.
 
 ## Before extracting
 
-1. Read `data/PROGRESS.yaml`. The source's `next` field names your chunk; its
-   `scope_policy` and `deferred` list say what is in and out of scope. Read the
-   spec (`docs/graph-representation.md`) and `schema/schema.yaml` if you have
-   not this session.
+1. Read `data/PROGRESS.yaml`. Take the first source whose `status` is
+   `in_progress`; its `next` field names your chunk, and its `scope_policy`
+   and `deferred` list say what is in and out of scope. **If no source is
+   `in_progress`, or the source's `next` is `null`, parsing is done: report
+   "done" — which source, which pass, and where the deferred work is listed —
+   and stop.** Do not look for work elsewhere: a deferred item or an
+   enrichment pass starts only when a human registers it in PROGRESS as a new
+   pass with its own chunks. Read the spec (`docs/graph-representation.md`)
+   and `schema/schema.yaml` if you have not this session.
 2. Fetch the source: URL and expected sha256 are on its entity under
    `data/sources/`. **Verify the hash.** On mismatch or an unreachable URL,
    stop parsing: record what you found in PROGRESS (the URL may have drifted —
@@ -56,8 +61,10 @@ create a claim in `data/claims/<source-id>/<chunk-id>.yaml`:
 ## The handover
 
 1. Update `data/PROGRESS.yaml`: chunk → `done` with a one-line note (box
-   count, entity counts, date), set `next`, extend `deferred` with anything
-   you consciously skipped.
+   count, entity counts, date), set `next` to the next pending chunk, extend
+   `deferred` with anything you consciously skipped. **If no pending chunk
+   remains, set `next: null` and the source's `status: done`** — the next
+   invocation then reports "done" instead of parsing.
 2. If a design question surfaced, add it to `docs/open-questions.md` (entry
    format is described there).
 3. Commit (schema commit first if any, then infra/data), push, open a PR. The
