@@ -1,0 +1,9 @@
+id: statements/epiduralanalgesie-offene-viszeralchirurgie
+type: statement
+lang: de
+label: Bei offenen onkologisch-viszeralchirurgischen Eingriffen sollte intra- und postoperativ eine kontinuierliche Epiduralanalgesie
+  zur perioperativen Analgesie eingesetzt werden.
+slots:
+  population: concepts/offene-gastrointestinale-tumoroperation
+  action: concepts/epiduralanalgesie
+source: modelling

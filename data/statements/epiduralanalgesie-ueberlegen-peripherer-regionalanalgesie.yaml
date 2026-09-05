@@ -1,0 +1,9 @@
+id: statements/epiduralanalgesie-ueberlegen-peripherer-regionalanalgesie
+type: statement
+lang: de
+label: Bei viszeralchirurgischen, onkologischen Eingriffen ist die Epiduralanalgesie peripheren Regionalanalgesieverfahren
+  überlegen (nicht stratifiziert nach Organsystemen, unabhängig vom OP-Zugang).
+slots:
+  population: concepts/gastrointestinale-tumoroperation
+  action: concepts/epiduralanalgesie
+source: modelling
