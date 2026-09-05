@@ -1,0 +1,37 @@
+# Parsing progress — the handover between parsing sessions.
+# Maintained by the parse-next-chunk skill; hand-editing is just as valid.
+# One chunk is processed per session; a chunk is done when its claims are
+# extracted (phase one) AND linked into the semantic layer (phase two), and
+# the PROGRESS entry records what was deferred.
+
+sources:
+  pomgat-lv-1.0:
+    entity: sources/pomgat-lv-1.0
+    status: in_progress
+    chunking: by chapter; printed page = physical page (verified, offset 0)
+    scope_policy: >
+      Pass 1 extracts the recommendation boxes (plus criteria the box text
+      directly depends on). Body-text fragments (refines/supplements/limits),
+      the evidence profiles (GRADE outcome tables), and codes_as links await
+      later enrichment passes — see deferred.
+    chunks:
+      - {id: ch06, chapters: "6.1–6.2", pages: 58-74,  status: done,
+         note: "15 boxes (6.1–6.15) + 1 criterion claim; 15 statements, 18 concepts; done 2026-09-05"}
+      - {id: ch04, chapters: "4.1–4.5", pages: 26-39,  status: pending}
+      - {id: ch05, chapters: "5.1–5.7", pages: 40-57,  status: pending}
+      - {id: ch07a, chapters: "7.1–7.3", pages: 75-90, status: pending}
+      - {id: ch07b, chapters: "7.4–7.7", pages: 91-111, status: pending}
+      - {id: ch08, chapters: "8.1–8.2", pages: 112-121, status: pending}
+      - {id: ch09, chapters: "9",       pages: 122-124, status: pending}
+    next: ch04
+    deferred:
+      - evidence profiles (the per-outcome GRADE symbol tables in evidence-based
+        boxes) are not yet modelled; the schema has no shape for them — raise as
+        an open question when a consumer needs them
+      - codes_as links (e.g. concepts/pankreasresektion → ops-2026/5-52) await
+        a terminology import; none exists in the pool yet
+      - no pathway/view authored yet; chapter 6 is recommendations, not a
+        decision pathway — a views/ cut becomes worthwhile once a chapter's
+        statements form one
+      - body-text enrichment pass over done chunks (refines/supplements/limits
+        beyond the single criterion claim in ch06)
