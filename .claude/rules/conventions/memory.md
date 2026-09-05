@@ -31,6 +31,7 @@ pre-emptively.
 | `conventions/editing-your-own-instructions.md` | Editing the files that instruct you is allowed; saying so in the PR is the obligation. |
 | `environment/commit-author-is-not-evidence.md` | A commit's author line is display only, not evidence about the setup. |
 | `environment/push-failure-triage.md` | Which failures are host-side, which are the design working, and why commits are usually safe. |
+| `design/sources-referenced-never-rehosted.md` | Sources are never committed or rehosted; the graph links to public URLs, and agents download sources per session. |
 
 ## Writing one
 

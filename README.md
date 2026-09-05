@@ -43,10 +43,15 @@ project itself.
 ## Source documents
 
 Source documents — papers, guidelines, classification releases — are **not
-committed to this repository**. Third-party material carries its own licensing
-and does not belong in the history of a PolyForm-licensed repository. The route
-by which such documents reach a working copy is deliberately not decided yet;
-until it is, there is none.
+committed to this repository**, and not rehosted anywhere else. Third-party
+material carries its own licensing and does not belong in the history of a
+PolyForm-licensed repository; the repository and its links to public sources
+are the only assets. An agent that needs a source downloads it from its public
+URL into the session's working copy (the source's domain needs an egress
+allowlist entry — see "Development environment" above), extracts what it needs into
+the graph, and references the public location; the downloaded copy is
+ephemeral and never committed. The reasoning is recorded in
+`.claude/memory/design/sources-referenced-never-rehosted.md`.
 
 ## License
 
