@@ -401,7 +401,15 @@ nothing for a per-view schema to govern. Instead:
   types they may connect, the **slot shapes** of statement types, and the
   **structural validations** a view kind must pass at cut time (§4);
 - schema changes land **before** the data that uses them (§7);
-- the schema is versioned by its own history like everything else.
+- the schema is versioned by its own history like everything else;
+- the schema is a **JSON Schema** (draft 2020-12, written in YAML), so a standard
+  validator library checks every data file against it and editors can validate on
+  save. What JSON Schema has no keyword for — provenance requirement levels, identity
+  strategies, which file holds which definition, view filters, cut validations — is
+  carried as `x-` annotations in the same file, so it stays the single point of
+  truth; `tools/validate.py` reads those annotations for the cross-file checks
+  (references resolve, claim ids hash correctly, edges are unique) that a document
+  schema cannot express.
 
 What a pathway needed a "graph kind" for — its node types, its edge vocabulary,
 its completeness rules — is now a *view kind* inside the one schema.

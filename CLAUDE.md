@@ -17,8 +17,10 @@ not exist.
 ## Checks
 
 Python tooling is managed with `uv` (`pyproject.toml`, `uv.lock`); never pip. The one
-check is the validator, which reads `schema/schema.yaml` and checks everything under
-`data/` against it — ids, enums, provenance, claim hashes, edges:
+check is the validator. `schema/schema.yaml` is a JSON Schema (draft 2020-12); the
+validator applies it to every file under `data/` with the `jsonschema` library, then
+checks what a document schema cannot say — references resolve, claim ids hash
+correctly, edges are unique:
 
 ```bash
 uv run tools/validate.py                  # structure, offline

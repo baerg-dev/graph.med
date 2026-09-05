@@ -44,9 +44,12 @@ project itself.
 
 ## Checks
 
-One check exists: the validator, `tools/validate.py`, which checks everything under
-`data/` against `schema/schema.yaml` — ids, enums, provenance, claim hashes, edges,
-and optionally every quote against the cited page of its source. The commands, and
+One check exists: the validator, `tools/validate.py`. `schema/schema.yaml` is a JSON
+Schema (draft 2020-12, written in YAML) and the single point of truth; the validator
+applies it to every file under `data/` with the standard `jsonschema` library, then
+checks the few cross-file rules a document schema cannot state — references resolve,
+claim ids are the hash of their anchor, edges are unique — and optionally every quote
+against the cited page of its source. The commands, and
 what each form checks, are in [`CLAUDE.md`](CLAUDE.md) under "Checks" — one home for
 them, read by humans and agents alike. Python tooling is managed with
 [`uv`](https://docs.astral.sh/uv/) (`pyproject.toml`, `uv.lock`); never pip.
