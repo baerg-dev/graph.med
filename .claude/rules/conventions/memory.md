@@ -51,7 +51,8 @@ metadata:
 
 File the memory in the subdirectory of the level it belongs to — `environment/`,
 `conventions/`, `design/` (created with its first fact) — as
-`conventions/documentation.md` defines them.
+`conventions/documentation.md` defines them. A `design/` memory most often records
+the resolution of an entry in `docs/open-questions.md` — see the `handover` skill.
 Link related memories with `[[their-name]]`. Add a row to the index above in the same
 commit — a memory absent from the index is a memory nobody will open.
 
