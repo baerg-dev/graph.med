@@ -1,9 +1,14 @@
 # Graph Representation — how knowledge is stored in this repository
 
-> **Status: design intent (v0.2).** A first schema exists (`schema/schema.yaml`),
-> but no validator and no CI exist in this repository yet. Statements below that a
-> check runs, or that a change "does not pass", describe the model this repository
-> is being built to — not behaviour anyone can rely on today.
+> **Status: design intent (v0.2), partly enforced.** The schema (`schema/schema.yaml`)
+> exists and `tools/validate.py` enforces it, locally and in CI (`CLAUDE.md`,
+> "Checks"): ids, enums, provenance requirements, claim hashes, slots, edges, and
+> with `--verify-quotes` every quote against its source. Everything else this
+> document describes as checked or computed — the canonical form and content hashes
+> (§2), staleness (§5, §8), attestations and review state (§8), view cuts (§4), the
+> derived statement properties (§3.3) — is not implemented yet. Statements about
+> those describe the model this repository is being built to, not behaviour anyone
+> can rely on today.
 
 This file explains the approach behind the knowledge in this repository. It is
 written for humans who review changes and for AI agents that read or write graph
