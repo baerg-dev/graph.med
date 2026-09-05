@@ -1,0 +1,95 @@
+- id: claims/pomgat-lv-1.0/57c01723
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '8.1'
+  label: Eine onkologische Ösophagusresektion sollte in dem Kontext eines multimodalen perioperativen Managementkonzepts stattfinden.
+  grade: B
+  verb: sollte
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=112
+    quote: Eine onkologische Ösophagusresektion sollte in dem Kontext eines multimodalen
+- id: claims/pomgat-lv-1.0/5a4b0550
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '8.2'
+  label: Eine onkologische Magenresektion sollte eingebettet in ein multimodales perioperatives Managementkonzept stattfinden.
+  grade: B
+  verb: sollte
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=113
+    quote: Eine onkologische Magenresektion sollte eingebettet in ein multimodales
+- id: claims/pomgat-lv-1.0/5ff38f16
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '8.3'
+  label: Eine onkologische Pankreasresektion sollte im Rahmen eines multimodalen perioperativen Managementkonzepts erfolgen.
+  grade: B
+  verb: sollte
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=115
+    quote: Eine onkologische Pankreasresektion sollte im Rahmen eines multimodalen
+- id: claims/pomgat-lv-1.0/623aaba0
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '8.4'
+  label: Eine onkologische Leberresektion sollte eingebettet in ein multimodales perioperatives Managementkonzept (mPOM) stattfinden.
+  grade: B
+  verb: sollte
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=116
+    quote: Eine onkologische Leberresektion sollte eingebettet in ein multimodales
+- id: claims/pomgat-lv-1.0/e5188265
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '8.5'
+  label: Eine kolorektale Resektion soll eingebettet in ein multimodales perioperatives Managementkonzept (mPOM) stattfinden.
+  grade: A
+  verb: soll
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=118
+    quote: Eine kolorektale Resektion soll eingebettet in ein multimodales perioperatives
+- id: claims/pomgat-lv-1.0/c8dce4d6
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '8.6'
+  label: Perioperativ können Patienten, die sich einer kolorektalen Resektion im Kontext eines multimodalen perioperativen
+    Managementkonzepts (mPOM) unterziehen, durch eine auf perioperative Interventionen spezialisierte Fachkraft begleitet
+    werden.
+  grade: '0'
+  verb: kann
+  direction: for
+  consensus: konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=120
+    quote: Perioperativ können Patienten, die sich einer kolorektalen Resektion im Kontext
+- id: claims/pomgat-lv-1.0/3cb16057
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '8.7'
+  label: Für Patienten, die sich einer nicht-kolorektalen viszeralonkologischen Resektion im Kontext eines multimodalen perioperativen
+    Managementkonzepts unterziehen, kann die Betreuung durch eine auf perioperative Interventionen spezialisierte Fachkraft
+    erwogen werden.
+  grade: EK
+  verb: kann
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=120
+    quote: Für Patienten, die sich einer nicht-kolorektalen viszeralonkologischen Resektion
