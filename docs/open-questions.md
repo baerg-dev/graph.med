@@ -29,8 +29,8 @@ open edges of the v0.2 model.
 ## statement-shape  (graph-representation.md §3.2; schema `statement.slots`)
 **Question:** Which slot vocabulary does each statement type need — is population/action/condition/outcome (PICO-shaped) right, and for which content is it overkill?
 **Options:** one fixed slot set for all statements · slot sets per statement type in the schema · free-form statements with slots optional everywhere
-**Leaning:** slot sets per statement type; the current schema ships one PICO-ish set with every slot optional as a starting point. The granularity rule (smallest independently contestable unit) is the fixed part; the slots serve it. Settle against the first full guideline extraction. (2026-09-05)
-**Settled by:** extracting one complete guideline chapter and seeing which statements resist the shape.
+**Leaning:** slot sets per statement type; the current schema ships one PICO-ish set with every slot optional as a starting point. The granularity rule (smallest independently contestable unit) is the fixed part; the slots serve it. First evidence (chunk ch06, POMGAT chapter 6, 15 statements): population+action fit every statement, condition and outcome each earned their keep once, nothing resisted the shape — but all statements came from one chapter of one source, so the shape has not yet met cross-source sameness. Keep open until a second source lands on the same statements. (2026-09-05)
+**Settled by:** a second source's claims linking into existing statements without the slots getting in the way.
 
 ## concept-minting  (graph-representation.md §2, §11.3)
 **Question:** Who may mint uncoded concepts, and what keeps the concept namespace from silting up with near-duplicates?
@@ -43,3 +43,9 @@ open edges of the v0.2 model.
 **Options:** keep the fixed filter forms, adding one per proven need · adopt an existing query language (a GQL/Cypher subset, Datalog) early · filters as code in the build layer, not data
 **Leaning:** fixed forms, extended one proven need at a time — a query language is a dependency and an injection surface the data model should not commit to before a build layer exists. Filters must stay declarative data so cuts are reproducible. (2026-09-05)
 **Settled by:** the first view a fixed form cannot express.
+
+## evidence-profiles  (data/PROGRESS.yaml deferred; schema `claim`)
+**Question:** How are the per-outcome GRADE evidence tables of evidence-based recommendation boxes modelled — the ⊕-symbol ratings per outcome with effect sizes that justify a claim's grade?
+**Options:** not at all (the grade plus the locator suffice; the reader follows the link) · a structured `evidence_profile` property on the claim (outcome, rating, effect, CI) · each outcome row as its own claim (kind: fact) with a `refines` edge to the recommendation claim
+**Leaning:** none yet — deliberately unmodelled in chunk ch06. The third option fits the model best (rows are source-anchored, quotable, individually verifiable) but multiplies claims roughly fivefold per box; decide when a consumer (a view, the website, grade-derivation) actually needs the profiles rather than on principle. (2026-09-05)
+**Settled by:** the first consumer that needs evidence detail beyond the grade.
