@@ -1,0 +1,8 @@
+id: statements/keine-rein-mechanische-darmvorbereitung-kolorektal
+type: statement
+lang: de
+label: Vor kolorektalen Operationen soll keine rein mechanische Darmvorbereitung durchgeführt werden.
+slots:
+  population: concepts/kolorektale-resektion
+  action: concepts/mechanische-darmvorbereitung
+source: modelling

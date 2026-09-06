@@ -1,0 +1,9 @@
+id: statements/akupunkturpunkte-zusanli-shangjuxu
+type: statement
+lang: de
+label: Für die postoperative Akupunktur nach abdominalchirurgischen Eingriffen sollten die Akupunkturpunkte ZuSanLi und ShangJuXu
+  als gering invasive und nebenwirkungsarme Option genutzt werden.
+slots:
+  population: concepts/elektiver-abdominalchirurgischer-tumoreingriff
+  action: concepts/akupunkturpunkte-zusanli-shangjuxu
+source: modelling

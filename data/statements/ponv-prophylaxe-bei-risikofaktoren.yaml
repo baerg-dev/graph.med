@@ -1,0 +1,9 @@
+id: statements/ponv-prophylaxe-bei-risikofaktoren
+type: statement
+lang: de
+label: Bei abdominalchirurgischen Tumoroperationen soll bei Patienten mit Risikofaktoren eine PONV-Prophylaxe erfolgen.
+slots:
+  population: concepts/elektiver-abdominalchirurgischer-tumoreingriff
+  action: concepts/ponv-prophylaxe
+  condition: concepts/ponv-risikofaktoren
+source: modelling

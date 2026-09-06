@@ -1,0 +1,64 @@
+- - claims/pomgat-lv-1.0/833d22a3
+  - supports
+  - statements/doppellumige-magensonde-oesophagektomie
+  - source: modelling
+- - claims/pomgat-lv-1.0/10423e92
+  - supports
+  - statements/magensonde-fruehe-entfernung-oesophagektomie
+  - source: modelling
+- - claims/pomgat-lv-1.0/25a12d88
+  - supports
+  - statements/magensonde-entfernung-vor-narkoseausleitung-magenresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/6d1139d0
+  - supports
+  - statements/magensonde-entfernung-op-ende-whipple
+  - source: modelling
+- - claims/pomgat-lv-1.0/a5a87bd9
+  - supports
+  - statements/magensonde-entfernung-vor-narkoseausleitung-leberresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/b871a426
+  - supports
+  - statements/magensonde-entfernung-vor-narkoseausleitung-kolorektal
+  - source: modelling
+- - claims/pomgat-lv-1.0/93a72721
+  - supports
+  - statements/dauerkatheter-entfernung-24h-kolorektal
+  - source: modelling
+- - claims/pomgat-lv-1.0/36973ab5
+  - supports
+  - statements/dauerkatheter-verlaengert-bei-harnverhaltrisiko
+  - source: modelling
+- - claims/pomgat-lv-1.0/d556cbf1
+  - supports
+  - statements/epiduralanalgesie-offene-viszeralchirurgie
+  - source: modelling
+- - claims/pomgat-lv-1.0/5871558c
+  - supports
+  - statements/epiduralanalgesie-mic-bei-risikokonstellation
+  - source: modelling
+- - claims/pomgat-lv-1.0/51f44d3f
+  - supports
+  - statements/epiduralanalgesie-ueberlegen-peripherer-regionalanalgesie
+  - source: modelling
+- - claims/pomgat-lv-1.0/fac02f97
+  - supports
+  - statements/tap-block-mic-kolorektal
+  - source: modelling
+- - claims/pomgat-lv-1.0/12b2d1f0
+  - supports
+  - statements/periphere-regionalanalgesie-viszeralchirurgie
+  - source: modelling
+- - claims/pomgat-lv-1.0/10423e92
+  - supplements
+  - claims/pomgat-lv-1.0/833d22a3
+  - source: modelling
+- - claims/pomgat-lv-1.0/36973ab5
+  - supplements
+  - claims/pomgat-lv-1.0/93a72721
+  - source: modelling
+- - claims/pomgat-lv-1.0/b0e0ee65
+  - refines
+  - claims/pomgat-lv-1.0/fac02f97
+  - source: modelling

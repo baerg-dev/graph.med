@@ -1,0 +1,10 @@
+id: statements/epiduralanalgesie-mic-bei-risikokonstellation
+type: statement
+lang: de
+label: Bei minimalinvasiven Eingriffen kann eine Epiduralanalgesie eingesetzt werden, wenn ihr Einsatz aufgrund von Risiko-Konstellationen
+  (lange OP-Zeiten, zu erwartender hoher postoperativer Opioidverbrauch) Erfolg verspricht.
+slots:
+  population: concepts/minimalinvasive-gastrointestinale-tumoroperation
+  action: concepts/epiduralanalgesie
+  condition: concepts/risikokonstellation-lange-op-hoher-opioidbedarf
+source: modelling

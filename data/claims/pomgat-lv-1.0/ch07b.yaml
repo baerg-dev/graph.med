@@ -1,0 +1,154 @@
+- id: claims/pomgat-lv-1.0/c4ed841b
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.14'
+  label: Die unmittelbar postoperative s.c. Gabe von Methylnaltrexon zur Prophylaxe des postoperativen (paralytischen) Ileus
+    nach onkologischen kolorektalen Resektionen soll bei systemischer opioidbasierter Schmerztherapie nicht erfolgen.
+  grade: A
+  verb: soll
+  direction: against
+  consensus: konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=91
+    quote: Die unmittelbar postoperative s.c. Gabe von Methylnaltrexon zur Prophylaxe des
+- id: claims/pomgat-lv-1.0/398ee0ce
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.15'
+  label: Die präoperativ begonnene und postoperativ fortgesetzte Gabe von NSAR kann zur Prophylaxe des postoperativen (paralytischen)
+    Ileus nach onkologischen kolorektalen Resektionen durchgeführt werden.
+  grade: '0'
+  verb: kann
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=92
+    quote: Die präoperativ begonnene und postoperativ fortgesetzte Gabe von NSAR kann
+- id: claims/pomgat-lv-1.0/cea5e680
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.16'
+  label: Propranolol soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach onkologischen kolorektalen Resektionen
+    angewendet werden.
+  grade: A
+  verb: soll
+  direction: against
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=93
+    quote: Propranolol soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus
+- id: claims/pomgat-lv-1.0/12c3812a
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.17'
+  label: Neostigmin kann als Ultima ratio zur Therapie des klinisch manifesten postoperativen (paralytischen) Ileus angewendet
+    werden.
+  grade: '0'
+  verb: kann
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=96
+    quote: Neostigmin kann als Ultima ratio zur Therapie des klinisch manifesten
+- id: claims/pomgat-lv-1.0/9a48c38e
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.18'
+  label: Prucaloprid zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen sollte
+    nicht eingesetzt werden.
+  grade: B
+  verb: sollte
+  direction: against
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=97
+    quote: Prucaloprid zur Prophylaxe des postoperativen (paralytischen) Ileus nach
+- id: claims/pomgat-lv-1.0/364e5d3f
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.19'
+  label: Metoclopramid soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
+    eingesetzt werden.
+  grade: A
+  verb: soll
+  direction: against
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=98
+    quote: Metoclopramid soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus
+- id: claims/pomgat-lv-1.0/ee0b0137
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.20'
+  label: Erythromycin soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
+    eingesetzt werden.
+  grade: A
+  verb: soll
+  direction: against
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=99
+    quote: Erythromycin soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus
+- id: claims/pomgat-lv-1.0/11449037
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.21'
+  label: Laxantien sollten frühzeitig in eine multimodale Prophylaxe und / oder Therapie des postoperativen (paralytischen)
+    Ileus nach onkologischen kolorektalen Resektionen implementiert werden.
+  grade: B
+  verb: sollte
+  direction: for
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=99
+    quote: Laxantien sollten frühzeitig in eine multimodale Prophylaxe und / oder Therapie
+- id: claims/pomgat-lv-1.0/43df010f
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.22'
+  label: Simethicon soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
+    eingesetzt werden.
+  grade: A
+  verb: soll
+  direction: against
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=100
+    quote: Simethicon soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus
+- id: claims/pomgat-lv-1.0/0d68c66e
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.23'
+  label: Osmotisch wirksame Röntgenkontrastmittel (z.B. Gastrografin®) sollen nicht zur Therapie des postoperativen (paralytischen)
+    Ileus nach gastrointestinalen Tumorresektionen eingesetzt werden.
+  grade: A
+  verb: soll
+  direction: against
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=101
+    quote: Osmotisch wirksame Röntgenkontrastmittel (z.B. Gastrografin®) sollen nicht zur
+- id: claims/pomgat-lv-1.0/f0082ce5
+  type: claim
+  lang: de
+  kind: recommendation
+  recommendation_no: '7.24'
+  label: Daikenchuto sollte nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
+    eingesetzt werden.
+  grade: B
+  verb: sollte
+  direction: against
+  consensus: starker_konsens
+  source:
+    at: sources/pomgat-lv-1.0#page=101
+    quote: Daikenchuto sollte nicht zur Prophylaxe des postoperativen (paralytischen) Ileus

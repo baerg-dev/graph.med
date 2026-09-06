@@ -1,0 +1,44 @@
+- - claims/pomgat-lv-1.0/6fc4b22f
+  - supports
+  - statements/kaffee-nach-abdominalchirurgie
+  - source: modelling
+- - claims/pomgat-lv-1.0/c0b8b043
+  - supports
+  - statements/kaffeekonsum-ab-aufwachraum
+  - source: modelling
+- - claims/pomgat-lv-1.0/455b91f9
+  - supports
+  - statements/kaugummi-kolorektal
+  - source: modelling
+- - claims/pomgat-lv-1.0/29334ef8
+  - supports
+  - statements/kaugummi-offene-leberresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/90443ad0
+  - supports
+  - statements/akupunktur-nach-abdominalchirurgie
+  - source: modelling
+- - claims/pomgat-lv-1.0/a63da046
+  - supports
+  - statements/akupunkturpunkte-zusanli-shangjuxu
+  - source: modelling
+- - claims/pomgat-lv-1.0/b42d6557
+  - supports
+  - statements/postoperative-fruehmobilisation
+  - source: modelling
+- - claims/pomgat-lv-1.0/65bb0fcd
+  - supports
+  - statements/verzicht-incentive-spirometrie-alleinig
+  - source: modelling
+- - claims/pomgat-lv-1.0/9a78a59d
+  - supports
+  - statements/bauchbinde-nach-medianer-laparotomie
+  - source: modelling
+- - claims/pomgat-lv-1.0/c0b8b043
+  - supplements
+  - claims/pomgat-lv-1.0/6fc4b22f
+  - source: modelling
+- - claims/pomgat-lv-1.0/a63da046
+  - refines
+  - claims/pomgat-lv-1.0/90443ad0
+  - source: modelling

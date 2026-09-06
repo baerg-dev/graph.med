@@ -1,0 +1,8 @@
+id: statements/magensonde-entfernung-vor-narkoseausleitung-kolorektal
+type: statement
+lang: de
+label: Bei elektiven kolorektalen Eingriffen soll eine nasogastrale Sonde vor Narkoseausleitung gezogen werden.
+slots:
+  population: concepts/kolorektale-resektion
+  action: concepts/magensondenentfernung-vor-narkoseausleitung
+source: modelling

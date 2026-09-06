@@ -1,0 +1,8 @@
+id: statements/drainage-pankreasresektion-optional
+type: statement
+lang: de
+label: Nach Pankreasresektion kann eine intraabdominelle Drainage erwogen werden.
+slots:
+  population: concepts/pankreasresektion
+  action: concepts/abdominelle-drainage
+source: modelling

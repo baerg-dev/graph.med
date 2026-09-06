@@ -1,0 +1,28 @@
+- - claims/pomgat-lv-1.0/57c01723
+  - supports
+  - statements/mpom-oesophagusresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/5a4b0550
+  - supports
+  - statements/mpom-magenresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/5ff38f16
+  - supports
+  - statements/mpom-pankreasresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/623aaba0
+  - supports
+  - statements/mpom-leberresektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/e5188265
+  - supports
+  - statements/mpom-kolorektale-resektion
+  - source: modelling
+- - claims/pomgat-lv-1.0/c8dce4d6
+  - supports
+  - statements/spezialisierte-fachkraft-kolorektal-mpom
+  - source: modelling
+- - claims/pomgat-lv-1.0/3cb16057
+  - supports
+  - statements/spezialisierte-fachkraft-nicht-kolorektal-mpom
+  - source: modelling

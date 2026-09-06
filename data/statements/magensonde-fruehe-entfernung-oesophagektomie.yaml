@@ -1,0 +1,9 @@
+id: statements/magensonde-fruehe-entfernung-oesophagektomie
+type: statement
+lang: de
+label: Nach transthorakaler Ösophagektomie kann die nasogastrale Magensonde im frühen postoperativen Verlauf innerhalb der
+  ersten 48 Stunden entfernt werden.
+slots:
+  population: concepts/transthorakale-oesophagektomie
+  action: concepts/fruehe-magensondenentfernung-48h
+source: modelling

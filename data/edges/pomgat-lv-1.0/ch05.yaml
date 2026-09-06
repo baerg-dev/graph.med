@@ -1,0 +1,92 @@
+- - claims/pomgat-lv-1.0/cb7c2563
+  - supports
+  - statements/ponv-prophylaxe-bei-risikofaktoren
+  - source: modelling
+- - claims/pomgat-lv-1.0/392ed64d
+  - supports
+  - statements/ponv-prophylaxe-kombinationstherapie
+  - source: modelling
+- - claims/pomgat-lv-1.0/57bc2664
+  - supports
+  - statements/propofol-tiva-statt-volatiler-anaesthesie
+  - source: modelling
+- - claims/pomgat-lv-1.0/f9eb0050
+  - supports
+  - statements/volatile-anaesthesie-mit-antiemetikum-gleichwertig-tiva
+  - source: modelling
+- - claims/pomgat-lv-1.0/635f8f2a
+  - supports
+  - statements/keine-praeoperative-haarentfernung
+  - source: modelling
+- - claims/pomgat-lv-1.0/4803d625
+  - supports
+  - statements/haarentfernung-mit-clipper
+  - source: modelling
+- - claims/pomgat-lv-1.0/d8a787cf
+  - supports
+  - statements/keine-praeoperative-rasur
+  - source: modelling
+- - claims/pomgat-lv-1.0/484d969e
+  - supports
+  - statements/hautdesinfektion-chlorhexidin-alkoholisch
+  - source: modelling
+- - claims/pomgat-lv-1.0/d766c5a6
+  - supports
+  - statements/hautdesinfektion-povidon-iod-bei-unvertraeglichkeit
+  - source: modelling
+- - claims/pomgat-lv-1.0/1098f250
+  - supports
+  - statements/intravenoese-antibiotikaprophylaxe-praeoperativ
+  - source: modelling
+- - claims/pomgat-lv-1.0/413dbf62
+  - supports
+  - statements/antibiotikaprophylaxe-intraoperativ-wiederholen
+  - source: modelling
+- - claims/pomgat-lv-1.0/0b6c33a1
+  - supports
+  - statements/keine-postoperative-antibiotikaprophylaxe
+  - source: modelling
+- - claims/pomgat-lv-1.0/3cc01d64
+  - supports
+  - statements/darmvorbereitung-kolorektal-kombiniert
+  - source: modelling
+- - claims/pomgat-lv-1.0/7660502b
+  - supports
+  - statements/keine-rein-mechanische-darmvorbereitung-kolorektal
+  - source: modelling
+- - claims/pomgat-lv-1.0/d4427c4a
+  - supports
+  - statements/oral-antibiotische-darmvorbereitung-kolorektal-optional
+  - source: modelling
+- - claims/pomgat-lv-1.0/c5e4008d
+  - supports
+  - statements/keine-mechanische-darmvorbereitung-oberer-gi-trakt-pankreas
+  - source: modelling
+- - claims/pomgat-lv-1.0/d12ec537
+  - supports
+  - statements/keine-mechanische-darmvorbereitung-leberresektion-hcc
+  - source: modelling
+- - claims/pomgat-lv-1.0/4d76032e
+  - supports
+  - statements/selektive-darmdekontamination-oberer-gi-trakt-optional
+  - source: modelling
+- - claims/pomgat-lv-1.0/2a119f14
+  - supports
+  - statements/keine-selektive-darmdekontamination-kolorektal
+  - source: modelling
+- - claims/pomgat-lv-1.0/392ed64d
+  - refines
+  - claims/pomgat-lv-1.0/cb7c2563
+  - source: modelling
+- - claims/pomgat-lv-1.0/ad0f29aa
+  - refines
+  - claims/pomgat-lv-1.0/cb7c2563
+  - source: modelling
+- - claims/pomgat-lv-1.0/f9eb0050
+  - supplements
+  - claims/pomgat-lv-1.0/57bc2664
+  - source: modelling
+- - claims/pomgat-lv-1.0/d766c5a6
+  - supplements
+  - claims/pomgat-lv-1.0/484d969e
+  - source: modelling

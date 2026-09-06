@@ -1,0 +1,80 @@
+- - claims/pomgat-lv-1.0/8ce3a620
+  - supports
+  - statements/betablocker-neuansetzen-hochrisiko
+  - source: modelling
+- - claims/pomgat-lv-1.0/2c6b9961
+  - supports
+  - statements/betablocker-neuansetzen-dosistitration
+  - source: modelling
+- - claims/pomgat-lv-1.0/21c39c61
+  - supports
+  - statements/kein-generelles-betablocker-neuansetzen
+  - source: modelling
+- - claims/pomgat-lv-1.0/c380eb49
+  - supports
+  - statements/betablocker-fortfuehrung
+  - source: modelling
+- - claims/pomgat-lv-1.0/00b290e0
+  - supports
+  - statements/nitrate-fortfuehrung
+  - source: modelling
+- - claims/pomgat-lv-1.0/d71e071c
+  - supports
+  - statements/statin-fortfuehrung
+  - source: modelling
+- - claims/pomgat-lv-1.0/694720f1
+  - supports
+  - statements/statin-neubeginn-hochrisiko
+  - source: modelling
+- - claims/pomgat-lv-1.0/01ba1a06
+  - supports
+  - statements/ace-hemmer-sartane-fortfuehrung
+  - source: modelling
+- - claims/pomgat-lv-1.0/5d24c688
+  - supports
+  - statements/ace-hemmer-sartane-pause-op-morgen
+  - source: modelling
+- - claims/pomgat-lv-1.0/3e709b29
+  - supports
+  - statements/op-verschiebung-eindosierung-ace-hemmer-sartane
+  - source: modelling
+- - claims/pomgat-lv-1.0/f2da26e1
+  - supports
+  - statements/glukokortikoid-pankreas-leberchirurgie
+  - source: modelling
+- - claims/pomgat-lv-1.0/8c4dc5c7
+  - supports
+  - statements/praeoperative-lebensstilmassnahmen-standard
+  - source: modelling
+- - claims/pomgat-lv-1.0/fb48ead9
+  - supports
+  - statements/keine-strukturierte-praehabilitation
+  - source: modelling
+- - claims/pomgat-lv-1.0/ce748c35
+  - supports
+  - statements/praeoperative-patientenschulung-multimodales-konzept
+  - source: modelling
+- - claims/pomgat-lv-1.0/b60a7436
+  - supports
+  - statements/risikostratifizierungsinstrument-verwenden
+  - source: modelling
+- - claims/pomgat-lv-1.0/74c9e24e
+  - supports
+  - statements/risikostratifizierung-mit-patient-besprechen
+  - source: modelling
+- - claims/pomgat-lv-1.0/2c6b9961
+  - refines
+  - claims/pomgat-lv-1.0/8ce3a620
+  - source: modelling
+- - claims/pomgat-lv-1.0/5d24c688
+  - limits
+  - claims/pomgat-lv-1.0/01ba1a06
+  - source: modelling
+- - claims/pomgat-lv-1.0/ed10bff2
+  - refines
+  - claims/pomgat-lv-1.0/8ce3a620
+  - source: modelling
+- - claims/pomgat-lv-1.0/1134b4ef
+  - refines
+  - claims/pomgat-lv-1.0/2c6b9961
+  - source: modelling
