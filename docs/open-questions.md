@@ -75,7 +75,7 @@ open edges of the v0.2 model.
 **Settled by:** the first citation of a view.
 
 ## decision-graph-derivation  (publication.md §3; graph-representation.md §3.2 structure, §5 `branch`/`guard`)
-**Question:** The site draws a decision graph per chapter *derived* from statement slots (population → condition → recommendation → aim). Is that the durable form, or a stand-in until pathways are authored — and what do authored pathways add that the derivation cannot?
+**Question:** The site draws one decision tree *derived* from statement slots (which patient group? → which condition? → recommendation → aim, answers on the edges). Is that the durable form, or a stand-in until pathways are authored — and what do authored pathways add that the derivation cannot?
 **Options:** keep deriving from slots and never author pathways for plain recommendation chapters · author a pathway per chapter as structural nodes with `branch` guards and `about` edges, and render those instead · both — derived by default, authored where a chapter is a real algorithm (a flowchart in the source)
 **Leaning:** the third. The derivation is honest (every element is a slot value or a claim's grade, nothing invented) and covers recommendation lists well, but it has no branch labels, no ordering between decisions, and no gaps; a chapter that *is* a decision algorithm in the source deserves authored structure with guards, and the view then renders the pathway. What the derivation cannot say is exactly what a pathway is for. (2026-09-06)
 **Settled by:** the first source chapter that is a flowchart, authored as a pathway and read next to its derived graph.

@@ -30,38 +30,18 @@ ul.cards li a { display: block; padding: .8rem; border: 1px solid var(--line); b
 ul.cards small, ul.plain small { display: block; color: var(--mute); }
 .foot { padding: 1rem; color: var(--mute); font-size: .8rem; border-top: 1px solid var(--line); }
 
-/* the graph: one decision graph per chapter inside a fixed viewport */
-.chapters { display: flex; gap: .4rem; overflow-x: auto; padding: .6rem 0 .4rem; scrollbar-width: none; }
-.chapters button { flex: none; min-height: 40px; padding: 0 .9rem; border-radius: 1.2rem; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: .9rem; }
-.chapters button.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+/* the graph: one decision tree in a fixed viewport, drawn by Cytoscape.js */
 .graph-wrap { margin: 0 -1rem; position: relative; background: var(--bg); border-top: 1px solid var(--line); }
-#graph { display: block; width: 100%; height: 60vh; touch-action: none; user-select: none; cursor: grab; }
+#graph { display: block; width: 100%; height: 62vh; touch-action: none; }
 .hint { position: absolute; left: 1rem; right: 1rem; bottom: .3rem; margin: 0; color: var(--mute); font-size: .74rem; line-height: 1.5; pointer-events: none; }
 .sw { display: inline-block; width: .75em; height: .75em; vertical-align: -.05em; margin: 0 .15em 0 .45em; border: 1px solid var(--mute); box-sizing: border-box; }
-.sw.population { transform: rotate(45deg) scale(.8); }
-.sw.condition { clip-path: polygon(20% 0, 80% 0, 100% 50%, 80% 100%, 20% 100%, 0 50%); background: var(--mute); }
+.sw.question { transform: rotate(45deg) scale(.8); border-color: var(--fg); }
 .sw.statement { border-radius: 2px; background: var(--mute); }
-.sw.outcome { clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%); background: var(--mute); }
+.sw.aim { clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%); background: var(--mute); }
 .sw.g-A { background: var(--gA); border: 0; } .sw.g-B { background: var(--gB); border: 0; } .sw.g-0 { background: var(--g0); border: 0; } .sw.g-EK { background: var(--gEK); border: 0; }
 .sw.against { border: 2px solid var(--contested); }
 .tools { position: absolute; right: .6rem; top: .6rem; display: flex; gap: .4rem; }
 .tools button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: 1.2rem; }
-#graph .edge { fill: none; stroke: var(--edge); stroke-width: 1.6; }
-#graph .edge.purpose { stroke-dasharray: 4 4; }
-#graph .node { cursor: pointer; }
-#graph .node rect, #graph .node polygon { fill: var(--bg); stroke: var(--mute); stroke-width: 1.4; }
-#graph .population polygon { stroke: var(--fg); }
-#graph .statement rect { stroke: transparent; }
-#graph .statement.g-A rect { fill: var(--gA); } #graph .statement.g-B rect { fill: var(--gB); }
-#graph .statement.g-0 rect { fill: var(--g0); } #graph .statement.g-EK rect { fill: var(--gEK); }
-#graph .statement.g-mixed rect { fill: var(--line); }
-#graph .statement.against rect { stroke: var(--contested); stroke-width: 3; }
-#graph .statement.contested rect { stroke: var(--contested); stroke-width: 3; stroke-dasharray: 6 4; }
-#graph text { font-size: 12px; fill: var(--fg); pointer-events: none; }
-#graph .statement text { fill: #111; }
-#graph text.no { font-size: 9px; font-weight: 700; fill: #333; opacity: .7; }
-#graph .dim { opacity: .15; }
-#graph .selected rect, #graph .selected polygon { stroke: var(--fg); stroke-width: 3; }
 
 /* the sheet below the graph, and the entity page */
 .sheet { border-top: 2px solid var(--line); padding-top: .6rem; }

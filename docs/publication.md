@@ -63,53 +63,57 @@ The view page is designed for a phone first and kept minimal: one graph, one
 detail section, nothing else competing for the screen. Desktop gets the same page
 with more room.
 
-**The graph is a decision graph, one per chapter.** The page is for physicians and
-academics, who read a guideline as decisions: which patients, under which condition,
-which recommendation, to what end. The first published page drew every member at
-once and was unreadable; the second was an outline and read as a table of contents.
-So each chapter is drawn top-down as a layered decision graph, derived from the
-statements' slots — the pool has no authored pathways yet, and this derivation is the
-stand-in until it does (`open-questions.md` → decision-graph-derivation):
+**The graph is one decision tree.** The page is for physicians and academics, who
+read a guideline as decisions: which patients, under which condition, which
+recommendation, to what end. So the whole view is drawn top-down as a decision
+tree, derived from the statements' slots — the pool has no authored pathways yet,
+and this derivation is the stand-in until it does (`open-questions.md` →
+decision-graph-derivation):
 
 ```
-        ◇ patient group  (population slot — "is the patient in this group?")
-        │
-        ⬡ condition      (condition slot — a further question, asked within its group)
-        │
-   ┌────────────┐
-   │ recommend- │      (the statement — a box coloured by its claims' grade,
-   │ ation      │       A · B · 0 · EK; a thick red border when it is *against*;
-   └────────────┘       dashed red when contested; the recommendation number in the corner)
-        ┆
-        ▷ aim            (outcome slot — what the recommendation is for)
+   ┌─────────────────────┐
+   │ the guideline       │                       root
+   └─────────┬───────────┘
+        ◇ Which patient group?                   question (ours)
+       ╱ Gastrektomie ╲ Kolorektale Resektion …  answers on the edges (population slot)
+      ●                ●                          junction per group
+      │                ├──── ◇ Which condition?  question (ours)
+      │                │       ╲ Amylase < …     answer on the edge (condition slot)
+   ┌──┴────────┐   ┌───┴───────┐ ┌───┴───────┐
+   │ recommend.│   │ recommend.│ │ recommend.│    the statements — boxes coloured by
+   └─────┬─────┘   └───────────┘ └───────────┘    grade (A · B · 0 · EK), red border
+         ┆ (dashed)                               when *against*, dashed red when contested
+         ▷ aim                                    outcome slot
 ```
 
-- **Chapters** are the entry point: a row of chips above the graph, one chapter open
-  at a time. A statement's chapter is derived from the recommendation numbers of
-  its claims (6.3 → chapter 6) — a display grouping for one-source views, computed by
-  the build, never stored.
-- **Patient groups converge.** Statements that share a population concept hang from
-  one diamond, so the graph shows at a glance what the guideline says for, say,
-  colorectal resection. A condition is asked within its patient group, so the same
-  condition concept under two groups is two hexagons, and the path stays unambiguous.
-- **Forms tell the types apart, colour tells the grade.** Diamond, hexagon, box, tag
-  for group, condition, recommendation, aim; solid connectors on the decision path,
-  dashed to the aim. Grade colours are the guideline's own scale; the legend sits under
-  the graph. Claims are not nodes; they are the evidence and appear in the section.
+- **The questions are ours; every answer is data.** "Which patient group?" and
+  "Which condition?" are the only text the build adds. Each answer on an edge is a
+  population or condition concept; each box is a statement with its claims' grade;
+  each aim an outcome concept. Nothing else is invented — in particular no yes/no
+  branches and no ordering between conditions, which is what authored pathways will
+  add (`graph-representation.md` §5, `branch` edges with a `guard`).
+- **Patient groups converge.** Statements sharing a population hang from one
+  junction, so the tree shows at a glance what the guideline says for, say,
+  colorectal resection. A condition is asked within its group.
+- **Forms tell the types apart, colour tells the grade.** Diamond, box, tag for
+  question, recommendation, aim; the answers are bold edge labels, the aim a dashed
+  edge; the grade colours are the guideline's own scale. Legend under the graph.
+  Claims are not nodes; they are the evidence and appear in the section.
 
-Positions are **computed by the build**, deterministically: recommendations in
-reading order set the x axis, the other layers sit at the barycentre of what they
-connect to and are pushed apart until nothing overlaps. The browser only renders,
-so the client script stays small and dependency-free.
+**Drawn by a library.** The page uses Cytoscape.js with the dagre layout,
+self-hosted under `assets/vendor/` (MIT, pinned, no third-party request): nodes size
+to their text, the layered top-down layout has no overlaps, edge labels are placed,
+and touch pan and pinch come with it. The data carries no positions; the layout is
+deterministic for a given tree. This replaces the earlier hand-written renderer,
+whose fixed boxes could not fit the labels.
 
 **The interaction.** Pan by one finger, pinch or wheel to zoom, a fit button.
-Tapping a node selects it: its ancestors and descendants stay, everything else
-fades, and its details open in the **section below the graph**; the graph stays
-where it is, so the reader keeps their place. Tapping the background clears the
-selection. Tapping a neighbour listed in the section moves there, switching chapter
-if needed. Deep links carry `#<entity id>` or `#chapter=<n>`. There are no modal
-dialogs and no page loads needed to read a view; the entity pages (§4) exist for
-linking, not for reading.
+Tapping a node or an answer selects it: what leads to it and what follows it stay,
+everything else fades, the view fits its neighbourhood, and its details open in the
+**section below the graph**; the graph stays where it is, so the reader keeps their
+place. Tapping the background clears. Tapping a neighbour listed in the section
+moves there. Deep links carry `#<entity id>`. There are no modal dialogs and no page
+loads needed to read a view; the entity pages (§4) exist for linking, not for reading.
 
 **What the section shows.**
 
@@ -189,10 +193,9 @@ cut-publication).
 
 - **Cut publication** — how cuts are built and served alongside the floating view;
   whether a cut has a PDF export.
-- **Search** — the chapter chips are the entry point; finding a statement by word is
-  not built.
-- **Edge labels** — a decision graph proper labels its branches (yes/no, a value
-  range). The derived graph has none; they come with authored pathways (`branch`
-  edges carry a `guard`).
+- **Search** — finding a statement by word is not built; the root question is the
+  entry point.
+- **Branch guards** — yes/no and value-range branches come with authored pathways
+  (`branch` edges carry a `guard`); the derived tree has only slot answers.
 - **Translation** — a build-layer projection, not started.
 - **Other projections** — FHIR, RDF, diagram formats (`graph-representation.md` §13).

@@ -2,14 +2,13 @@
 {% block title %}{{ vid }} — graph.med{% endblock %}
 {% block crumbs %}<span class="crumb">{{ vid }}</span>{% endblock %}
 {% block main %}
-<nav class="chapters" id="chapters" aria-label="chapters"></nav>
 <section class="graph-wrap">
-  <svg id="graph" role="img" aria-label="{{ title }}"></svg>
+  <div id="graph" role="img" aria-label="{{ title }}"></div>
   <div class="tools">
-    <button type="button" id="fit" title="fit the chapter">⤢</button>
+    <button type="button" id="fit" title="fit the whole tree">⤢</button>
   </div>
   <p class="hint" id="hint">
-    <span class="sw population"></span> patient group <span class="sw condition"></span> condition <span class="sw statement"></span> recommendation <span class="sw outcome"></span> aim
+    <span class="sw question"></span> question <span class="sw statement"></span> recommendation <span class="sw aim"></span> aim · answers on the edges
     <br><span class="sw g-A"></span> A <span class="sw g-B"></span> B <span class="sw g-0"></span> 0 <span class="sw g-EK"></span> EK <span class="sw against"></span> against · tap a box for details
   </p>
 </section>
@@ -22,4 +21,9 @@
 </section>
 <script type="application/json" id="graph-data">{{ graph_json | safe }}</script>
 {% endblock %}
-{% block scripts %}<script src="{{ base }}assets/graph.js"></script>{% endblock %}
+{% block scripts %}
+<script src="{{ base }}assets/vendor/cytoscape-3.30.2.min.js"></script>
+<script src="{{ base }}assets/vendor/dagre-0.8.5.min.js"></script>
+<script src="{{ base }}assets/vendor/cytoscape-dagre-2.5.0.js"></script>
+<script src="{{ base }}assets/graph.js"></script>
+{% endblock %}

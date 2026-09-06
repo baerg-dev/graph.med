@@ -5,9 +5,9 @@
     uv run tools/build.py --base /graph.med/   # for baerg-dev.github.io/graph.med/
     uv run tools/build.py --cname graph.med    # also emit the CNAME file for Pages
 
-Every view becomes <view-id>/index.html — a decision graph per chapter (population →
-condition → recommendation → outcome, layered top-down, positions computed here)
-with a detail section below it — plus <view-id>.json; every entity becomes
+Every view becomes <view-id>/index.html — one decision tree (which patient group? →
+which condition? → recommendation → aim; answers on the edges; laid out top-down
+in the browser by dagre) with a detail section below it — plus <view-id>.json; every entity becomes
 <namespace>/<entity-id>/index.html and <namespace>/<entity-id>.json; the schema is
 copied to schema/schema.yaml. Offline, deterministic, nothing authored.
 """
@@ -131,119 +131,61 @@ def members_of(view: dict, pool: Pool) -> dict[str, dict]:
     return members
 
 
-def chapter_of(statement_id: str, pool: Pool) -> str | None:
-    """The chapter a statement belongs to: the recommendation numbers of its claims (e.g. 6.3 → 6).
-    A display grouping for one-source views, derived, never stored (docs/publication.md §3)."""
-    nos = sorted({c["recommendation_no"].split(".")[0] for c in pool.claims_for(statement_id) if c.get("recommendation_no")}, key=natural)
-    return nos[0] if nos else None
-
-
-GRADES = ("A", "B", "0", "EK")
-
-
-def wrap(text: str, width: int, lines: int) -> list[str]:
-    """Greedy word wrap into at most `lines` lines of about `width` characters; ellipsis if cut."""
-    out, cur = [], ""
-    for word in text.split():
-        if cur and len(cur) + 1 + len(word) > width:
-            out.append(cur); cur = word
-        else:
-            cur = f"{cur} {word}" if cur else word
-    if cur:
-        out.append(cur)
-    if len(out) > lines:
-        out = out[:lines]
-        out[-1] = out[-1][: max(0, width - 1)].rstrip() + "…"
-    return out
-
-
-def decision_graph_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
-    """One decision graph per chapter, derived from the statements' slots (docs/publication.md §3):
-    population (a question: is the patient in it?) → condition (a further question) → the
-    statement (the recommended action, coloured by its claims' grade) → outcome (its purpose).
-    Layered top-down; positions computed here, deterministically."""
-    statements = sorted((m for m in members.values() if m["type"] == "statement"), key=lambda s: s["id"])
-    chapters: dict[str, list] = defaultdict(list)
-    for st in statements:
-        chapters[chapter_of(st["id"], pool) or "?"].append(st)
+def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
+    """One decision tree for the whole view, derived from the statements' slots
+    (docs/publication.md §3). The question nodes are ours; every answer on an edge and
+    every box is a slot value or a claim's grade. Layout happens in the browser (dagre)."""
+    nodes: list[dict] = []
+    edges: list[dict] = []
+    seen: set = set()
+    def add(nid, **kw):
+        if nid not in seen:
+            seen.add(nid); nodes.append({"id": nid, **kw})
+        return nid
+    def edge(a, b, kind, label=None, ref=None):
+        e = {"from": a, "to": b, "kind": kind}
+        if label: e["label"] = label
+        if ref: e["ref"] = ref
+        edges.append(e)
     label = lambda cid: members[cid]["label"] if cid in members else cid
-    out = []
-    for ch, sts in sorted(chapters.items(), key=lambda kv: natural(kv[0])):
-        sts.sort(key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")) + [s["id"]])
-        nodes: dict[str, dict] = {}
-        edges: list[dict] = []
-        def add(nid, **kw):
-            if nid not in nodes:
-                nodes[nid] = {"id": nid, **kw}
-            return nid
-        for st in sts:
-            slots = st.get("slots") or {}
-            claims = pool.claims_for(st["id"])
-            grades = {c["grade"] for c in claims if c["edge"] == "supports" and c.get("grade")}
-            against = {c["direction"] for c in claims if c["edge"] == "supports" and c.get("direction")} == {"against"}
-            sid = add(st["id"], ref=st["id"], type="statement", layer=2, lang=st["lang"],
-                      lines=wrap(st["label"], 26, 3), grade=grades.pop() if len(grades) == 1 else ("mixed" if grades else None),
-                      against=against, contested=any(c["edge"] == "contests" for c in claims),
-                      no=min((c["recommendation_no"] for c in claims if c.get("recommendation_no")), default=None))
-            pop = slots.get("population"); cond = slots.get("condition"); outc = slots.get("outcome")
-            prev = None
-            if pop in members:
-                prev = add(pop, ref=pop, type="population", layer=0, lang=members[pop]["lang"], lines=wrap(label(pop), 20, 3))
-            if cond in members:
-                cid = f"{pop}|{cond}" if pop else cond      # a condition is asked within its population
-                cid = add(cid, ref=cond, type="condition", layer=1, lang=members[cond]["lang"], lines=wrap(label(cond), 20, 3))
-                if prev:
-                    edges.append({"from": prev, "to": cid, "kind": "branch"})
-                prev = cid
-            if prev:
-                edges.append({"from": prev, "to": sid, "kind": "branch"})
-            if outc in members:
-                oid = add(outc, ref=outc, type="outcome", layer=3, lang=members[outc]["lang"], lines=wrap(label(outc), 22, 2))
-                edges.append({"from": sid, "to": oid, "kind": "purpose"})
-        layered_layout(nodes, edges)
-        out.append({"id": f"{view['id']}#chapter={ch}", "chapter": ch, "label": f"Kapitel {ch}", "count": len(sts),
-                    "nodes": sorted(nodes.values(), key=lambda n: (n["layer"], n["x"], n["id"])),
-                    "edges": sorted({(e["from"], e["kind"], e["to"]) for e in edges})})
-    for c in out:
-        c["edges"] = [{"from": f, "kind": k, "to": t} for f, k, t in c["edges"]]
-    return out
-
-
-SIZE = {"statement": (170, 62), "population": (150, 56), "condition": (140, 52), "outcome": (150, 40)}
-LAYER_Y = (0, 150, 310, 450)
-
-
-def layered_layout(nodes: dict[str, dict], edges: list[dict]) -> None:
-    """Statements in reading order set the x axis; the other layers sit at the barycentre of
-    what they connect to, then overlaps are pushed apart. Deterministic."""
-    GAP = 22
-    for n in nodes.values():
-        n["w"], n["h"] = SIZE[n["type"]]
-        n["y"] = LAYER_Y[n["layer"]]
-    order = [n for n in nodes.values() if n["type"] == "statement"]   # insertion order = reading order
-    x = 0.0
-    for n in order:
-        n["x"] = x + n["w"] / 2; x += n["w"] + GAP
-    nbrs: dict[str, list[str]] = defaultdict(list)
-    for e in edges:
-        nbrs[e["from"]].append(e["to"]); nbrs[e["to"]].append(e["from"])
-    for layer in (1, 0, 3):    # conditions from statements, populations from conditions/statements, outcomes from statements
-        row = [n for n in nodes.values() if n["layer"] == layer]
-        for n in row:
-            xs = [nodes[m]["x"] for m in nbrs[n["id"]] if "x" in nodes[m]]
-            n["x"] = sum(xs) / len(xs) if xs else 0.0
-        row.sort(key=lambda n: (n["x"], n["id"]))
-        for i in range(1, len(row)):     # push apart, left to right
-            lo = row[i - 1]["x"] + row[i - 1]["w"] / 2 + GAP + row[i]["w"] / 2
-            if row[i]["x"] < lo:
-                row[i]["x"] = lo
-        if row:                          # recentre the row over the neighbours already placed
-            targets = [sum(nodes[m]["x"] for m in nbrs[n["id"]] if "x" in nodes[m] and nodes[m] is not n) / max(1, sum(1 for m in nbrs[n["id"]] if "x" in nodes[m] and nodes[m] is not n)) for n in row]
-            shift = sum(n["x"] for n in row) / len(row) - sum(targets) / len(targets)
-            for n in row:
-                n["x"] -= shift
-    for n in nodes.values():
-        n["x"] = round(n["x"], 1)
+    sources = [members[s] for s in view["filter"]["sources"]]
+    root = add(view["id"], ref=sources[0]["id"], type="root", lang=sources[0]["lang"], label=sources[0]["title"])
+    q0 = add("q:population", type="question", label="Which patient group?")
+    edge(root, q0, "flow")
+    statements = sorted((m for m in members.values() if m["type"] == "statement"),
+                        key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")) + [s["id"]])
+    for st in statements:
+        slots = st.get("slots") or {}
+        claims = pool.claims_for(st["id"])
+        grades = {c["grade"] for c in claims if c["edge"] == "supports" and c.get("grade")}
+        pop, cond, outc = slots.get("population"), slots.get("condition"), slots.get("outcome")
+        sid = add(st["id"], ref=st["id"], type="statement", lang=st["lang"], label=st["label"],
+                  grade=grades.pop() if len(grades) == 1 else ("mixed" if grades else None),
+                  against={c["direction"] for c in claims if c["edge"] == "supports" and c.get("direction")} == {"against"},
+                  contested=any(c["edge"] == "contests" for c in claims),
+                  no=min((c["recommendation_no"] for c in claims if c.get("recommendation_no")), default=None))
+        at = q0
+        if pop in members:   # the answer sits on the edge; a junction fans out into what follows
+            j = f"j:{pop}"
+            if j not in seen:
+                add(j, ref=pop, type="junction", label="")
+                edge(q0, j, "answer", label(pop), ref=pop)
+            at = j
+        if cond in members:  # a further question, asked within the patient group
+            q = f"q:{at}"
+            if q not in seen:
+                add(q, type="question", label="Which condition?")
+                edge(at, q, "flow")
+            edge(q, sid, "answer", label(cond), ref=cond)
+        else:
+            edge(at, sid, "flow")
+        if outc in members:
+            add(outc, ref=outc, type="aim", lang=members[outc]["lang"], label=label(outc))
+            edge(sid, outc, "aim")
+        for kind, to, _ in pool.out.get(st["id"], []):
+            if kind in STATEMENT_EDGES and to in members:
+                edge(sid, to, "relation", kind)
+    return {"nodes": nodes, "edges": edges}
 
 
 # ── rendering ───────────────────────────────────────────────────────────────
@@ -316,12 +258,9 @@ def main(argv=None) -> int:
     for view in sorted(pool.of_type("view"), key=lambda v: v["id"]):
         vid = view["id"].split("/", 1)[1]
         members = members_of(view, pool)
-        chapters = decision_graph_of(view, members, pool)
-        html = {}
-        for c in chapters:
-            for node in c["nodes"]:
-                html.setdefault(node["ref"], detail_tpl.render(**details(pool.entities[node["ref"]])))
-        graph = {"chapters": chapters, "html": html}
+        graph = decision_tree_of(view, members, pool)
+        refs = {n["ref"] for n in graph["nodes"] if n.get("ref")} | {e["ref"] for e in graph["edges"] if e.get("ref")}
+        graph["html"] = {r: detail_tpl.render(**details(pool.entities[r])) for r in sorted(refs) if r in pool.entities}
         sources = [members[s] for s in view["filter"]["sources"]]
         title = sources[0]["title"] if len(sources) == 1 else vid
         counts = {t: sum(1 for m in members.values() if m["type"] == t) for t in ("statement", "concept", "claim")}
