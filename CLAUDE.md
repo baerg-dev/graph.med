@@ -53,7 +53,9 @@ This file describes the **project** and maps the rest. Design lives in `docs/`:
 `docs/graph-representation.md` is the authority on how knowledge is represented —
 one pool of source-anchored claims and a semantic layer, graphs as versioned views,
 provenance, attestations, review — with `schema/schema.yaml` as the authority on
-syntax, and `docs/open-questions.md`
+syntax; `docs/publication.md` is the authority on how the pool is shown — the site
+at `graph.med`, views as pages, a graph-and-sheet page read on a phone first; and
+`docs/open-questions.md`
 carries what is not yet decided: the handover between sessions. How an agent is expected to operate
 lives in `.claude/`, filed by level, so that each piece loads when it is relevant
 rather than all of it, always:

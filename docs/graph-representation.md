@@ -139,7 +139,9 @@ stored under a property address; it is an address the resolution rules in §6
 answer for.
 
 Identity is the URL, never the file. How entities are distributed over files is
-a storage and diff-ergonomics decision that the model does not depend on.
+a storage and diff-ergonomics decision that the model does not depend on. Once
+published, every identifier resolves at `https://graph.med/<namespace>/<entity-id>`
+and every view at `https://graph.med/<view-id>` — `docs/publication.md`.
 
 **Language.** Content stays in the source language — labels, quotes, statement
 texts are never translated at extraction. Every entity and edge that carries
@@ -623,7 +625,8 @@ No inference semantics are assumed: relations are asserted, not entailed.
   statement type needs, and how supporting claims' grades compose, are open —
   they are medically sensitive and will be settled against real content.
 - **Export projections.** FHIR, RDF, diagram formats — generated from the
-  data, never authored.
+  data, never authored. The website is the first such projection; its design
+  is `docs/publication.md`.
 
 ---
 
