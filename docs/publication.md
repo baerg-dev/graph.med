@@ -100,17 +100,35 @@ decision-graph-derivation):
   edge; the grade colours are the guideline's own scale. Legend under the graph.
   Claims are not nodes; they are the evidence and appear in the section.
 
-**Drawn by a library.** The page uses Cytoscape.js with the dagre layout,
-self-hosted under `assets/vendor/` (MIT, pinned, no third-party request): nodes size
-to their text, the layered top-down layout has no overlaps, edge labels are placed,
-and touch pan and pinch come with it. The data carries no positions; the layout is
-deterministic for a given tree. This replaces the earlier hand-written renderer,
-whose fixed boxes could not fit the labels.
+**Drawn by a library, left to right, folded.** The page uses Cytoscape.js with the
+dagre layout, self-hosted under `assets/vendor/` (MIT, pinned, no third-party
+request): boxes have a fixed width and grow to their wrapped text, the layered
+layout has no overlaps, edge labels are placed, and touch pan and pinch come with
+it. Three choices keep the tree readable at ninety recommendations:
 
-**The interaction.** Pan by one finger, pinch or wheel to zoom, a fit button.
-Tapping a node or an answer selects it: what leads to it and what follows it stay,
-everything else fades, the view fits its neighbourhood, and its details open in the
-**section below the graph**; the graph stays where it is, so the reader keeps their
+- **Left to right.** A rank is a column, so the widest rank becomes a tall column
+  that pans vertically — natural on a phone and on a desktop — and the whole tree is
+  seven columns wide.
+- **Folded by default.** The page opens with the root, the first question and its
+  answers, one junction per patient group carrying the number of recommendations
+  behind it. Tapping an answer or its junction unfolds that group's conditions and
+  recommendations; tapping again folds it. Only what the reader opened takes space.
+  A deep link unfolds the group its target is in.
+- **Answers in order of weight.** The patient groups with the most recommendations
+  come first, so the general ones lead and the single-use ones trail. A real
+  hierarchy of groups — organ, then procedure — would shrink the fan-out further; it
+  is data the pool does not have yet (broader/narrower edges between concepts) and
+  will be drawn when it does.
+
+The data carries no positions; the layout is deterministic for a given set of open
+groups. This replaces the earlier hand-written renderer, whose fixed boxes could not
+fit the labels.
+
+**The interaction.** Pan by one finger, pinch or wheel to zoom, a fit button for
+what is open. Tapping a node or an answer selects it: what leads to it and what
+follows it stay, everything else fades, and its details open in the **section
+below the graph** — on a wide screen, in a **column beside it**, the graph taking
+the full height; the graph stays where it is either way, so the reader keeps their
 place. Tapping the background clears. Tapping a neighbour listed in the section
 moves there. Deep links carry `#<entity id>`. There are no modal dialogs and no page
 loads needed to read a view; the entity pages (§4) exist for linking, not for reading.

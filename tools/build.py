@@ -134,7 +134,8 @@ def members_of(view: dict, pool: Pool) -> dict[str, dict]:
 def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     """One decision tree for the whole view, derived from the statements' slots
     (docs/publication.md §3). The question nodes are ours; every answer on an edge and
-    every box is a slot value or a claim's grade. Layout happens in the browser (dagre)."""
+    every box is a slot value or a claim's grade. Answers are ordered by how many
+    recommendations they lead to. Layout and folding happen in the browser (dagre)."""
     nodes: list[dict] = []
     edges: list[dict] = []
     seen: set = set()
@@ -154,6 +155,11 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     edge(root, q0, "flow")
     statements = sorted((m for m in members.values() if m["type"] == "statement"),
                         key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")) + [s["id"]])
+    per_group: dict = defaultdict(int)
+    for st in statements:
+        per_group[(st.get("slots") or {}).get("population")] += 1
+    statements.sort(key=lambda s: (-per_group[(s.get("slots") or {}).get("population")], label((s.get("slots") or {}).get("population") or ""),
+                                   natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")), s["id"]))
     for st in statements:
         slots = st.get("slots") or {}
         claims = pool.claims_for(st["id"])
@@ -168,7 +174,7 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
         if pop in members:   # the answer sits on the edge; a junction fans out into what follows
             j = f"j:{pop}"
             if j not in seen:
-                add(j, ref=pop, type="junction", label="")
+                add(j, ref=pop, type="junction", label=str(per_group[pop]), lang=members[pop]["lang"], group=label(pop))
                 edge(q0, j, "answer", label(pop), ref=pop)
             at = j
         if cond in members:  # a further question, asked within the patient group

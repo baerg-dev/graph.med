@@ -24,8 +24,10 @@ graph throughout. A library that measures text, lays out a DAG without overlaps,
 and places edge labels answers all of it; self-hosting keeps the site free of
 third-party requests.
 
-**How to apply:** Keep one tree for the whole view; keep the answers on the
-edges and the questions as the only text the build adds; keep the grade colours
+**How to apply:** Keep one tree for the whole view, drawn left to right and
+folded by default (the maintainer found the top-down, all-open tree "much too
+wide" on a desktop, with labels still spilling out of the diamonds); keep the
+answers on the edges and the questions as the only text the build adds; keep the grade colours
 and the node forms; keep Cytoscape.js + dagre vendored and pinned. Do not split
 the page by chapter, reintroduce an outline, or hand-write layout again. The tree
 is *derived* from slots until pathways are authored (`docs/open-questions.md` →
