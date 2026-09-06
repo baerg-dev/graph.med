@@ -36,6 +36,7 @@ ul.cards small, ul.plain small { display: block; color: var(--mute); }
 .hint { position: absolute; left: 1rem; right: 1rem; bottom: .3rem; margin: 0; color: var(--mute); font-size: .74rem; line-height: 1.5; pointer-events: none; }
 .sw { display: inline-block; width: .75em; height: .75em; vertical-align: -.05em; margin: 0 .15em 0 .45em; border: 1px solid var(--mute); box-sizing: border-box; }
 .sw.question { transform: rotate(45deg) scale(.8); border-color: var(--fg); }
+.sw.junction { border-radius: 50%; border: 2px solid var(--fg); }
 .sw.statement { border-radius: 2px; background: var(--mute); }
 .sw.aim { clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%); background: var(--mute); }
 .sw.g-A { background: var(--gA); border: 0; } .sw.g-B { background: var(--gB); border: 0; } .sw.g-0 { background: var(--g0); border: 0; } .sw.g-EK { background: var(--gEK); border: 0; }
@@ -59,3 +60,11 @@ ol.claims p { margin: .3rem 0; }
 blockquote { margin: .3rem 0; padding-left: .7rem; border-left: 3px solid var(--line); color: var(--mute); font-style: italic; }
 .cite { font-size: .85rem; color: var(--mute); }
 .node-link { min-height: 44px; display: inline-flex; align-items: center; }   /* touch target */
+
+/* wide screens: the graph fills the height, the details sit beside it as a column */
+@media (min-width: 900px) {
+  main.view { max-width: none; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) 400px; height: calc(100vh - 6.6rem); }   /* header and footer stay */
+  main.view .graph-wrap { margin: 0; border-top: 0; height: 100%; min-height: 0; }
+  main.view #graph { height: 100%; }
+  main.view .sheet { border-top: 0; border-left: 1px solid var(--line); padding: .6rem 1rem 2rem; overflow: auto; min-height: 0; }
+}

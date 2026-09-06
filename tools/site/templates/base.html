@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{% block title %}graph.med{% endblock %}</title>
-<link rel="stylesheet" href="{{ base }}assets/site.css">
+<link rel="stylesheet" href="{{ base }}assets/site.css?v={{ commit }}">
 {% block head %}{% endblock %}
 </head>
 <body>
@@ -12,7 +12,7 @@
   <a class="brand" href="{{ base }}">graph.med</a>
   {% block crumbs %}{% endblock %}
 </header>
-<main>
+<main class="{% block mainclass %}{% endblock %}">
 {% block main %}{% endblock %}
 </main>
 <footer class="foot">
