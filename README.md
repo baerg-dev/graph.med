@@ -80,9 +80,10 @@ ephemeral, like everything outside the repository.
 
 ## Build
 
-`tools/build.py` renders `data/` into a static site — one graph page per view, one
-page and one JSON document per entity, read on a phone first — as designed in
-`docs/publication.md`. The command is in [`CLAUDE.md`](CLAUDE.md) under "Build"; run
+`tools/build.py` renders `data/` into a static site — one decision-tree page per view,
+one page and one JSON document per entity, read on a phone first — as designed in
+`docs/publication.md`. The tree is drawn by Cytoscape.js with the dagre layout,
+vendored under `tools/site/static/vendor/` (MIT, pinned; see its `LICENSES.md`). The command is in [`CLAUDE.md`](CLAUDE.md) under "Build"; run
 it locally and open `site/index.html`. Deployment to GitHub Pages is a workflow, and
 like every workflow file it is committed by a person (see "Checks").
 
