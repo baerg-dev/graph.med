@@ -7,12 +7,32 @@ Copyright 2026 Robert Schwarzenberg, Anton Zolkin.
 
 The repository is at inception: it currently contains `README.md`, `LICENSE`, this
 file, the design documentation under `docs/`, the one schema for the data pool
-(`schema/schema.yaml`), the pool itself under `data/` (layout in `data/README.md`,
-parsing progress in `data/PROGRESS.yaml`), and the `.claude/` directory described
-below. There is no build system, dependency manifest, or test suite yet.
+(`schema/schema.yaml`), the validator that enforces it (`tools/validate.py`) with the
+CI workflow that runs it (`.github/workflows/validate.yml`), the pool itself under
+`data/` (layout in `data/README.md`, parsing progress in `data/PROGRESS.yaml`), and
+the `.claude/` directory described below. There is no source tree or build system yet.
 Project-specific guidance — data sources and their licenses, setup and test
 instructions — belongs in this file once it exists. Do not document tooling that does
 not exist.
+
+## Checks
+
+Python tooling is managed with `uv` (`pyproject.toml`, `uv.lock`); never pip. The one
+check is the validator. `schema/schema.yaml` is a JSON Schema (draft 2020-12); the
+validator applies it to every file under `data/` with the `jsonschema` library, then
+checks what a document schema cannot say — references resolve, claim ids hash
+correctly, edges are unique:
+
+```bash
+uv run tools/validate.py                  # structure, offline
+uv run tools/validate.py --verify-quotes  # also downloads each source and checks every quote
+```
+
+The second form needs `pdftotext` (poppler) and network access to the sources; it
+caches downloads under `~/.cache/graph.med/sources/` by content hash. CI runs both on
+every pull request and on every push to `main` (`.github/workflows/validate.yml`).
+Run the first form before proposing a change (the contribution workflow’s "run the
+checks locally").
 
 ## Where this runs
 
@@ -68,11 +88,12 @@ it is reviewed and shared rather than private to one machine.
 `rules/conventions/memory.md` carries its index.
 
 `agents/` is deliberately empty, and `skills/` holds exactly two skills. A subagent
-or skill that automates nothing would be guidance pretending to be capability; both
-exceptions earned their place as real, repeated tasks. `handover` ends a session by
-maintaining `docs/open-questions.md`. `parse-next-chunk` continues parsing a
-registered source into `data/` — one chunk per session, ending with an updated
-`data/PROGRESS.yaml` and a pull request. Add another only for another such task —
-then say in the pull request what it does and what it is allowed to touch.
+or skill that automates nothing would be guidance pretending to be capability — the
+validator is a check, not a task to automate — and both exceptions earned their place
+as real, repeated tasks. `handover` ends a session by maintaining
+`docs/open-questions.md`. `parse-next-chunk` continues parsing a registered source
+into `data/` — one chunk per session, ending with an updated `data/PROGRESS.yaml` and
+a pull request. Add another only for another such task — then say in the pull
+request what it does and what it is allowed to touch.
 
 One fact, one home: guidance that belongs in a rule is not restated here.

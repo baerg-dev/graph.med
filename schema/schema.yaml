@@ -1,159 +1,69 @@
-# The one schema for the graph.med pool.
+# The one schema for the graph.med pool — a JSON Schema (draft 2020-12), written in YAML.
 #
 # Authority on syntax; concepts and rules live in docs/graph-representation.md.
 # Graphs are views (spec §4) and own nothing, so there is exactly one schema.
 # Schema changes land BEFORE the data that uses them (spec §7); data validates
 # against the schema as of its commit.
 #
-# Status mirrors the spec: design intent. No validator enforces this file yet.
+# Enforced by tools/validate.py (`uv run tools/validate.py`), which validates every
+# file under data/ against the definition `x-layout` assigns to it, then checks the
+# few rules a document schema cannot state: ids resolve across files, claim ids are
+# the hash of their anchor, edges are unique. CI runs it on every pull request and
+# push to main (.github/workflows/validate.yml).
+#
+# Keywords prefixed `x-` are this project's annotations; JSON Schema validators
+# ignore them, tools/validate.py and the spec read them.
 
-schema: graph.med
-version: 0.2.0
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://graph.med/schema/schema.yaml
+title: graph.med pool
+x-version: 0.3.0
 
-# ── namespaces ──────────────────────────────────────────────────────────────
-# Namespaces mint identity; they do not own content (spec §2).
-namespaces:
-  sources:       {identity: slug-with-version}         # e.g. pomgat-lv-1.0
-  claims:        {identity: derived}                   # claims/<source-id>/<hash8(locator|quote)>
-  concepts:      {identity: minted}                    # search before minting; code if possible
-  statements:    {identity: minted}
-  pathways:      {identity: minted-within-pathway}     # pathways/<pathway-id>/<entity-id>
-  views:         {identity: slug}
-  agents:        {identity: slug}
-  attestations:  {identity: sequential}
-  terminologies:                                       # one namespace per release; codes are ids
-    - icd10gm-2026
-    - ops-2026
+# ── layout: which definition each data file validates against ────────────────
+# (data/README.md). Globs are relative to the repository root. `one_per_file`
+# means the entity's id must equal <namespace>/<file stem>.
+x-layout:
+  data/sources/*.yaml:      {schema: {$ref: '#/$defs/source'},    one_per_file: true}
+  data/concepts/*.yaml:     {schema: {$ref: '#/$defs/concept'},   one_per_file: true}
+  data/statements/*.yaml:   {schema: {$ref: '#/$defs/statement'}, one_per_file: true}
+  data/views/*.yaml:        {schema: {$ref: '#/$defs/view'},      one_per_file: true}
+  data/agents/*.yaml:       {schema: {$ref: '#/$defs/agent'},     one_per_file: true}
+  data/attestations/*.yaml: {schema: {$ref: '#/$defs/attestation'}, one_per_file: true}
+  data/pathways/*/*.yaml:   {schema: {$ref: '#/$defs/structural_node'}}
+  data/claims/*/*.yaml:     {schema: {type: array, items: {$ref: '#/$defs/claim'}}}
+  data/edges/*/*.yaml:      {schema: {type: array, items: {$ref: '#/$defs/edge'}}}
 
-# ── provenance requirement levels (spec §6.5) ───────────────────────────────
-# required        must resolve to a source passage; never `modelling`
-# optional        passage or `modelling`
-# not_applicable  ours (identifiers, labels, types); no provenance recorded
+# ── namespaces ───────────────────────────────────────────────────────────────
+# Namespaces mint identity; they do not own content (spec §2). Any string in the
+# data that starts with a non-terminology namespace must resolve to an entity;
+# terminology codes are ids by construction and are not checked for existence.
+x-namespaces:
+  sources:      slug-with-version          # e.g. pomgat-lv-1.0
+  claims:       derived                    # claims/<source-id>/<hash8>, hash8 = sha256("<at>|<quote>")[:8]
+  concepts:     minted                     # search before minting; code if possible
+  statements:   minted
+  pathways:     minted-within-pathway      # pathways/<pathway-id>/<entity-id>
+  views:        slug
+  agents:       slug
+  attestations: sequential
+  terminologies: [icd10gm-2026, ops-2026]  # one namespace per release; codes are ids
 
-# ── node types ──────────────────────────────────────────────────────────────
-node_types:
+# ── provenance requirement levels (spec §6.5), the meaning of `x-provenance` ─
+#   required        must resolve to a source passage; never `modelling`
+#   optional        passage or `modelling`
+#   not_applicable  ours (identifiers, labels, types); no provenance recorded
+# Resolution (spec §6.4): the entry under `provenance:` for the property if
+# present, otherwise the entity's `source`. The constraints below encode this:
+# a `required` property may only be overridden with a reference, and every
+# entity that has one is anchored by a reference or overrides each such property.
 
-  source:
-    properties:
-      title:         {type: string,  required: true,  provenance: not_applicable}
-      url:           {type: url,     required: true,  provenance: not_applicable}
-      content_hash:  {type: sha256,  required: true,  provenance: not_applicable}
-      license:       {type: string,  required: true,  provenance: not_applicable}
-      media_type:    {type: string,  required: false, provenance: not_applicable}
-      awmf_register: {type: string,  required: false, provenance: not_applicable}
-      lang:          {type: bcp47,   required: false, provenance: not_applicable}
-
-  claim:
-    # Immutable, source-anchored extraction unit (spec §3.1). The entity default
-    # `source` (locator + verbatim quote) is the anchor and is always required.
-    identity: derived   # hash over (locator, quote); computed by tooling, checked by the validator
-    properties:
-      lang:              {type: bcp47,  required: true,  provenance: not_applicable}  # language of quote/label
-      label:             {type: string, required: true,  provenance: optional}
-                          # the full extracted text (a recommendation sentence), source language, never translated
-      kind:              {type: enum, values: [recommendation, criterion, definition, fact, gap_notice],
-                          required: true,  provenance: not_applicable}
-      recommendation_no: {type: string, required: false, provenance: required}
-      grade:             {type: enum, values: ["A", "B", "0", "EK"],
-                          required: false, provenance: required}   # never from the extractor
-      verb:              {type: enum, values: [soll, sollte, kann], required: false, provenance: required}
-      direction:         {type: enum, values: [for, against],       required: false, provenance: required}
-      consensus:         {type: enum, values: [konsens, starker_konsens, mehrheitliche_zustimmung],
-                          required: false, provenance: required}
-
-  concept:
-    properties:
-      lang:        {type: bcp47,  required: true,  provenance: not_applicable}
-      label:       {type: string, required: true,  provenance: not_applicable}
-      definition:  {type: string, required: false, provenance: optional}
-
-  statement:
-    # Slot values are concept URLs. Granularity rule: the smallest unit that can
-    # be independently supported or contested (spec §3.2).
-    properties:
-      lang:   {type: bcp47,  required: true, provenance: not_applicable}
-      label:  {type: string, required: true, provenance: not_applicable}
-      slots:
-        population: {type: concept-url, required: false}
-        action:     {type: concept-url, required: false}
-        condition:  {type: concept-url, required: false}
-        outcome:    {type: concept-url, required: false}
-    derived:   # computed, never written by hand (spec §3.3)
-      - sources          # via incoming `supports`
-      - conflict_status  # via incoming `contests`
-      - effective_grade  # policy: OPEN QUESTION (docs/open-questions.md → grade-derivation)
-      - review_state     # via attestations
-
-  # structural node types (pathways/ namespace; all pure modelling)
-  decision:
-    properties:
-      lang:     {type: bcp47,  required: true,  provenance: not_applicable}
-      label:    {type: string, required: true,  provenance: not_applicable}
-      criteria: {type: object, required: false, provenance: optional}
-  outcome:
-    properties:
-      lang:  {type: bcp47,  required: true, provenance: not_applicable}
-      label: {type: string, required: true, provenance: not_applicable}
-  gap:
-    # an explicit "no recommendation possible" in the source (spec §11.7)
-    properties:
-      lang:  {type: bcp47,  required: true, provenance: not_applicable}
-      label: {type: string, required: true, provenance: required}
-
-  agent:
-    properties:
-      label:                {type: string, required: true,  provenance: not_applicable}
-      identity_claims:      {type: list,   required: false, provenance: not_applicable}
-      verification_methods: {type: list,   required: false, provenance: not_applicable}
-
-  attestation:
-    properties:
-      subject:      {type: url,    required: true}
-      subject_hash: {type: sha256, required: true}
-      scope:        {type: enum, values: [content, with_evidence], required: true}
-      claim:        {type: enum, values: [expert_reviewed, validated, disputed], required: true}
-      by:           {type: agent-url, required: true}
-      date:         {type: date,   required: true}
-      source_hash:  {type: sha256, required: false}  # required when claim = validated (spec §8)
-      proof:        {type: object, required: true}
-
-  view:
-    properties:
-      view_kind: {type: enum, values: [pathway, selection], required: true}
-      filter:    {type: object, required: true}   # forms: see view_filters below
-      cuts:      {type: list,   required: false}  # {cut, as_of, members_hash, validated}
-
-# ── edge kinds ──────────────────────────────────────────────────────────────
-# Edge id: derived from (from, kind, to) + optional discriminator (spec §2, §5).
-# Every edge carries provenance; `modelling` where no document states the relation.
-# An edge with textual properties (rationale, guard) declares `lang` for them.
-edge_kinds:
-  supports:    {from: claim,     to: statement}
-  contests:    {from: claim,     to: statement}
-  refines:     {from: claim,     to: claim}
-  supplements: {from: claim,     to: claim}
-  limits:      {from: claim,     to: claim}
-  codes_as:    {from: concept,   to: terminology-concept}
-  sequence:    {from: [decision, outcome], to: [decision, outcome, gap]}
-  branch:      {from: decision,  to: [decision, outcome, gap],
-                properties: {guard: {type: any, required: true, provenance: optional}}}
-  about:       {from: [decision, outcome, gap], to: statement}
-  specializes: {from: statement, to: statement, provenance: modelling-only,
-                properties: {rationale: {required: true}, as_of: {required: true}}}
-  complements: {from: statement, to: statement, provenance: modelling-only,
-                properties: {rationale: {required: true}, as_of: {required: true}}}
-  conflicts:   {from: statement, to: statement, provenance: modelling-only,
-                properties: {rationale: {required: true}, as_of: {required: true}}}
-
-# ── view filters (minimal starting forms; spec §13) ─────────────────────────
-view_filters:
+# ── view filters (spec §13) and cut validations (spec §4) ───────────────────
+x-view-filters:
   pathway:   # a pathway namespace plus the closure over the named edge kinds
     example: {pathway: pathways/pomgat-drains, closure: [about, supports, refines, codes_as]}
   selection: # explicit membership or property predicates; deliberately minimal
     example: {sources: [sources/pomgat-lv-1.0], modified_after: "2026-01-01"}
-
-# ── cut validations per view kind (spec §4) ─────────────────────────────────
-cut_validations:
+x-cut-validations:
   pathway:
     - every branch edge's endpoints are members
     - every structural node's `about` targets are members
@@ -161,13 +71,307 @@ cut_validations:
     - no dangling slot or codes_as reference among members
   selection: []
 
-# ── conventions ─────────────────────────────────────────────────────────────
-conventions:
-  keys: english                       # structural keys are English; they are ours, not content
-  language: source-language           # ALL content values (labels, quotes, text) stay in the source
-                                      # language, never translated at extraction; every entity and edge
-                                      # carrying text declares `lang` (BCP 47). Enum values are schema
-                                      # vocabulary, slugified from the source language (soll/sollte/kann,
-                                      # konsens/starker_konsens). Translations are a build-layer concern.
-  quotes: verbatim-substring          # of the source's extracted text (spec §6.2)
-  pdf_pages: physical                 # #page=N counts PDF pages, not printed numbers
+# ── conventions ──────────────────────────────────────────────────────────────
+x-conventions:
+  keys: english                 # structural keys are English; they are ours, not content
+  language: source-language     # ALL content values (labels, quotes, text) stay in the source
+                                # language, never translated at extraction; every entity and edge
+                                # carrying text declares `lang` (BCP 47). Enum values are schema
+                                # vocabulary, slugified from the source language (soll/sollte/kann,
+                                # konsens/starker_konsens). Translations are a build-layer concern.
+  quotes: verbatim-substring    # of the source's extracted text (spec §6.2); single line
+  pdf_pages: physical           # #page=N counts PDF pages, not printed numbers
+
+$defs:
+
+  # ── value shapes ──────────────────────────────────────────────────────────
+  lang:    {type: string, pattern: '^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$'}   # BCP 47
+  sha256:  {type: string, pattern: '^sha256:[0-9a-f]{64}$'}
+  url:     {type: string, pattern: '^https?://'}
+  date:    {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}
+  slug:    {type: string, pattern: '^[A-Za-z0-9._-]+$'}
+  text:    {type: string, minLength: 1}
+
+  # entity references, by namespace (spec §2)
+  source_ref:     {type: string, pattern: '^sources/[A-Za-z0-9._-]+$'}
+  claim_ref:      {type: string, pattern: '^claims/[A-Za-z0-9._-]+/[0-9a-f]{8}$'}
+  concept_ref:    {type: string, pattern: '^(concepts|icd10gm-2026|ops-2026)/[A-Za-z0-9._-]+$'}  # uncoded or terminology
+  terminology_ref: {type: string, pattern: '^(icd10gm-2026|ops-2026)/[A-Za-z0-9._-]+$'}
+  statement_ref:  {type: string, pattern: '^statements/[A-Za-z0-9._-]+$'}
+  structural_ref: {type: string, pattern: '^pathways/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$'}
+  agent_ref:      {type: string, pattern: '^agents/[A-Za-z0-9._-]+$'}
+  entity_ref:     {type: string, pattern: '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$'}
+
+  # ── provenance (spec §6.2–6.4) ────────────────────────────────────────────
+  locator:
+    type: string
+    pattern: '^sources/[A-Za-z0-9._-]+(#page=[1-9][0-9]*)?$'   # physical PDF page
+  reference:
+    description: '"The source says this" — a locator plus a verbatim, single-line quote.'
+    type: object
+    required: [at, quote]
+    additionalProperties: false
+    properties:
+      at:    {$ref: '#/$defs/locator'}
+      quote: {type: string, minLength: 1, pattern: '^[^\n]+$'}
+  references:
+    description: A reference, or a non-empty list of them (a single one is shorthand for a list of one).
+    anyOf:
+      - $ref: '#/$defs/reference'
+      - {type: array, minItems: 1, items: {$ref: '#/$defs/reference'}}
+  provenance_value:
+    description: What a `source` or a `provenance.<property>` entry may hold.
+    anyOf:
+      - const: modelling
+      - $ref: '#/$defs/references'
+
+  # ── node types ────────────────────────────────────────────────────────────
+
+  source:
+    type: object
+    required: [id, type, title, url, content_hash, license]
+    additionalProperties: false
+    properties:
+      id:            {$ref: '#/$defs/source_ref'}
+      type:          {const: source}
+      title:         {$ref: '#/$defs/text',   x-provenance: not_applicable}
+      url:           {$ref: '#/$defs/url',    x-provenance: not_applicable}
+      content_hash:  {$ref: '#/$defs/sha256', x-provenance: not_applicable}
+      license:       {$ref: '#/$defs/text',   x-provenance: not_applicable}
+      media_type:    {$ref: '#/$defs/text',   x-provenance: not_applicable}
+      awmf_register: {$ref: '#/$defs/text',   x-provenance: not_applicable}
+      lang:          {$ref: '#/$defs/lang',   x-provenance: not_applicable}
+
+  claim:
+    description: >
+      Immutable, source-anchored extraction unit (spec §3.1). `source` is the
+      anchor — always one passage, never `modelling` — and the id derives from
+      it: claims/<source-id>/<hash8>, hash8 = first 8 hex of
+      sha256("<at>|<quote>"), computed by tooling, checked by the validator.
+    type: object
+    required: [id, type, lang, label, kind, source]
+    additionalProperties: false
+    x-identity: derived
+    properties:
+      id:    {$ref: '#/$defs/claim_ref'}
+      type:  {const: claim}
+      lang:  {$ref: '#/$defs/lang', x-provenance: not_applicable}   # language of quote and label
+      label: {$ref: '#/$defs/text', x-provenance: optional}
+             # the full extracted text (a recommendation sentence), source language, never translated
+      kind:
+        enum: [recommendation, criterion, definition, fact, gap_notice]
+        x-provenance: not_applicable
+      recommendation_no: {type: string, minLength: 1, x-provenance: required}
+      grade:     {enum: ["A", "B", "0", "EK"],   x-provenance: required}   # never from the extractor
+      verb:      {enum: [soll, sollte, kann],     x-provenance: required}
+      direction: {enum: [for, against],           x-provenance: required}
+      consensus: {enum: [konsens, starker_konsens, mehrheitliche_zustimmung], x-provenance: required}
+      source: {$ref: '#/$defs/reference'}
+      provenance:
+        description: Per-property overrides. A `required`-provenance property may only be overridden with a passage.
+        type: object
+        additionalProperties: false
+        properties:
+          label:             {$ref: '#/$defs/provenance_value'}
+          recommendation_no: {$ref: '#/$defs/references'}
+          grade:             {$ref: '#/$defs/references'}
+          verb:              {$ref: '#/$defs/references'}
+          direction:         {$ref: '#/$defs/references'}
+          consensus:         {$ref: '#/$defs/references'}
+
+  concept:
+    type: object
+    required: [id, type, lang, label, source]
+    additionalProperties: false
+    properties:
+      id:         {$ref: '#/$defs/concept_ref'}
+      type:       {const: concept}
+      lang:       {$ref: '#/$defs/lang', x-provenance: not_applicable}
+      label:      {$ref: '#/$defs/text', x-provenance: not_applicable}
+      definition: {$ref: '#/$defs/text', x-provenance: optional}
+      source:     {$ref: '#/$defs/provenance_value'}
+      provenance:
+        type: object
+        additionalProperties: false
+        properties:
+          definition: {$ref: '#/$defs/provenance_value'}
+
+  statement:
+    description: >
+      Slot values are concept URLs. Granularity rule: the smallest unit that can
+      be independently supported or contested (spec §3.2).
+    type: object
+    required: [id, type, lang, label, source]
+    additionalProperties: false
+    x-derived: [sources, conflict_status, effective_grade, review_state]
+      # computed, never written by hand (spec §3.3); effective_grade policy is
+      # an OPEN QUESTION (docs/open-questions.md → grade-derivation)
+    properties:
+      id:    {$ref: '#/$defs/statement_ref'}
+      type:  {const: statement}
+      lang:  {$ref: '#/$defs/lang', x-provenance: not_applicable}
+      label: {$ref: '#/$defs/text', x-provenance: not_applicable}
+      slots:
+        type: object
+        additionalProperties: false
+        properties:
+          population: {$ref: '#/$defs/concept_ref'}
+          action:     {$ref: '#/$defs/concept_ref'}
+          condition:  {$ref: '#/$defs/concept_ref'}
+          outcome:    {$ref: '#/$defs/concept_ref'}
+      source: {$ref: '#/$defs/provenance_value'}
+
+  # structural node types (pathways/ namespace; all pure modelling)
+  structural_node:
+    oneOf:
+      - $ref: '#/$defs/decision'
+      - $ref: '#/$defs/outcome'
+      - $ref: '#/$defs/gap'
+  decision:
+    type: object
+    required: [id, type, lang, label, source]
+    additionalProperties: false
+    properties:
+      id:       {$ref: '#/$defs/structural_ref'}
+      type:     {const: decision}
+      lang:     {$ref: '#/$defs/lang', x-provenance: not_applicable}
+      label:    {$ref: '#/$defs/text', x-provenance: not_applicable}
+      criteria: {type: object,          x-provenance: optional}
+      source:   {$ref: '#/$defs/provenance_value'}
+      provenance:
+        type: object
+        additionalProperties: false
+        properties:
+          criteria: {$ref: '#/$defs/provenance_value'}
+  outcome:
+    type: object
+    required: [id, type, lang, label, source]
+    additionalProperties: false
+    properties:
+      id:     {$ref: '#/$defs/structural_ref'}
+      type:   {const: outcome}
+      lang:   {$ref: '#/$defs/lang', x-provenance: not_applicable}
+      label:  {$ref: '#/$defs/text', x-provenance: not_applicable}
+      source: {$ref: '#/$defs/provenance_value'}
+  gap:
+    description: An explicit "no recommendation possible" in the source (spec §11.7); its label is quoted from the source.
+    type: object
+    required: [id, type, lang, label, source]
+    additionalProperties: false
+    properties:
+      id:     {$ref: '#/$defs/structural_ref'}
+      type:   {const: gap}
+      lang:   {$ref: '#/$defs/lang', x-provenance: not_applicable}
+      label:  {$ref: '#/$defs/text', x-provenance: required}
+      source: {$ref: '#/$defs/references'}   # required provenance: never modelling
+
+  agent:
+    type: object
+    required: [id, type, label]
+    additionalProperties: false
+    properties:
+      id:                   {$ref: '#/$defs/agent_ref'}
+      type:                 {const: agent}
+      label:                {$ref: '#/$defs/text', x-provenance: not_applicable}
+      identity_claims:      {type: array,          x-provenance: not_applicable}
+      verification_methods: {type: array,          x-provenance: not_applicable}
+
+  attestation:
+    type: object
+    required: [id, type, subject, subject_hash, scope, claim, by, date, proof]
+    additionalProperties: false
+    properties:
+      id:           {type: string, pattern: '^attestations/[A-Za-z0-9._-]+$'}
+      type:         {const: attestation}
+      subject:      {$ref: '#/$defs/entity_ref'}
+      subject_hash: {$ref: '#/$defs/sha256'}
+      scope:        {enum: [content, with_evidence]}
+      claim:        {enum: [expert_reviewed, validated, disputed]}
+      by:           {$ref: '#/$defs/agent_ref'}
+      date:         {$ref: '#/$defs/date'}
+      source_hash:  {$ref: '#/$defs/sha256'}
+      proof:        {type: object}
+    if:   {properties: {claim: {const: validated}}}
+    then: {required: [source_hash]}          # spec §8
+
+  view:
+    type: object
+    required: [id, type, view_kind, filter]
+    additionalProperties: false
+    properties:
+      id:        {type: string, pattern: '^views/[A-Za-z0-9._-]+$'}
+      type:      {const: view}
+      view_kind: {enum: [pathway, selection]}
+      filter:    {type: object}               # forms: see x-view-filters
+      cuts:
+        type: array
+        items:
+          type: object
+          required: [cut, as_of, members_hash, validated]
+          additionalProperties: false
+          properties:
+            cut:          {type: integer, minimum: 1}
+            as_of:        {type: string, minLength: 7}     # a commit
+            members_hash: {$ref: '#/$defs/sha256'}
+            validated:    {type: boolean}
+
+  # ── edges ─────────────────────────────────────────────────────────────────
+  # An edge is the tuple [from, kind, to, {properties}] (spec §5). Its id derives
+  # from (from, kind, to) plus `discriminator` when parallel edges of one kind
+  # exist; the validator checks uniqueness. Every edge carries `source`;
+  # `modelling` where no document states the relation. An edge with textual
+  # properties (rationale, guard) declares `lang` for them.
+  edge_props:
+    type: object
+    required: [source]
+    additionalProperties: false
+    properties:
+      source:        {$ref: '#/$defs/provenance_value'}
+      lang:          {$ref: '#/$defs/lang'}
+      discriminator: {$ref: '#/$defs/slug'}
+      rationale:     {$ref: '#/$defs/text'}
+      as_of:         {$ref: '#/$defs/date'}
+      guard:         {}
+    dependentRequired:
+      rationale: [lang]
+  modelling_edge_props:
+    description: 'Cross-source semantics are our assertions (spec §5) — always modelling, with rationale and date.'
+    allOf:
+      - $ref: '#/$defs/edge_props'
+      - required: [source, rationale, as_of, lang]
+        properties: {source: {const: modelling}}
+
+  edge:
+    type: array
+    minItems: 4
+    maxItems: 4
+    prefixItems:
+      - $ref: '#/$defs/entity_ref'
+      - enum: [supports, contests, refines, supplements, limits, codes_as,
+               sequence, branch, about, specializes, complements, conflicts]
+      - $ref: '#/$defs/entity_ref'
+      - $ref: '#/$defs/edge_props'
+    allOf:
+      # evidence — the only edges that carry evidential weight
+      - if: {prefixItems: [true, {enum: [supports, contests]}]}
+        then: {prefixItems: [{$ref: '#/$defs/claim_ref'}, true, {$ref: '#/$defs/statement_ref'}]}
+      # body-text relations — never inherit a recommendation's grade
+      - if: {prefixItems: [true, {enum: [refines, supplements, limits]}]}
+        then: {prefixItems: [{$ref: '#/$defs/claim_ref'}, true, {$ref: '#/$defs/claim_ref'}]}
+      # coding — a code is a node, coding is an edge
+      - if: {prefixItems: [true, {const: codes_as}]}
+        then: {prefixItems: [{$ref: '#/$defs/concept_ref'}, true, {$ref: '#/$defs/terminology_ref'}]}
+      # structure — among structural nodes, and from them to statements
+      - if: {prefixItems: [true, {const: sequence}]}
+        then: {prefixItems: [{$ref: '#/$defs/structural_ref'}, true, {$ref: '#/$defs/structural_ref'}]}
+      - if: {prefixItems: [true, {const: branch}]}
+        then:
+          prefixItems: [{$ref: '#/$defs/structural_ref'}, true, {$ref: '#/$defs/structural_ref'},
+                        {required: [source, guard]}]
+      - if: {prefixItems: [true, {const: about}]}
+        then: {prefixItems: [{$ref: '#/$defs/structural_ref'}, true, {$ref: '#/$defs/statement_ref'}]}
+      # cross-source semantics — statement → statement, modelling-only
+      - if: {prefixItems: [true, {enum: [specializes, complements, conflicts]}]}
+        then:
+          prefixItems: [{$ref: '#/$defs/statement_ref'}, true, {$ref: '#/$defs/statement_ref'},
+                        {$ref: '#/$defs/modelling_edge_props'}]

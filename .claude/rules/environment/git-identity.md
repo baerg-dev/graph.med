@@ -29,6 +29,21 @@ not let an author approve their own pull request, so this separation is what mak
 review gate real rather than decorative. Do not commit or push under a human identity,
 and do not respond to a failed push by changing the git identity.
 
+## What the App may not push
+
+The App has no `workflows` permission. A push that adds or changes anything under
+`.github/workflows/` is refused by GitHub:
+
+```
+refusing to allow a GitHub App to create or update workflow `.github/workflows/<file>` without `workflows` permission
+```
+
+This is deliberate, not a misconfiguration: what CI runs is decided by humans only,
+and the workflow's own token is read-only. When a change needs a workflow file, keep
+that file out of what you push, put its full content in the pull request description,
+and ask for a person to commit it. Do not ask for the permission to be granted and do
+not look for another route.
+
 ## Credentials
 
 You do not hold a GitHub credential. Authentication happens outside the sandbox: you make
