@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}graph.med{% endblock %}</title>
+<link rel="stylesheet" href="{{ base }}assets/site.css">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="{{ base }}">graph.med</a>
+  {% block crumbs %}{% endblock %}
+</header>
+<main>
+{% block main %}{% endblock %}
+</main>
+<footer class="foot">
+  built from <code>{{ commit }}</code> on {{ built }} · schema {{ version }} ·
+  <a href="https://github.com/baerg-dev/graph.med">repository</a> ·
+  PolyForm Noncommercial 1.0.0
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

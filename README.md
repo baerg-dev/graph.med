@@ -2,11 +2,12 @@
 
 Open Medical Knowledge Graph.
 
-> **Status: at inception.** There is no source tree or build system yet. What exists
-> is the design (`docs/`), the one schema (`schema/schema.yaml`), the validator that
-> enforces it and the CI that runs it (see "Checks"), and the pool under `data/` as
-> it lands through pull requests. The domain `graph.med` points at GitHub Pages and
-> serves nothing yet; what the site will be is designed in `docs/publication.md`.
+> **Status: at inception.** What exists is the design (`docs/`), the one schema
+> (`schema/schema.yaml`), the validator that enforces it and the CI that runs it (see
+> "Checks"), the pool under `data/` as it lands through pull requests, and the build
+> that renders the pool into the site (see "Build"). The domain `graph.med` points at
+> GitHub Pages; the site is designed in `docs/publication.md` and goes live with the
+> first deployment.
 > This README describes how the project is worked on; it will describe what the
 > project *is* once there is more to describe.
 
@@ -76,6 +77,14 @@ Running the quote check inside the sandbox needs each source's domain on the egr
 allowlist (`sbx policy allow network register.awmf.org` for the first source). The
 download is cached under `~/.cache/graph.med/sources/` by content hash and is
 ephemeral, like everything outside the repository.
+
+## Build
+
+`tools/build.py` renders `data/` into a static site — one graph page per view, one
+page and one JSON document per entity, read on a phone first — as designed in
+`docs/publication.md`. The command is in [`CLAUDE.md`](CLAUDE.md) under "Build"; run
+it locally and open `site/index.html`. Deployment to GitHub Pages is a workflow, and
+like every workflow file it is committed by a person (see "Checks").
 
 ## Source documents
 

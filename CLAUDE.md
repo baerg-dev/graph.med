@@ -9,8 +9,9 @@ The repository is at inception: it currently contains `README.md`, `LICENSE`, th
 file, the design documentation under `docs/`, the one schema for the data pool
 (`schema/schema.yaml`), the validator that enforces it (`tools/validate.py`) with the
 CI workflow that runs it (`.github/workflows/validate.yml`), the pool itself under
-`data/` (layout in `data/README.md`, parsing progress in `data/PROGRESS.yaml`), and
-the `.claude/` directory described below. There is no source tree or build system yet.
+`data/` (layout in `data/README.md`, parsing progress in `data/PROGRESS.yaml`), the
+site build (`tools/build.py`, see "Build"), and the `.claude/` directory described
+below. There is no source tree beyond these two scripts.
 Project-specific guidance — data sources and their licenses, setup and test
 instructions — belongs in this file once it exists. Do not document tooling that does
 not exist.
@@ -33,6 +34,22 @@ caches downloads under `~/.cache/graph.med/sources/` by content hash. CI runs bo
 every pull request and on every push to `main` (`.github/workflows/validate.yml`).
 Run the first form before proposing a change (the contribution workflow’s "run the
 checks locally").
+
+## Build
+
+`tools/build.py` renders the site described in `docs/publication.md` from `data/`
+into `site/` (gitignored): one graph page and one JSON per view, one page and one
+JSON per entity, the schema at its `$id`. Offline and deterministic; two seconds.
+
+```bash
+uv run tools/build.py                       # site/ for graph.med (base path /)
+uv run tools/build.py --base /graph.med/    # for baerg-dev.github.io/graph.med/
+```
+
+Open `site/index.html` in a browser to see a change. Templates and the client script
+live in `tools/site/`. Deployment to GitHub Pages is a workflow file, committed by a
+person (`.github/workflows/pages.yml` once it exists): validate, build, deploy on
+every push to `main`.
 
 ## Where this runs
 
