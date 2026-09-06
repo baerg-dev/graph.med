@@ -29,6 +29,7 @@ jobs:
           enable-cache: true
       - run: uv sync --frozen
       - run: uv run --frozen tools/validate.py
+      - run: uv run --frozen tools/build.py
 
   quotes:
     name: quotes against the sources
