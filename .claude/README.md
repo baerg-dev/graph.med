@@ -41,6 +41,7 @@ it loads always or conditionally is decided by one frontmatter key:
 | `conventions/documentation.md` | `**/*.md` |
 | `conventions/governed-files.md` | `.claude/**`, `.github/**`, `CLAUDE.md`, `CODEOWNERS` |
 | `conventions/memory.md` | — always |
+| `conventions/no-personal-information.md` | — always |
 
 Three things worth knowing before adding one:
 

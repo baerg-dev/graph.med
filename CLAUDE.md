@@ -69,7 +69,8 @@ rather than all of it, always:
 │       ├── contribution-workflow.md what you may and may not do; branch → PR → stop
 │       ├── documentation.md         the documentation levels (*.md)
 │       ├── governed-files.md        editing agent-governing files (.claude/, .github/, …)
-│       └── memory.md                what project memory is, and the index of it
+│       ├── memory.md                what project memory is, and the index of it
+│       └── no-personal-information.md  nothing that identifies a person or a machine, anywhere
 ├── memory/                      durable facts, one per file, filed by level
 │   ├── environment/
 │   └── conventions/
