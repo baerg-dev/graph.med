@@ -2,11 +2,13 @@
 :root {
   --bg: #fff; --fg: #1a1a1a; --mute: #666; --line: #ddd; --accent: #0b5cad;
   --statement: #0b5cad; --concept: #6a994e; --contested: #c1121f; --edge: #bbb;
+  --gA: #9ad3a8; --gB: #f2d97a; --g0: #f4b183; --gEK: #c5d3e8;   /* recommendation grades, light enough for dark text */
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root { --bg: #111; --fg: #eee; --mute: #999; --line: #333; --accent: #7cb7ff;
-          --statement: #7cb7ff; --concept: #9ad17a; --contested: #ff6b6b; --edge: #444; }
+          --statement: #7cb7ff; --concept: #9ad17a; --contested: #ff6b6b; --edge: #555;
+          --gA: #7fc492; --gB: #e5c95a; --g0: #eaa06a; --gEK: #a9bcd8; }
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -28,35 +30,38 @@ ul.cards li a { display: block; padding: .8rem; border: 1px solid var(--line); b
 ul.cards small, ul.plain small { display: block; color: var(--mute); }
 .foot { padding: 1rem; color: var(--mute); font-size: .8rem; border-top: 1px solid var(--line); }
 
-/* the graph: an outline tree inside a fixed viewport */
-.graph-wrap { margin: 0 -1rem; position: relative; background: var(--bg); }
-#graph { display: block; width: 100%; height: 62vh; touch-action: none; user-select: none; cursor: grab; }
-.hint { position: absolute; left: 1rem; right: 1rem; bottom: .3rem; margin: 0; color: var(--mute); font-size: .78rem; pointer-events: none; }
-.sw { display: inline-block; width: .7em; height: .7em; vertical-align: -.05em; margin: 0 .15em 0 .5em; }
-.sw.source { background: var(--mute); border-radius: 2px; }
-.sw.chapter { background: var(--mute); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
-.sw.statement { background: var(--statement); border-radius: 50%; }
-.sw.concept { background: var(--concept); transform: rotate(45deg) scale(.8); }
+/* the graph: one decision graph per chapter inside a fixed viewport */
+.chapters { display: flex; gap: .4rem; overflow-x: auto; padding: .6rem 0 .4rem; scrollbar-width: none; }
+.chapters button { flex: none; min-height: 40px; padding: 0 .9rem; border-radius: 1.2rem; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: .9rem; }
+.chapters button.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.graph-wrap { margin: 0 -1rem; position: relative; background: var(--bg); border-top: 1px solid var(--line); }
+#graph { display: block; width: 100%; height: 60vh; touch-action: none; user-select: none; cursor: grab; }
+.hint { position: absolute; left: 1rem; right: 1rem; bottom: .3rem; margin: 0; color: var(--mute); font-size: .74rem; line-height: 1.5; pointer-events: none; }
+.sw { display: inline-block; width: .75em; height: .75em; vertical-align: -.05em; margin: 0 .15em 0 .45em; border: 1px solid var(--mute); box-sizing: border-box; }
+.sw.population { transform: rotate(45deg) scale(.8); }
+.sw.condition { clip-path: polygon(20% 0, 80% 0, 100% 50%, 80% 100%, 20% 100%, 0 50%); background: var(--mute); }
+.sw.statement { border-radius: 2px; background: var(--mute); }
+.sw.outcome { clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%); background: var(--mute); }
+.sw.g-A { background: var(--gA); border: 0; } .sw.g-B { background: var(--gB); border: 0; } .sw.g-0 { background: var(--g0); border: 0; } .sw.g-EK { background: var(--gEK); border: 0; }
+.sw.against { border: 2px solid var(--contested); }
 .tools { position: absolute; right: .6rem; top: .6rem; display: flex; gap: .4rem; }
 .tools button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: 1.2rem; }
-#graph path.contains { fill: none; stroke: var(--edge); stroke-width: 1.5; }
-#graph path.slot { fill: none; stroke: var(--concept); stroke-width: 1.2; }
-#graph path.relation { fill: none; stroke: var(--statement); stroke-width: 1.2; stroke-dasharray: 5 4; }
-#graph path.relation.conflicts { stroke: var(--contested); }
-#graph .node .hit { fill: transparent; stroke: none; cursor: pointer; }
-#graph .node rect, #graph .node polygon, #graph .node circle:not(.hit) { stroke: var(--bg); stroke-width: 1.5; }
-#graph .source rect, #graph .chapter polygon { fill: var(--mute); }
-#graph .statement circle:not(.hit) { fill: var(--statement); }
-#graph .statement.contested circle:not(.hit) { fill: var(--contested); }
-#graph .concept polygon { fill: var(--concept); }
-#graph .leaf.statement circle:not(.hit), #graph .closed.statement circle:not(.hit) { fill-opacity: .55; }
-#graph .open .hit { stroke: var(--line); stroke-width: 1; }
-#graph text { font-size: 13px; fill: var(--fg); pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
-#graph text.label { pointer-events: all; cursor: pointer; }
-#graph text.chev { font-size: 12px; font-weight: 700; fill: var(--bg); stroke: none; }
-#graph .slot-tag { fill: var(--mute); font-size: 11px; }
-#graph .selected text.label { font-weight: 700; }
-#graph .selected .hit { stroke: var(--fg); stroke-width: 2; }
+#graph .edge { fill: none; stroke: var(--edge); stroke-width: 1.6; }
+#graph .edge.purpose { stroke-dasharray: 4 4; }
+#graph .node { cursor: pointer; }
+#graph .node rect, #graph .node polygon { fill: var(--bg); stroke: var(--mute); stroke-width: 1.4; }
+#graph .population polygon { stroke: var(--fg); }
+#graph .statement rect { stroke: transparent; }
+#graph .statement.g-A rect { fill: var(--gA); } #graph .statement.g-B rect { fill: var(--gB); }
+#graph .statement.g-0 rect { fill: var(--g0); } #graph .statement.g-EK rect { fill: var(--gEK); }
+#graph .statement.g-mixed rect { fill: var(--line); }
+#graph .statement.against rect { stroke: var(--contested); stroke-width: 3; }
+#graph .statement.contested rect { stroke: var(--contested); stroke-width: 3; stroke-dasharray: 6 4; }
+#graph text { font-size: 12px; fill: var(--fg); pointer-events: none; }
+#graph .statement text { fill: #111; }
+#graph text.no { font-size: 9px; font-weight: 700; fill: #333; opacity: .7; }
+#graph .dim { opacity: .15; }
+#graph .selected rect, #graph .selected polygon { stroke: var(--fg); stroke-width: 3; }
 
 /* the sheet below the graph, and the entity page */
 .sheet { border-top: 2px solid var(--line); padding-top: .6rem; }

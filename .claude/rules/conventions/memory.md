@@ -35,7 +35,7 @@ pre-emptively.
 | `design/pool-and-views.md` | The repository is one pool; graphs are versioned views (filter + as-of commit); one schema governs everything. |
 | `design/two-layer-identity.md` | Claims have deterministic source-anchored identity and never merge; semantic nodes are minted; sameness is an edge. |
 | `design/staleness-and-verification.md` | One content-hash mechanism for review, verification and references; stale downgrades, only invalid blocks. |
-| `design/view-page-is-an-outline.md` | The view page is an outline tree opened step by step, types told apart by form; never an all-at-once drawing. |
+| `design/view-page-is-a-decision-graph.md` | The view page is a decision graph per chapter (group → condition → recommendation → aim), grade colours, top-down; not an outline, not an all-at-once drawing. |
 
 ## Writing one
 
