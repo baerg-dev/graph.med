@@ -1,27 +1,15 @@
-/* graph.med view page: an outline tree — source → chapters → statements → concepts — expanded
-   step by step; pan and pinch inside the viewport; tap a shape to open it, a label for the sheet.
-   Layout is the outline order: row = y, depth = x. No dependencies, no simulation.
-   Data: the #graph-data JSON written by tools/build.py. */
+/* graph.med view page: one decision graph per chapter — patient group (diamond) → condition
+   (hexagon) → recommendation (box, coloured by grade) → aim (tag) — laid out top-down by the
+   build. Pan and pinch inside the viewport; tap a node for its details in the section below.
+   No dependencies, no layout in the browser. Data: the #graph-data JSON from tools/build.py. */
 (function () {
   "use strict";
   var data = JSON.parse(document.getElementById("graph-data").textContent);
   var svg = document.getElementById("graph"), sheet = document.getElementById("sheet");
-  var hint = document.getElementById("hint"), home = sheet.innerHTML;
-  var NS = "http://www.w3.org/2000/svg";
-  var ROW = 30, INDENT = 26, PAD = 14;
-  var nodes = data.nodes;
-
-  /* the outline as instances: one per occurrence (a concept may sit under several statements) */
-  var instances = [], byId = {};
-  function walk(item, depth, parent, slot) {
-    var inst = { key: instances.length, id: item.id, depth: depth, parent: parent, slot: slot || null,
-                 children: [], open: false, node: nodes[item.id] };
-    instances.push(inst); (byId[item.id] = byId[item.id] || []).push(inst);
-    (item.children || []).forEach(function (c) { inst.children.push(walk(c, depth + 1, inst, c.slot)); });
-    return inst;
-  }
-  var roots = data.tree.map(function (r) { return walk(r, 0, null); });
-  roots.forEach(function (r) { r.open = true; });          /* start: the source and its chapters */
+  var hint = document.getElementById("hint"), nav = document.getElementById("chapters");
+  var home = sheet.innerHTML, NS = "http://www.w3.org/2000/svg";
+  var chapter = null, selected = null, nodes = {}, out = {}, inn = {}, groups = {}, paths = [];
+  var view = { x: 0, y: 0, k: 1 }, world, anim = null;
 
   function el(name, attrs, parent) {
     var e = document.createElementNS(NS, name);
@@ -29,69 +17,86 @@
     if (parent) parent.appendChild(e);
     return e;
   }
-  var world = el("g", { id: "world" }, svg);
-  var edges = el("g", { "class": "edges" }, world);
-  var rels = el("g", { "class": "relations" }, world);
-  var rows = el("g", { "class": "nodes" }, world);
-  var selected = null, view = { x: 0, y: 0, k: 1 };
-
-  function shape(type, g) {           /* node form by type */
-    if (type === "source") return el("rect", { x: -9, y: -9, width: 18, height: 18, rx: 4 }, g);
-    if (type === "chapter") return el("polygon", { points: "0,-10 9,-5 9,5 0,10 -9,5 -9,-5" }, g);
-    if (type === "concept") return el("polygon", { points: "0,-8 8,0 0,8 -8,0" }, g);
-    return el("circle", { r: 8 }, g);
+  function shape(n, g) {   /* the node's form by type; size from the build */
+    var w = n.w, h = n.h;
+    if (n.type === "population") return el("polygon", { points: "0," + (-h / 2) + " " + (w / 2) + ",0 0," + (h / 2) + " " + (-w / 2) + ",0" }, g);
+    if (n.type === "condition") { var q = w / 2 - 14; return el("polygon", { points: (-q) + "," + (-h / 2) + " " + q + "," + (-h / 2) + " " + (w / 2) + ",0 " + q + "," + (h / 2) + " " + (-q) + "," + (h / 2) + " " + (-w / 2) + ",0" }, g); }
+    if (n.type === "outcome") return el("polygon", { points: (-w / 2) + "," + (-h / 2) + " " + (w / 2 - 12) + "," + (-h / 2) + " " + (w / 2) + ",0 " + (w / 2 - 12) + "," + (h / 2) + " " + (-w / 2) + "," + (h / 2) }, g);
+    return el("rect", { x: -w / 2, y: -h / 2, width: w, height: h, rx: 8 }, g);
   }
-  function short(s, n) { return s.length > n ? s.slice(0, n - 1) + "…" : s; }
 
-  var visible = [], drawn = {};
-  function render() {
-    edges.textContent = ""; rels.textContent = ""; rows.textContent = "";
-    visible = []; drawn = {};
-    (function collect(list) { list.forEach(function (i) { visible.push(i); if (i.open) collect(i.children); }); })(roots);
-    visible.forEach(function (inst, row) {
-      inst.x = PAD + inst.depth * INDENT; inst.y = PAD + row * ROW + ROW / 2;
-      drawn[inst.id] = drawn[inst.id] || inst;
+  /* chapter chips */
+  data.chapters.forEach(function (c, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = c.label + " · " + c.count; b.dataset.i = i;
+    b.addEventListener("click", function () { show(i, true); });
+    nav.appendChild(b);
+  });
+
+  function show(i, push) {
+    chapter = data.chapters[i];
+    Array.prototype.forEach.call(nav.children, function (b, j) { b.classList.toggle("on", j === i); });
+    svg.textContent = ""; nodes = {}; out = {}; inn = {}; groups = {}; paths = [];
+    world = el("g", {}, svg);
+    var edges = el("g", { "class": "edges" }, world), boxes = el("g", { "class": "nodes" }, world);
+    chapter.nodes.forEach(function (n) { nodes[n.id] = n; out[n.id] = []; inn[n.id] = []; });
+    chapter.edges.forEach(function (e) {
+      var a = nodes[e.from], b = nodes[e.to]; if (!a || !b) return;
+      out[e.from].push(e.to); inn[e.to].push(e.from);
+      var y0 = a.y + a.h / 2, y1 = b.y - b.h / 2, m = (y0 + y1) / 2;
+      var p = el("path", { d: "M" + a.x + "," + y0 + " C" + a.x + "," + m + " " + b.x + "," + m + " " + b.x + "," + y1, "class": "edge " + e.kind }, edges);
+      p.dataset.from = e.from; p.dataset.to = e.to; paths.push(p);
     });
-    visible.forEach(function (inst) {
-      if (inst.parent) {   /* elbow connector from the parent's shape down to this row */
-        var p = inst.parent, cls = inst.slot ? "slot " + inst.slot : "contains";
-        el("path", { d: "M" + p.x + "," + (p.y + 10) + "V" + inst.y + "H" + (inst.x - 10), "class": cls }, edges);
-      }
-      var n = inst.node, g = el("g", { transform: "translate(" + inst.x + "," + inst.y + ")",
-        "class": "node " + n.type + (n.contested ? " contested" : "") + (inst.children.length ? (inst.open ? " open" : " closed") : " leaf")
-                 + (selected === inst.id ? " selected" : "") }, rows);
-      g.dataset.key = inst.key;
-      el("circle", { r: 16, "class": "hit", "data-act": "toggle" }, g);
-      shape(n.type, g);
-      if (inst.children.length && n.type !== "source") el("text", { "class": "chev", x: 0, y: 4, "text-anchor": "middle" }, g).textContent = inst.open ? "−" : "+";
-      var label = n.label; if (n.type === "chapter") label += " · " + n.count;
-      var t = el("text", { x: 16, y: 4, "class": "label", "data-act": "select" }, g);
+    chapter.nodes.forEach(function (n) {
+      var cls = "node " + n.type + (n.grade ? " g-" + n.grade : "") + (n.against ? " against" : "") + (n.contested ? " contested" : "");
+      var g = el("g", { transform: "translate(" + n.x + "," + n.y + ")", "class": cls }, boxes);
+      g.dataset.id = n.id;
+      shape(n, g);
+      var t = el("text", { "text-anchor": "middle", y: -((n.lines.length - 1) * 7) + 4 }, g);
       if (n.lang) t.setAttribute("lang", n.lang);
-      if (inst.slot) { var s = el("tspan", { "class": "slot-tag" }, t); s.textContent = inst.slot + " "; }
-      el("tspan", {}, t).textContent = short(label, n.type === "statement" ? 60 : 44);
+      n.lines.forEach(function (line, k) { var s = el("tspan", { x: 0, dy: k ? 14 : 0 }, t); s.textContent = line; });
+      if (n.no) el("text", { "class": "no", x: -n.w / 2 + 6, y: -n.h / 2 + 11 }, g).textContent = n.no;
+      groups[n.id] = g;
     });
-    data.relations.forEach(function (r) {   /* dashed arcs on the right between related statements */
-      var a = drawn[r.from], b = drawn[r.to]; if (!a || !b) return;
-      var x = Math.max(a.x, b.x) + 30 + 8 * Math.abs(a.depth - b.depth), bend = x + 40;
-      el("path", { d: "M" + x + "," + a.y + " C" + bend + "," + a.y + " " + bend + "," + b.y + " " + x + "," + b.y, "class": "relation " + r.kind }, rels)
-        .appendChild(el("title", {})).textContent = r.kind;
-    });
-    var h = PAD * 2 + visible.length * ROW;
-    svg.dataset.h = h;
+    if (push) history.replaceState(null, "", "#chapter=" + chapter.chapter);
+    select(null, false);
+    fit(false);
   }
 
-  /* pan / zoom inside the viewport; fit animates to the open rows */
-  function apply() { world.setAttribute("transform", "translate(" + view.x + "," + view.y + ") scale(" + view.k + ")"); }
-  function fit(rowsToFit) {
-    var r = svg.getBoundingClientRect();
-    var ys = rowsToFit.map(function (i) { return i.y; });
-    var y0 = Math.min.apply(null, ys) - ROW, y1 = Math.max.apply(null, ys) + ROW;
-    var k = Math.min(1.6, Math.max(0.5, (r.height - 2 * PAD) / (y1 - y0)));
-    var target = { k: k, x: PAD, y: (r.height - (y1 - y0) * k) / 2 - y0 * k };
-    if (target.y > PAD) target.y = PAD;
-    animate(target);
+  /* selection: the node, its ancestors and descendants stay; the rest fades; the sheet fills */
+  function reach(id, dir) { var seen = {}; (function go(x) { if (seen[x]) return; seen[x] = true; dir[x].forEach(go); })(id); return seen; }
+  function select(id, push) {
+    selected = id;
+    var keep = null;
+    if (id && nodes[id]) { keep = reach(id, out); var up = reach(id, inn); for (var k in up) keep[k] = true; }
+    for (var nid in groups) {
+      groups[nid].classList.toggle("dim", !!keep && !keep[nid]);
+      groups[nid].classList.toggle("selected", nid === id);
+    }
+    paths.forEach(function (p) { p.classList.toggle("dim", !!keep && !(keep[p.dataset.from] && keep[p.dataset.to])); });
+    if (keep) {
+      sheet.innerHTML = data.html[nodes[id].ref] || ""; hint.hidden = true;
+      if (push) history.replaceState(null, "", "#" + nodes[id].ref);
+      sheet.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      sheet.innerHTML = home; hint.hidden = false;
+      if (push) history.replaceState(null, "", "#chapter=" + chapter.chapter);
+    }
   }
-  var anim = null;
+
+  /* pan / zoom / fit */
+  function apply() { world.setAttribute("transform", "translate(" + view.x + "," + view.y + ") scale(" + view.k + ")"); }
+  function bounds(list) {
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    list.forEach(function (n) { x0 = Math.min(x0, n.x - n.w / 2); x1 = Math.max(x1, n.x + n.w / 2); y0 = Math.min(y0, n.y - n.h / 2); y1 = Math.max(y1, n.y + n.h / 2); });
+    return { x0: x0, y0: y0, x1: x1, y1: y1 };
+  }
+  function fit(animated, list) {
+    var r = svg.getBoundingClientRect(), b = bounds(list || chapter.nodes), pad = 24;
+    var k = Math.min(2, (r.width - 2 * pad) / (b.x1 - b.x0), (r.height - 2 * pad) / (b.y1 - b.y0));
+    var target = { k: k, x: (r.width - (b.x1 - b.x0) * k) / 2 - b.x0 * k, y: (r.height - (b.y1 - b.y0) * k) / 2 - b.y0 * k };
+    if (animated) animate(target); else { view = target; apply(); }
+  }
   function animate(target) {
     var from = { x: view.x, y: view.y, k: view.k }, t0 = performance.now();
     cancelAnimationFrame(anim);
@@ -104,7 +109,7 @@
   var pointers = {}, pinch = null, press = null;
   function local(px, py) { var r = svg.getBoundingClientRect(); return { x: px - r.left, y: py - r.top }; }
   function zoomAt(f, cx, cy) {
-    var k = Math.max(0.4, Math.min(4, view.k * f)); f = k / view.k;
+    var k = Math.max(0.15, Math.min(4, view.k * f)); f = k / view.k;
     view.x = cx - (cx - view.x) * f; view.y = cy - (cy - view.y) * f; view.k = k; apply();
   }
   svg.addEventListener("pointerdown", function (e) {
@@ -129,49 +134,39 @@
   function up(e) {
     delete pointers[e.pointerId];
     if (Object.keys(pointers).length < 2) pinch = null;
-    if (press && press.id === e.pointerId) tap(press.target);
+    if (press && press.id === e.pointerId) {
+      var g = press.target.closest && press.target.closest("g.node");
+      if (g) { select(g.dataset.id, true); var n = nodes[g.dataset.id]; if (view.k < 0.8) fit(true, [n].concat(out[n.id].concat(inn[n.id]).map(function (i) { return nodes[i]; }))); }
+      else select(null, true);
+    }
     press = null;
   }
   svg.addEventListener("pointerup", up); svg.addEventListener("pointercancel", up);
   svg.addEventListener("wheel", function (e) { e.preventDefault(); var p = local(e.clientX, e.clientY); zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, p.x, p.y); }, { passive: false });
+  document.getElementById("fit").addEventListener("click", function () { fit(true); });
+  window.addEventListener("resize", function () { fit(false); });
 
-  /* taps: shape toggles, label selects (and opens); background clears the selection */
-  function tap(target) {
-    var g = target.closest && target.closest("g.node");
-    if (!g) { select(null, true); return; }
-    var inst = instances[+g.dataset.key], act = target.getAttribute("data-act") || "toggle";
-    if (act === "select") { select(inst.id, true, inst); return; }
-    if (inst.children.length) { inst.open = !inst.open; render(); fit(inst.open ? [inst].concat(inst.children) : [inst]); }
-    else select(inst.id, true, inst);
-  }
-  function select(id, push, inst) {
-    selected = id;
-    if (!id || !nodes[id]) {
-      render(); sheet.innerHTML = home; hint.hidden = false;
-      if (push) history.replaceState(null, "", location.pathname);
-      return;
+  /* links in the sheet and deep links: #<entity id> or #chapter=<n> */
+  function locate(ref) {
+    for (var i = 0; i < data.chapters.length; i++) {
+      var hit = data.chapters[i].nodes.filter(function (n) { return n.ref === ref; })[0];
+      if (hit) return { i: i, id: hit.id };
     }
-    inst = inst || byId[id].filter(function (i) { return visible.indexOf(i) >= 0; })[0] || byId[id][0];
-    for (var p = inst.parent; p; p = p.parent) p.open = true;   /* reveal the path to it */
-    if (inst.children.length) inst.open = true;
-    render();
-    sheet.innerHTML = nodes[id].html; hint.hidden = true;
-    if (push) history.replaceState(null, "", "#" + id);
-    fit([inst].concat(inst.open ? inst.children : []));
-    sheet.scrollIntoView({ behavior: "smooth", block: "start" });
+    return null;
+  }
+  function open(hash, push) {
+    var m = /^chapter=(.+)$/.exec(hash);
+    if (m) { var i = data.chapters.map(function (c) { return c.chapter; }).indexOf(m[1]); show(i < 0 ? 0 : i, push); return; }
+    var at = locate(hash);
+    if (!at) { show(0, push); return; }
+    if (chapter !== data.chapters[at.i]) show(at.i, false);
+    select(at.id, push);
+    var n = nodes[at.id]; fit(true, [n].concat(out[n.id].concat(inn[n.id]).map(function (i) { return nodes[i]; })));
   }
   sheet.addEventListener("click", function (e) {
     var a = e.target.closest("a.node-link");
-    if (a && nodes[a.dataset.node]) { e.preventDefault(); select(a.dataset.node, true); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (a && locate(a.dataset.node)) { e.preventDefault(); open(a.dataset.node, true); window.scrollTo({ top: 0, behavior: "smooth" }); }
   });
-  document.getElementById("fit").addEventListener("click", function () { fit(visible); });
-  document.getElementById("reset").addEventListener("click", function () {
-    instances.forEach(function (i) { i.open = false; }); roots.forEach(function (r) { r.open = true; }); select(null, true); fit(visible);
-  });
-  window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)), false); });
-  window.addEventListener("resize", function () { fit(visible); });
-
-  render();
-  if (location.hash.length > 1 && nodes[decodeURIComponent(location.hash.slice(1))]) select(decodeURIComponent(location.hash.slice(1)), false);
-  else fit(visible);
+  window.addEventListener("hashchange", function () { open(decodeURIComponent(location.hash.slice(1)), false); });
+  open(decodeURIComponent(location.hash.slice(1)), false);
 })();

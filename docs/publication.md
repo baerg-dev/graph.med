@@ -63,51 +63,56 @@ The view page is designed for a phone first and kept minimal: one graph, one
 detail section, nothing else competing for the screen. Desktop gets the same page
 with more room.
 
-**The graph is an outline tree**, opened step by step. The first published page drew
-every member of the view at once — 209 nodes — and was unreadable on a phone; a graph
-that is browsed has to disclose itself progressively. So the page is a tree:
+**The graph is a decision graph, one per chapter.** The page is for physicians and
+academics, who read a guideline as decisions: which patients, under which condition,
+which recommendation, to what end. The first published page drew every member at
+once and was unreadable; the second was an outline and read as a table of contents.
+So each chapter is drawn top-down as a layered decision graph, derived from the
+statements' slots — the pool has no authored pathways yet, and this derivation is the
+stand-in until it does (`open-questions.md` → decision-graph-derivation):
 
 ```
-▢ source
-  ⬡ chapter · count
-    ● statement
-      ◆ population · concept
-      ◆ action · concept
-    ● statement …
+        ◇ patient group  (population slot — "is the patient in this group?")
+        │
+        ⬡ condition      (condition slot — a further question, asked within its group)
+        │
+   ┌────────────┐
+   │ recommend- │      (the statement — a box coloured by its claims' grade,
+   │ ation      │       A · B · 0 · EK; a thick red border when it is *against*;
+   └────────────┘       dashed red when contested; the recommendation number in the corner)
+        ┆
+        ▷ aim            (outcome slot — what the recommendation is for)
 ```
 
-- **Root and chapters.** The source is the root; its chapters are the first level. A
-  statement's chapter is derived from the recommendation numbers of its claims
-  (6.3 → chapter 6) — a display grouping for one-source views, computed by the
-  build, never stored.
-- **Statements** sit under their chapter, ordered by recommendation number; a
-  contested statement is drawn red. **Concepts** sit under each statement that uses
-  them, with the slot named on the connector, so a concept shared by several
-  statements appears under each of them; its section lists all its uses.
-- **Cross-statement relations** (`specializes`, `complements`, `conflicts`) are drawn
-  as dashed arcs on the right when both statements are open. Claims are not nodes;
-  they are the evidence and appear in the section.
-- **Forms tell the types apart**, not colour alone: source a square, chapter a
-  hexagon, statement a circle, concept a diamond; containment a solid grey
-  connector, a slot fill a solid green one, a relation a dashed blue one. A legend
-  sits under the graph.
+- **Chapters** are the entry point: a row of chips above the graph, one chapter open
+  at a time. A statement's chapter is derived from the recommendation numbers of
+  its claims (6.3 → chapter 6) — a display grouping for one-source views, computed by
+  the build, never stored.
+- **Patient groups converge.** Statements that share a population concept hang from
+  one diamond, so the graph shows at a glance what the guideline says for, say,
+  colorectal resection. A condition is asked within its patient group, so the same
+  condition concept under two groups is two hexagons, and the path stays unambiguous.
+- **Forms tell the types apart, colour tells the grade.** Diamond, hexagon, box, tag
+  for group, condition, recommendation, aim; solid connectors on the decision path,
+  dashed to the aim. Grade colours are the guideline's own scale; the legend sits under
+  the graph. Claims are not nodes; they are the evidence and appear in the section.
 
-The layout is the outline order — row is y, depth is x — computed at render from
-what is open; no simulation, no positions in the data, so two builds of the same
-commit draw the same picture and the client script stays small and dependency-free.
+Positions are **computed by the build**, deterministically: recommendations in
+reading order set the x axis, the other layers sit at the barycentre of what they
+connect to and are pushed apart until nothing overlaps. The browser only renders,
+so the client script stays small and dependency-free.
 
-**The interaction.** The page opens with the source and its chapters. Tapping a
-shape opens or closes it; tapping a label selects the node and opens its details in
-the **section below the graph**; the graph stays where it is, so the reader keeps
-their place. Each step animates the viewport to fit what just opened. Pan by one
-finger, pinch or wheel to zoom, and two buttons — fit to what is open, collapse to
-the chapters. Tapping a neighbour listed in the section moves the selection and
-reveals the path to it. There are no modal dialogs and no page loads needed to read
-a view; the entity pages (§4) exist for linking, not for reading.
+**The interaction.** Pan by one finger, pinch or wheel to zoom, a fit button.
+Tapping a node selects it: its ancestors and descendants stay, everything else
+fades, and its details open in the **section below the graph**; the graph stays
+where it is, so the reader keeps their place. Tapping the background clears the
+selection. Tapping a neighbour listed in the section moves there, switching chapter
+if needed. Deep links carry `#<entity id>` or `#chapter=<n>`. There are no modal
+dialogs and no page loads needed to read a view; the entity pages (§4) exist for
+linking, not for reading.
 
 **What the section shows.**
 
-- *chapter*: its statements, each a link into the outline.
 - *statement*: the label, in its source language; the slots with their concepts;
   every claim linked to it by `supports` or `contests` — each with its
   recommendation number, **its own grade**, verb and direction, the verbatim quote,
@@ -184,7 +189,10 @@ cut-publication).
 
 - **Cut publication** — how cuts are built and served alongside the floating view;
   whether a cut has a PDF export.
-- **Search** — the outline gives an entry point by chapter; finding a statement by
-  word is not built.
+- **Search** — the chapter chips are the entry point; finding a statement by word is
+  not built.
+- **Edge labels** — a decision graph proper labels its branches (yes/no, a value
+  range). The derived graph has none; they come with authored pathways (`branch`
+  edges carry a `guard`).
 - **Translation** — a build-layer projection, not started.
 - **Other projections** — FHIR, RDF, diagram formats (`graph-representation.md` §13).

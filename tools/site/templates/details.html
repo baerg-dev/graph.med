@@ -62,12 +62,6 @@
 {% for s in c.statements %}<li><span class="tag">{{ s.edge }}</span> <a href="{{ base }}{{ s.id }}/">{{ s.label }}</a></li>{% endfor %}
 </ul>
 {% endif %}
-{% elif e.type == "chapter" %}
-<p class="kind">chapter</p>
-<p class="label">{{ e.label }}</p>
-<ul class="plain">
-{% for s in statements %}<li><a class="node-link" data-node="{{ s.id }}" href="{{ base }}{{ s.id }}/" lang="{{ s.lang }}">{{ s.label }}</a></li>{% endfor %}
-</ul>
 {% elif e.type == "source" %}
 <p class="kind">source</p>
 <p class="label" lang="{{ e.lang }}">{{ e.title }}</p>
