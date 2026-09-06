@@ -5,8 +5,10 @@ Open Medical Knowledge Graph.
 > **Status: at inception.** There is no source tree or build system yet. What exists
 > is the design (`docs/`), the one schema (`schema/schema.yaml`), the validator that
 > enforces it and the CI that runs it (see "Checks"), and the pool under `data/` as
-> it lands through pull requests. This README describes how the project is worked
-> on; it will describe what the project *is* once there is more to describe.
+> it lands through pull requests. The domain `graph.med` points at GitHub Pages and
+> serves nothing yet; what the site will be is designed in `docs/publication.md`.
+> This README describes how the project is worked on; it will describe what the
+> project *is* once there is more to describe.
 
 ## Development environment (sbx)
 

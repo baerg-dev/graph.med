@@ -67,3 +67,15 @@ open edges of the v0.2 model.
 **Options:** a claim kind `quality_indicator` plus a new edge kind (`measures`: claim → statement) · model the QI as a statement of its own ("adherence to X is measured as numerator/denominator") that the QI text `supports`, linked to the underlying statement by `complements` · leave QIs out of the pool entirely — they are the guideline's audit instrument, not knowledge, and a consumer can recover them from the referenced statement's source
 **Leaning:** the first option, once a consumer asks — a QI is exactly the kind of thing a hospital-facing view wants next to the recommendation ("this one is audited, target 0%"), and a dedicated kind plus edge keeps it a claim (verbatim, hashed, verifiable) without pretending it is evidence. Deliberately unmodelled in chunk ch09, which closed pass 1 of POMGAT with the four QIs and their statement mapping recorded in PROGRESS deferred, so nothing is lost. Note two scope mismatches a modelling pass will meet: QI 3's denominator spans three organ groups whose recommendations are three separate statements, and QI 4's is narrower (Kolonresektion) than the box it references (kolorektale Resektionen). (2026-09-05)
 **Settled by:** the first view that has to show which recommendations are audited, or a second source whose QIs land on the same statements.
+
+## cut-publication  (publication.md §7; graph-representation.md §4; schema `view.cuts`)
+**Question:** How is a cut served next to the floating view — and does a cut get a single-file export (a PDF) as the citable artefact?
+**Options:** the build checks out each cut's `as_of` commit and renders it under `<view-id>@<n>` on every deploy · a cut is rendered once, when made, and its output committed to a publication branch · cuts are not served at all; the URL redirects to the repository at the commit
+**Leaning:** the first — one build, no second branch to keep consistent, and a cut stays exactly as reproducible as the pool it is cut from; cost is build time growing with the number of cuts, which is fine for years. A PDF export belongs to a cut if anywhere (it is frozen too), but nothing needs it yet. Deferred until someone needs to cite a view. (2026-09-06)
+**Settled by:** the first citation of a view.
+
+## view-graph-scope  (publication.md §3, §8)
+**Question:** A source view has a few hundred nodes (POMGAT pass 1: 90 statements, 119 concepts). How does a phone-sized graph give the reader an entry point without adding chrome?
+**Options:** draw everything and rely on pan/zoom and the sheet's neighbour links · start from a search box, drawing only the matched node and its neighbourhood · a per-view starting node declared on the view entity · a chapter or concept filter as part of the view filter
+**Leaning:** draw everything, with node size and the sheet's neighbour links doing the work, and see whether it is readable before adding anything; search is the likely second step because it adds no permanent chrome. Decide against the first rendered view, not in the abstract. (2026-09-06)
+**Settled by:** reading the first published view on a phone.
