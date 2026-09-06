@@ -73,9 +73,3 @@ open edges of the v0.2 model.
 **Options:** the build checks out each cut's `as_of` commit and renders it under `<view-id>@<n>` on every deploy · a cut is rendered once, when made, and its output committed to a publication branch · cuts are not served at all; the URL redirects to the repository at the commit
 **Leaning:** the first — one build, no second branch to keep consistent, and a cut stays exactly as reproducible as the pool it is cut from; cost is build time growing with the number of cuts, which is fine for years. A PDF export belongs to a cut if anywhere (it is frozen too), but nothing needs it yet. Deferred until someone needs to cite a view. (2026-09-06)
 **Settled by:** the first citation of a view.
-
-## view-graph-scope  (publication.md §3, §8)
-**Question:** A source view has a few hundred nodes (POMGAT pass 1: 90 statements, 119 concepts). How does a phone-sized graph give the reader an entry point without adding chrome?
-**Options:** draw everything and rely on pan/zoom and the sheet's neighbour links · start from a search box, drawing only the matched node and its neighbourhood · a per-view starting node declared on the view entity · a chapter or concept filter as part of the view filter
-**Leaning:** draw everything, with node size and the sheet's neighbour links doing the work, and see whether it is readable before adding anything; search is the likely second step because it adds no permanent chrome. Decide against the first rendered view, not in the abstract. (2026-09-06)
-**Settled by:** reading the first published view on a phone.

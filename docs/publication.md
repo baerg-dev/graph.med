@@ -63,29 +63,51 @@ The view page is designed for a phone first and kept minimal: one graph, one
 detail section, nothing else competing for the screen. Desktop gets the same page
 with more room.
 
-**The graph.** The members of the view drawn as nodes and edges:
+**The graph is an outline tree**, opened step by step. The first published page drew
+every member of the view at once — 209 nodes — and was unreadable on a phone; a graph
+that is browsed has to disclose itself progressively. So the page is a tree:
 
-- For a `selection` view over a source: the **statements** and the **concepts** that
-  fill their slots. An edge is a slot fill (statement → concept, labelled by the
-  slot). Claims are *not* nodes — they are the evidence and appear in the sheet. A
-  statement with a `contests` edge is marked contested. Cross-statement edges
-  (`specializes`, `complements`, `conflicts`) are drawn when they exist.
-- For a `pathway` view: the structural nodes (decision, outcome, gap) with their
-  `sequence` and `branch` edges, and the statements they are `about`.
+```
+▢ source
+  ⬡ chapter · count
+    ● statement
+      ◆ population · concept
+      ◆ action · concept
+    ● statement …
+```
 
-Node positions are **computed by the build**, deterministically, and shipped with
-the page. The browser renders and interacts; it does not run a layout simulation.
-This keeps the client script small and dependency-free and makes two builds of the
-same commit produce the same picture.
+- **Root and chapters.** The source is the root; its chapters are the first level. A
+  statement's chapter is derived from the recommendation numbers of its claims
+  (6.3 → chapter 6) — a display grouping for one-source views, computed by the
+  build, never stored.
+- **Statements** sit under their chapter, ordered by recommendation number; a
+  contested statement is drawn red. **Concepts** sit under each statement that uses
+  them, with the slot named on the connector, so a concept shared by several
+  statements appears under each of them; its section lists all its uses.
+- **Cross-statement relations** (`specializes`, `complements`, `conflicts`) are drawn
+  as dashed arcs on the right when both statements are open. Claims are not nodes;
+  they are the evidence and appear in the section.
+- **Forms tell the types apart**, not colour alone: source a square, chapter a
+  hexagon, statement a circle, concept a diamond; containment a solid grey
+  connector, a slot fill a solid green one, a relation a dashed blue one. A legend
+  sits under the graph.
 
-**The interaction.** Pan and zoom by touch. Tapping a node opens a **section below
-the graph** with that node's details; the graph stays where it is, so the reader
-keeps their place. Tapping a neighbour listed in the section moves the selection.
-There are no modal dialogs and no page loads needed to read a view; the entity
-pages (§4) exist for linking, not for reading.
+The layout is the outline order — row is y, depth is x — computed at render from
+what is open; no simulation, no positions in the data, so two builds of the same
+commit draw the same picture and the client script stays small and dependency-free.
+
+**The interaction.** The page opens with the source and its chapters. Tapping a
+shape opens or closes it; tapping a label selects the node and opens its details in
+the **section below the graph**; the graph stays where it is, so the reader keeps
+their place. Each step animates the viewport to fit what just opened. Pan by one
+finger, pinch or wheel to zoom, and two buttons — fit to what is open, collapse to
+the chapters. Tapping a neighbour listed in the section moves the selection and
+reveals the path to it. There are no modal dialogs and no page loads needed to read
+a view; the entity pages (§4) exist for linking, not for reading.
 
 **What the section shows.**
 
+- *chapter*: its statements, each a link into the outline.
 - *statement*: the label, in its source language; the slots with their concepts;
   every claim linked to it by `supports` or `contests` — each with its
   recommendation number, **its own grade**, verb and direction, the verbatim quote,
@@ -162,8 +184,7 @@ cut-publication).
 
 - **Cut publication** — how cuts are built and served alongside the floating view;
   whether a cut has a PDF export.
-- **Graph scope** — a source view with a few hundred nodes is readable on a phone
-  only with an entry point; whether that is search, a starting node, or a chapter
-  filter is undecided (`open-questions.md` → view-graph-scope).
+- **Search** — the outline gives an entry point by chapter; finding a statement by
+  word is not built.
 - **Translation** — a build-layer projection, not started.
 - **Other projections** — FHIR, RDF, diagram formats (`graph-representation.md` §13).

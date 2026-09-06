@@ -5,8 +5,8 @@
     uv run tools/build.py --base /graph.med/   # for baerg-dev.github.io/graph.med/
     uv run tools/build.py --cname graph.med    # also emit the CNAME file for Pages
 
-Every view becomes <view-id>/index.html — a graph (positions computed here) with a
-detail section below it — plus <view-id>.json; every entity becomes
+Every view becomes <view-id>/index.html — an outline tree (source → chapters →
+statements → concepts) with a detail section below it — plus <view-id>.json; every entity becomes
 <namespace>/<entity-id>/index.html and <namespace>/<entity-id>.json; the schema is
 copied to schema/schema.yaml. Offline, deterministic, nothing authored.
 """
@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import re
 import shutil
 import subprocess
@@ -131,75 +130,48 @@ def members_of(view: dict, pool: Pool) -> dict[str, dict]:
     return members
 
 
-def graph_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
-    """Nodes (statements, concepts) and links (slot fills, statement edges) with positions."""
-    nodes, links = [], []
-    for ent in members.values():
-        if ent["type"] == "statement":
-            contested = any(k == "contests" for k, _, _ in pool.inc.get(ent["id"], []))
-            nodes.append({"id": ent["id"], "type": "statement", "label": ent["label"], "lang": ent["lang"], "contested": contested})
-            for slot in SLOTS:
-                cid = (ent.get("slots") or {}).get(slot)
-                if cid in members:
-                    links.append({"from": ent["id"], "to": cid, "kind": slot})
-            for kind, to, _ in pool.out.get(ent["id"], []):
-                if kind in STATEMENT_EDGES and to in members:
-                    links.append({"from": ent["id"], "to": to, "kind": kind})
-        elif ent["type"] == "concept":
-            nodes.append({"id": ent["id"], "type": "concept", "label": ent["label"], "lang": ent["lang"]})
-    nodes.sort(key=lambda n: n["id"])
-    links.sort(key=lambda l: (l["from"], l["kind"], l["to"]))
-    layout(nodes, links)
-    return {"nodes": nodes, "links": links}
+def chapter_of(statement_id: str, pool: Pool) -> str | None:
+    """The chapter a statement belongs to: the recommendation numbers of its claims (e.g. 6.3 → 6).
+    A display grouping for one-source views, derived, never stored (docs/publication.md §3)."""
+    nos = sorted({c["recommendation_no"].split(".")[0] for c in pool.claims_for(statement_id) if c.get("recommendation_no")}, key=natural)
+    return nos[0] if nos else None
 
 
-def layout(nodes: list[dict], links: list[dict], iterations: int = 250, size: float = 1000.0) -> None:
-    """Fruchterman–Reingold with a seeded start, so a commit always draws the same picture."""
-    n = len(nodes)
-    if n == 0:
-        return
-    seed = 2463534242
-    def rnd():
-        nonlocal seed
-        seed = (seed * 1103515245 + 12345) % 2**31
-        return seed / 2**31
-    idx = {node["id"]: i for i, node in enumerate(nodes)}
-    pos = [[size * rnd(), size * rnd()] for _ in nodes]
-    pairs = [(idx[l["from"]], idx[l["to"]]) for l in links if l["from"] in idx and l["to"] in idx]
-    k = math.sqrt(size * size / n) * 0.9
-    temp = size / 8
-    for it in range(iterations):
-        disp = [[0.0, 0.0] for _ in nodes]
-        for i in range(n):
-            xi, yi = pos[i]
-            for j in range(i + 1, n):
-                dx, dy = xi - pos[j][0], yi - pos[j][1]
-                d2 = dx * dx + dy * dy + 1e-6
-                if d2 > (4 * k) ** 2:
-                    continue
-                f = k * k / d2
-                disp[i][0] += dx * f; disp[i][1] += dy * f
-                disp[j][0] -= dx * f; disp[j][1] -= dy * f
-        for i, j in pairs:
-            dx, dy = pos[i][0] - pos[j][0], pos[i][1] - pos[j][1]
-            d = math.sqrt(dx * dx + dy * dy) + 1e-6
-            f = d / k
-            disp[i][0] -= dx / d * f * d; disp[i][1] -= dy / d * f * d
-            disp[j][0] += dx / d * f * d; disp[j][1] += dy / d * f * d
-        for i in range(n):
-            dx, dy = size / 2 - pos[i][0], size / 2 - pos[i][1]   # weak gravity keeps components together
-            disp[i][0] += dx * 0.05; disp[i][1] += dy * 0.05
-            d = math.sqrt(disp[i][0] ** 2 + disp[i][1] ** 2) + 1e-6
-            step = min(d, temp)
-            pos[i][0] += disp[i][0] / d * step
-            pos[i][1] += disp[i][1] / d * step
-        temp = max(temp * 0.97, 1.0)
-    xs, ys = [p[0] for p in pos], [p[1] for p in pos]
-    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
-    span = max(x1 - x0, y1 - y0, 1.0)
-    for node, (x, y) in zip(nodes, pos):
-        node["x"] = round((x - x0) / span * size, 1)
-        node["y"] = round((y - y0) / span * size, 1)
+def tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
+    """The outline: source → chapters → statements → slot concepts; plus cross-statement relations."""
+    nodes: dict[str, dict] = {}
+    def node(ent: dict, **extra) -> str:
+        if ent["id"] not in nodes:
+            nodes[ent["id"]] = {"id": ent["id"], "type": ent["type"], "label": ent.get("label") or ent.get("title") or ent["id"],
+                                "lang": ent.get("lang"), **extra}
+        return ent["id"]
+    statements = sorted((m for m in members.values() if m["type"] == "statement"), key=lambda s: s["id"])
+    chapters: dict[str, list] = defaultdict(list)
+    for st in statements:
+        chapters[chapter_of(st["id"], pool) or "?"].append(st)
+    relations = []
+    roots = []
+    for src_id in view["filter"]["sources"]:
+        src = members[src_id]
+        chapter_nodes = []
+        for ch, sts in sorted(chapters.items(), key=lambda kv: natural(kv[0])):
+            gid = f"{src_id}#chapter={ch}"
+            nodes[gid] = {"id": gid, "type": "chapter", "label": f"Kapitel {ch}", "lang": src.get("lang"), "count": len(sts)}
+            children = []
+            for st in sorted(sts, key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="") ) + [s["id"]]):
+                sid = node(st, contested=any(k == "contests" for k, _, _ in pool.inc.get(st["id"], [])))
+                leaves = []
+                for slot in SLOTS:
+                    cid = (st.get("slots") or {}).get(slot)
+                    if cid in members:
+                        leaves.append({"id": node(members[cid]), "slot": slot})
+                children.append({"id": sid, "children": leaves})
+                for kind, to, _ in pool.out.get(st["id"], []):
+                    if kind in STATEMENT_EDGES and to in members:
+                        relations.append({"from": st["id"], "kind": kind, "to": to})
+            chapter_nodes.append({"id": gid, "children": children})
+        roots.append({"id": node(src), "children": chapter_nodes})
+    return {"nodes": nodes, "tree": roots, "relations": sorted(relations, key=lambda r: (r["from"], r["kind"], r["to"]))}
 
 
 # ── rendering ───────────────────────────────────────────────────────────────
@@ -272,9 +244,15 @@ def main(argv=None) -> int:
     for view in sorted(pool.of_type("view"), key=lambda v: v["id"]):
         vid = view["id"].split("/", 1)[1]
         members = members_of(view, pool)
-        graph = graph_of(view, members, pool)
-        for node in graph["nodes"]:
-            node["html"] = detail_tpl.render(**details(pool.entities[node["id"]]))
+        graph = tree_of(view, members, pool)
+        for nid, node in graph["nodes"].items():
+            if nid in pool.entities:
+                node["html"] = detail_tpl.render(**details(pool.entities[nid]))
+            else:   # a chapter: the statements it holds, as links into the outline
+                ch = nid.split("#chapter=", 1)[1]
+                sts = [c for r in graph["tree"] for c in r["children"] if c["id"] == nid][0]["children"]
+                node["html"] = detail_tpl.render(entity={"type": "chapter", "id": nid, "label": node["label"]},
+                                                 chapter=ch, statements=[graph["nodes"][s["id"]] for s in sts])
         sources = [members[s] for s in view["filter"]["sources"]]
         title = sources[0]["title"] if len(sources) == 1 else vid
         counts = {t: sum(1 for m in members.values() if m["type"] == t) for t in ("statement", "concept", "claim")}

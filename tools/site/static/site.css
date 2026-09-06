@@ -28,21 +28,35 @@ ul.cards li a { display: block; padding: .8rem; border: 1px solid var(--line); b
 ul.cards small, ul.plain small { display: block; color: var(--mute); }
 .foot { padding: 1rem; color: var(--mute); font-size: .8rem; border-top: 1px solid var(--line); }
 
-/* the graph */
+/* the graph: an outline tree inside a fixed viewport */
 .graph-wrap { margin: 0 -1rem; position: relative; background: var(--bg); }
 #graph { display: block; width: 100%; height: 62vh; touch-action: none; user-select: none; cursor: grab; }
-.hint { position: absolute; left: 1rem; bottom: .3rem; margin: 0; color: var(--mute); font-size: .8rem; pointer-events: none; }
-#graph line { stroke: var(--edge); stroke-width: 1.2; }
-#graph line.statement-edge { stroke: var(--statement); stroke-dasharray: 4 3; }
-#graph circle { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; }
-#graph .statement circle { fill: var(--statement); }
-#graph .concept circle { fill: var(--concept); }
-#graph .statement.contested circle { fill: var(--contested); }
-#graph text { font-size: 11px; fill: var(--fg); pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
-#graph .dim { opacity: .18; }
-#graph .selected circle { stroke: var(--fg); stroke-width: 3; }
-#graph .near circle { stroke: var(--fg); stroke-width: 2; }
-#graph .hit { fill: transparent; stroke: none; }
+.hint { position: absolute; left: 1rem; right: 1rem; bottom: .3rem; margin: 0; color: var(--mute); font-size: .78rem; pointer-events: none; }
+.sw { display: inline-block; width: .7em; height: .7em; vertical-align: -.05em; margin: 0 .15em 0 .5em; }
+.sw.source { background: var(--mute); border-radius: 2px; }
+.sw.chapter { background: var(--mute); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+.sw.statement { background: var(--statement); border-radius: 50%; }
+.sw.concept { background: var(--concept); transform: rotate(45deg) scale(.8); }
+.tools { position: absolute; right: .6rem; top: .6rem; display: flex; gap: .4rem; }
+.tools button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: 1.2rem; }
+#graph path.contains { fill: none; stroke: var(--edge); stroke-width: 1.5; }
+#graph path.slot { fill: none; stroke: var(--concept); stroke-width: 1.2; }
+#graph path.relation { fill: none; stroke: var(--statement); stroke-width: 1.2; stroke-dasharray: 5 4; }
+#graph path.relation.conflicts { stroke: var(--contested); }
+#graph .node .hit { fill: transparent; stroke: none; cursor: pointer; }
+#graph .node rect, #graph .node polygon, #graph .node circle:not(.hit) { stroke: var(--bg); stroke-width: 1.5; }
+#graph .source rect, #graph .chapter polygon { fill: var(--mute); }
+#graph .statement circle:not(.hit) { fill: var(--statement); }
+#graph .statement.contested circle:not(.hit) { fill: var(--contested); }
+#graph .concept polygon { fill: var(--concept); }
+#graph .leaf.statement circle:not(.hit), #graph .closed.statement circle:not(.hit) { fill-opacity: .55; }
+#graph .open .hit { stroke: var(--line); stroke-width: 1; }
+#graph text { font-size: 13px; fill: var(--fg); pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+#graph text.label { pointer-events: all; cursor: pointer; }
+#graph text.chev { font-size: 12px; font-weight: 700; fill: var(--bg); stroke: none; }
+#graph .slot-tag { fill: var(--mute); font-size: 11px; }
+#graph .selected text.label { font-weight: 700; }
+#graph .selected .hit { stroke: var(--fg); stroke-width: 2; }
 
 /* the sheet below the graph, and the entity page */
 .sheet { border-top: 2px solid var(--line); padding-top: .6rem; }

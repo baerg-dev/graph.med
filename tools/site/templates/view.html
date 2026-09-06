@@ -3,12 +3,17 @@
 {% block crumbs %}<span class="crumb">{{ vid }}</span>{% endblock %}
 {% block main %}
 <section class="graph-wrap">
-  <svg id="graph" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="{{ title }}"></svg>
-  <p class="hint" id="hint">{{ counts.statement }} statements · {{ counts.concept }} concepts · tap a node</p>
+  <svg id="graph" role="img" aria-label="{{ title }}"></svg>
+  <div class="tools">
+    <button type="button" id="fit" title="fit to what is open">⤢</button>
+    <button type="button" id="reset" title="collapse to the chapters">↺</button>
+  </div>
+  <p class="hint" id="hint"><span class="sw source"></span> source <span class="sw chapter"></span> chapter <span class="sw statement"></span> statement <span class="sw concept"></span> concept · tap a shape to open it, a label for details</p>
 </section>
 <section class="sheet" id="sheet" aria-live="polite">
   <p class="kind">view</p>
   <p class="label" lang="{{ sources[0].lang }}">{{ title }}</p>
+  <p class="cite">{{ counts.statement }} statements · {{ counts.concept }} concepts · {{ counts.claim }} claims</p>
   {% for s in sources %}<p class="cite"><a href="{{ s.url }}" rel="noopener">{{ s.id | short }}</a> · <a href="{{ base }}{{ s.id }}/">source</a> · <small>{{ s.license }}</small></p>{% endfor %}
   <p class="cite"><a href="{{ base }}{{ vid }}.json">json</a></p>
 </section>
