@@ -31,6 +31,50 @@ relations are **typed tuples**; every statement carries **provenance**; a
 validated when a version is cut; review is a **signed attestation** by an agent
 over a content hash; **one schema** governs the whole pool.
 
+The same, as a picture. Boxes are namespaces (§2); labelled arrows are edge
+kinds (§5); the two layers are §3; the view below the pool is §4:
+
+```
+              one schema (schema/schema.yaml) governs everything in the pool
+
+  +---------------------------------------------------------------------------+
+  |  THE POOL -- one repository; every git commit is a pool-wide as-of point  |
+  |                                                                           |
+  |  outside the pool     evidence layer             semantic layer           |
+  |  linked, never        identity DERIVED           identity MINTED          |
+  |  rehosted             from the anchor            (search before minting)  |
+  |                                                                           |
+  |  +-------------+      +------------------+       +--------------------+   |
+  |  | sources/    |      | claims/          |       | statements/        |   |
+  |  | url, sha256 |<-----| at + quote,      |------>| proposition        |   |
+  |  | license     | at + | grade/verb/      | supp- | slots: population, |   |
+  |  +-------------+quote | direction, kind  | orts/ | action, condition, |   |
+  |                       | id=sha256(at|q)  | cont- | outcome            |   |
+  |                       +------------------+ ests  +---------+----------+   |
+  |                          |      ^                          | slot values  |
+  |                          +------+                          v              |
+  |                          refines, supplements,   +--------------------+   |
+  |                          limits (body text)      | concepts/          |   |
+  |                                                  | thin: label, defn  |   |
+  |  agents/ --signs--> attestations/                +---------+----------+   |
+  |            over a content hash; a changed                  | codes_as     |
+  |            hash makes it stale, not void                   v              |
+  |                                                  <terminology>/<code>     |
+  |  pathways/ (decision, branch, outcome, gap)                               |
+  |            --about--> statements; sequence, branch among themselves       |
+  |            pure modelling, no evidence                                    |
+  |                                                                           |
+  |  every entity and edge carries `source`: a reference (at + quote) or the  |
+  |  marker `modelling`; evidence on a statement is derived from its edges    |
+  +---------------------------------------------------------------------------+
+                |
+                | filter: by pathway, source set, concept subtree, explicit list
+                v
+      views/<id>       floating -- the filter evaluated against the pool as of now
+      views/<id>@<n>   a cut -- as-of commit + frozen members + validation;
+                       stable forever, so it is what gets cited and attested
+```
+
 ---
 
 ## 2. Entities and URLs
