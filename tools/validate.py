@@ -9,7 +9,8 @@ rules a document schema cannot state because they span files:
   - every id is unique, and in one-per-file namespaces equals <ns>/<file stem>;
   - every entity reference in the data resolves (terminology codes excepted);
   - a claim's id is claims/<source-id>/<first 8 hex of sha256("<at>|<quote>")>;
-  - edges are unique per (from, kind, to, discriminator).
+  - edges are unique per (from, kind, to, discriminator);
+  - a view id is not a namespace name (views are served at the site root).
 
 With --verify-quotes it also downloads each source (hash-checked, cached) and
 verifies every quote is a verbatim substring of `pdftotext -layout` on the cited
@@ -60,6 +61,7 @@ def main(argv=None) -> int:
     Draft202012Validator.check_schema(schema)
     terminologies = set(schema["x-namespaces"]["terminologies"])
     namespaces = set(schema["x-namespaces"]) - {"terminologies"}
+    reserved = namespaces | terminologies | {"schema"}   # a view is served at the site root (docs/publication.md §2)
 
     # 1. each file against its definition ------------------------------------
     docs: list[tuple[str, object, bool]] = []   # (relative path, document, one_per_file)
@@ -89,6 +91,8 @@ def main(argv=None) -> int:
             ids[eid] = rel
             if one_per_file and eid != f"{Path(rel).parent.name}/{Path(rel).stem}":
                 errors.append(f"{rel}: id {eid} does not match the file name")
+            if ent.get("type") == "view" and eid.split("/", 1)[-1] in reserved:
+                errors.append(f"{rel}: view id {eid} collides with a namespace; it would shadow that path on the site")
             if ent.get("type") == "claim" and isinstance(ent.get("source"), dict):
                 at, quote = ent["source"].get("at", ""), ent["source"].get("quote", "")
                 digest = hashlib.sha256(f"{at}|{quote}".encode("utf-8")).hexdigest()[:8]

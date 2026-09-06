@@ -1,0 +1,74 @@
+{# The detail section for one entity: the sheet under the graph, and the entity page. #}
+{% set e = entity %}
+{% if e.type == "statement" %}
+<p class="kind">statement{% if contested %} · <mark>contested</mark>{% endif %}</p>
+<p class="label" lang="{{ e.lang }}">{{ e.label }}</p>
+{% if slots %}
+<dl class="slots">
+{% for s in slots %}
+  <dt>{{ s.slot }}</dt><dd><a class="node-link" data-node="{{ s.id }}" href="{{ base }}{{ s.id }}/" lang="{{ e.lang }}">{{ s.label }}</a></dd>
+{% endfor %}
+</dl>
+{% endif %}
+{% if claims %}
+<h3>Evidence</h3>
+<ol class="claims">
+{% for c in claims %}
+  <li class="claim {{ c.edge }}">
+    <span class="tag">{{ c.edge }}</span>
+    {% if c.recommendation_no %}<span class="tag">No. {{ c.recommendation_no }}</span>{% endif %}
+    {% if c.grade %}<span class="tag grade">grade {{ c.grade }}</span>{% endif %}
+    {% if c.verb %}<span class="tag">{{ c.verb }}{% if c.direction == "against" %} nicht{% endif %}</span>{% endif %}
+    <span class="tag">{{ c.kind }}</span>
+    <p lang="{{ c.lang }}">{{ c.label }}</p>
+    <blockquote lang="{{ c.lang }}">„{{ c.quote }}“</blockquote>
+    <p class="cite"><a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a> · <a href="{{ base }}{{ c.id }}/">{{ c.id | short }}</a></p>
+  </li>
+{% endfor %}
+</ol>
+{% endif %}
+{% if related %}
+<h3>Related statements</h3>
+<ul class="plain">
+{% for r in related %}<li><span class="tag">{{ r.kind }}</span> <a class="node-link" data-node="{{ r.id }}" href="{{ base }}{{ r.id }}/">{{ r.label }}</a></li>{% endfor %}
+</ul>
+{% endif %}
+{% elif e.type == "concept" %}
+<p class="kind">concept</p>
+<p class="label" lang="{{ e.lang }}">{{ e.label }}</p>
+{% if e.definition %}<p lang="{{ e.lang }}">{{ e.definition }}</p>{% endif %}
+{% if codes %}<p>codes: {% for c in codes %}<code>{{ c }}</code> {% endfor %}</p>{% endif %}
+{% if uses %}
+<h3>Used in</h3>
+<ul class="plain">
+{% for u in uses %}<li><span class="tag">{{ u.slot }}</span> <a class="node-link" data-node="{{ u.id }}" href="{{ base }}{{ u.id }}/" lang="{{ e.lang }}">{{ u.label }}</a></li>{% endfor %}
+</ul>
+{% endif %}
+{% elif e.type == "claim" %}
+{% set c = claim %}
+<p class="kind">claim · {{ c.kind }}</p>
+<p>
+  {% if c.recommendation_no %}<span class="tag">No. {{ c.recommendation_no }}</span>{% endif %}
+  {% if c.grade %}<span class="tag grade">grade {{ c.grade }}</span>{% endif %}
+  {% if c.verb %}<span class="tag">{{ c.verb }}{% if c.direction == "against" %} nicht{% endif %}</span>{% endif %}
+  {% if c.consensus %}<span class="tag">{{ c.consensus }}</span>{% endif %}
+</p>
+<p class="label" lang="{{ c.lang }}">{{ c.label }}</p>
+<blockquote lang="{{ c.lang }}">„{{ c.quote }}“</blockquote>
+<p class="cite"><a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a></p>
+{% if c.statements %}
+<h3>Bears on</h3>
+<ul class="plain">
+{% for s in c.statements %}<li><span class="tag">{{ s.edge }}</span> <a href="{{ base }}{{ s.id }}/">{{ s.label }}</a></li>{% endfor %}
+</ul>
+{% endif %}
+{% elif e.type == "source" %}
+<p class="kind">source</p>
+<p class="label" lang="{{ e.lang }}">{{ e.title }}</p>
+<p><a href="{{ e.url }}" rel="noopener">{{ e.url }}</a></p>
+<p><small>{{ e.license }}</small></p>
+<p><small>{{ e.content_hash }}{% if e.awmf_register %} · AWMF {{ e.awmf_register }}{% endif %} · {{ claim_count }} claims</small></p>
+{% else %}
+<p class="kind">{{ e.type }}</p>
+<p class="label">{{ e.label or e.id }}</p>
+{% endif %}

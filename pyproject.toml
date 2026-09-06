@@ -1,12 +1,14 @@
 # Python tooling for graph.med. Managed with uv: `uv sync` installs, `uv run
-# tools/validate.py` runs. There is no package to build; this only pins the
-# validator's dependencies and the interpreter it is tested against.
+# tools/validate.py` and `uv run tools/build.py` run. There is no package to build;
+# this only pins the two scripts' dependencies and the interpreter they are tested
+# against.
 [project]
 name = "graph-med-tools"
 version = "0.1.0"
-description = "Validator for the graph.med pool (data/ against schema/schema.yaml)"
+description = "Validator and site build for the graph.med pool (data/ against schema/schema.yaml; site/ from data/)"
 requires-python = ">=3.12"
 dependencies = [
+    "jinja2>=3.1,<4",
     "jsonschema>=4.26.0",
     "pyyaml>=6,<7",
 ]

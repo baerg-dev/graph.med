@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% set e = entity %}
+{% block title %}{{ e.id }} — graph.med{% endblock %}
+{% block crumbs %}<span class="crumb">{{ e.id }}</span>{% endblock %}
+{% block main %}
+<article class="sheet">
+{% include "details.html" %}
+<p class="cite"><a href="{{ base }}{{ e.id }}.json">json</a></p>
+</article>
+{% endblock %}

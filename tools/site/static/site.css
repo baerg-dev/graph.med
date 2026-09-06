@@ -1,0 +1,62 @@
+/* graph.med — phone first, minimal (docs/publication.md §3) */
+:root {
+  --bg: #fff; --fg: #1a1a1a; --mute: #666; --line: #ddd; --accent: #0b5cad;
+  --statement: #0b5cad; --concept: #6a994e; --contested: #c1121f; --edge: #bbb;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #111; --fg: #eee; --mute: #999; --line: #333; --accent: #7cb7ff;
+          --statement: #7cb7ff; --concept: #9ad17a; --contested: #ff6b6b; --edge: #444; }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--accent); }
+code { font-size: .9em; }
+.top { display: flex; gap: .75rem; align-items: baseline; padding: .6rem 1rem; border-bottom: 1px solid var(--line); }
+.brand { font-weight: 700; text-decoration: none; color: var(--fg); }
+.crumb { color: var(--mute); font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+main { padding: 0 1rem 2rem; max-width: 52rem; margin: 0 auto; }
+h1 { font-size: 1.4rem; margin: 1rem 0 .5rem; }
+h2 { font-size: 1.1rem; margin: 1.5rem 0 .5rem; }
+h3 { font-size: .95rem; margin: 1rem 0 .4rem; color: var(--mute); text-transform: uppercase; letter-spacing: .04em; }
+.lead { color: var(--mute); }
+ul.plain, ul.cards, ol.claims { list-style: none; padding: 0; margin: 0; }
+ul.plain li { padding: .45rem 0; border-top: 1px solid var(--line); }
+ul.cards li a { display: block; padding: .8rem; border: 1px solid var(--line); border-radius: .6rem; text-decoration: none; color: var(--fg); margin-bottom: .6rem; }
+ul.cards small, ul.plain small { display: block; color: var(--mute); }
+.foot { padding: 1rem; color: var(--mute); font-size: .8rem; border-top: 1px solid var(--line); }
+
+/* the graph */
+.graph-wrap { margin: 0 -1rem; position: relative; background: var(--bg); }
+#graph { display: block; width: 100%; height: 62vh; touch-action: none; user-select: none; cursor: grab; }
+.hint { position: absolute; left: 1rem; bottom: .3rem; margin: 0; color: var(--mute); font-size: .8rem; pointer-events: none; }
+#graph line { stroke: var(--edge); stroke-width: 1.2; }
+#graph line.statement-edge { stroke: var(--statement); stroke-dasharray: 4 3; }
+#graph circle { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; }
+#graph .statement circle { fill: var(--statement); }
+#graph .concept circle { fill: var(--concept); }
+#graph .statement.contested circle { fill: var(--contested); }
+#graph text { font-size: 11px; fill: var(--fg); pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+#graph .dim { opacity: .18; }
+#graph .selected circle { stroke: var(--fg); stroke-width: 3; }
+#graph .near circle { stroke: var(--fg); stroke-width: 2; }
+#graph .hit { fill: transparent; stroke: none; }
+
+/* the sheet below the graph, and the entity page */
+.sheet { border-top: 2px solid var(--line); padding-top: .6rem; }
+.kind { margin: .2rem 0; color: var(--mute); font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+.label { font-size: 1.15rem; margin: .2rem 0 .6rem; }
+mark { background: var(--contested); color: #fff; padding: 0 .3em; border-radius: .3em; }
+dl.slots { display: grid; grid-template-columns: max-content 1fr; gap: .2rem .8rem; margin: 0 0 .5rem; }
+dl.slots dt { color: var(--mute); font-size: .85rem; }
+dl.slots dd { margin: 0; }
+.tag { display: inline-block; font-size: .75rem; padding: .1rem .45rem; border: 1px solid var(--line); border-radius: 1rem; color: var(--mute); margin: 0 .2rem .2rem 0; }
+.tag.grade { color: var(--fg); border-color: var(--fg); font-weight: 600; }
+ol.claims li { padding: .6rem 0; border-top: 1px solid var(--line); }
+ol.claims li.contests { border-left: 3px solid var(--contested); padding-left: .6rem; }
+ol.claims p { margin: .3rem 0; }
+blockquote { margin: .3rem 0; padding-left: .7rem; border-left: 3px solid var(--line); color: var(--mute); font-style: italic; }
+.cite { font-size: .85rem; color: var(--mute); }
+.node-link { min-height: 44px; display: inline-flex; align-items: center; }   /* touch target */

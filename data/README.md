@@ -12,7 +12,7 @@ data/
 ├── statements/<id>.yaml     one entity per file
 ├── pathways/                structural nodes, when pathways are authored
 ├── edges/<source-id>/<chunk>.yaml     edges minted while processing that chunk
-└── views/<id>.yaml          view definitions and their cuts
+└── views/<id>.yaml          view definitions and their cuts — each one a page on the site
 ```
 
 Claims and the edges minted alongside them are grouped per chunk for diff

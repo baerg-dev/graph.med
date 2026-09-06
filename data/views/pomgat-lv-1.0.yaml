@@ -1,0 +1,7 @@
+# The first view: everything in the pool drawn from the POMGAT guideline —
+# published at graph.med/pomgat-lv-1.0 (docs/publication.md §2).
+id: views/pomgat-lv-1.0
+type: view
+view_kind: selection
+filter:
+  sources: [sources/pomgat-lv-1.0]

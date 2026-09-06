@@ -1,10 +1,12 @@
 # Publication — how the pool is served at graph.med
 
-> **Status: design intent. Nothing described here is built.** What exists is the
-> pool (`data/`), the schema, the validator and the CI that runs it (`CLAUDE.md`,
-> "Checks"). The domain `graph.med` points at GitHub Pages and serves nothing yet.
-> This document fixes what the site is *meant* to be so that the build is written to
-> it, not the other way round. It is the design-level counterpart of
+> **Status: design, built in part.** The build (`tools/build.py`, `CLAUDE.md`
+> "Build") renders §2–§5 for `selection` views over sources: the URL layout, the
+> graph-and-sheet page, entity pages and JSON, source links. Not built: the deploy
+> workflow until a person commits it (§6), cuts (§7), pathway views, and everything
+> under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
+> the site is *meant* to be so that the build is written to it, not the other way
+> round. It is the design-level counterpart of
 > `graph-representation.md`: that file says how knowledge is stored; this one says
 > how it is shown.
 
