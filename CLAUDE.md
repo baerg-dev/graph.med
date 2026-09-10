@@ -1,6 +1,8 @@
 # graph.med
 
-Open Medical Knowledge Graph.
+A collaborative public medical knowledge graph, published at
+[graph.med](https://graph.med/). An intuitive walk through the model opens
+`README.md`.
 
 Licensed under the PolyForm Noncommercial License 1.0.0 (see `LICENSE`).
 Copyright 2026 Robert Schwarzenberg, Anton Zolkin.
