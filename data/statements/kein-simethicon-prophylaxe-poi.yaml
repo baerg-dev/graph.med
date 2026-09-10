@@ -3,6 +3,7 @@ type: statement
 lang: de
 label: Nach gastrointestinalen Tumorresektionen soll Simethicon nicht zur Prophylaxe des postoperativen (paralytischen) Ileus
   eingesetzt werden.
+short_label: "Kein Simethicon zur POI-Prophylaxe"
 slots:
   population: concepts/gastrointestinale-tumoroperation
   action: concepts/simethicon
