@@ -137,7 +137,14 @@ sources:
           The same for ch07a, ch07b, ch07c, ch08 and ch09 and their concepts.
       - id: facets
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Rule applied: medication when the concept names a substance, a
+          substance class or an ongoing drug therapy; intervention when it is
+          a measure even if drugs are involved (Antibiotikaprophylaxe,
+          Darmvorbereitung, PONV-Prophylaxe, anaesthesia techniques);
+          procedure for resections and operative situations including
+          anastomoses; finding for a circumstance that triggers a decision.
         depends: [schema-0.4]
         does: >
           facet on every concept, exactly one; no concept left unclassified.
@@ -172,7 +179,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: facets
+    next: site-labels-panel
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,
