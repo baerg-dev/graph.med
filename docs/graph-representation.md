@@ -1,14 +1,18 @@
 # Graph Representation — how knowledge is stored in this repository
 
-> **Status: design intent (v0.2), partly enforced.** The schema (`schema/schema.yaml`)
-> exists and `tools/validate.py` enforces it, locally and in CI (`CLAUDE.md`,
-> "Checks"): ids, enums, provenance requirements, claim hashes, slots, edges, and
-> with `--verify-quotes` every quote against its source. Everything else this
-> document describes as checked or computed — the canonical form and content hashes
-> (§2), staleness (§5, §8), attestations and review state (§8), view cuts (§4), the
-> derived statement properties (§3.3) — is not implemented yet. Statements about
-> those describe the model this repository is being built to, not behaviour anyone
-> can rely on today.
+> **Status: design intent, partly enforced.** The schema (`schema/schema.yaml`,
+> currently 0.3.0) exists and `tools/validate.py` enforces it, locally and in CI
+> (`CLAUDE.md`, "Checks"): ids, enums, provenance requirements, claim hashes, slots,
+> edges, and with `--verify-quotes` every quote against its source. What this
+> document describes and the schema does not yet carry — the document-structure
+> properties `section` and `outline` (§6.7), `short_label` and `facet` (§3.2), the
+> `broader` edge (§5), the `section` view filter (§4) — is registered as schema
+> 0.4.0 in `data/PROGRESS.yaml` and lands there before any data uses it (§7).
+> Everything else described as checked or computed — the canonical form and content
+> hashes (§2), staleness (§5, §8), attestations and review state (§8), view cuts
+> (§4), the derived statement properties (§3.3) — is not implemented yet. Statements
+> about those describe the model this repository is being built to, not behaviour
+> anyone can rely on today.
 
 This file explains the approach behind the knowledge in this repository. It is
 written for humans who review changes and for AI agents that read or write graph
@@ -177,8 +181,19 @@ its own about what is true; it asserts what a source states at a location.
 Three kinds of entity, kept apart because different edges attach to them:
 
 - **Concepts** — the vocabulary: *pancreatic resection*, *intraabdominal
-  drainage*. Thin: labels, a definition, and `codes_as` edges into terminology
-  namespaces. A concept cannot be contested; it means, it does not claim.
+  drainage*. Thin: labels, a definition, a **facet** saying what kind of thing
+  the concept is, and edges — `codes_as` into terminology namespaces, `broader`
+  to the concept it is a special case of (§5). A concept cannot be contested; it
+  means, it does not claim. The facet is one of `procedure` (the operation that
+  defines the case: *leberresektion-komplex*), `patient_state` (a risk profile or
+  pre-existing condition), `medication` (a drug or long-term therapy),
+  `intervention` (the measure a recommendation judges: *epiduralanalgesie*,
+  *abdominelle-drainage*), `outcome` (an endpoint or complication) or `finding`
+  (a result that triggers a decision). It describes the concept's nature, which
+  is fixed; the slots a statement puts it in describe its role there, which
+  varies (`mpom` is the action of one statement and the condition of another).
+  Where the two seem to collide, ask whether the concept describes the case or
+  the act.
 - **Statements** — propositions with a truth claim: "after pancreatic
   resection, the drain can be removed early when the drain amylase indicates a
   low fistula risk." Statements are what claims *support* or *contest*. A
@@ -186,7 +201,14 @@ Three kinds of entity, kept apart because different edges attach to them:
   condition, outcome — filled with concept URLs), which makes "is this the same
   statement?" an almost-computable question and keeps granularity honest: **a
   statement is the smallest unit that can be independently supported or
-  contested.**
+  contested.** Its `label` is the full proposition; an optional **`short_label`**
+  is the same proposition compressed for a box on a drawing, and it must still
+  tell siblings apart — six boxes reading "Magensonde ziehen" hide exactly the
+  staging the drawing exists to show, so the short form carries the
+  distinguishing feature ("Magensonde vor Ausleitung (kolorektal)"). Concepts
+  and structural nodes may carry a `short_label` for the same reason. Shortening
+  a clinical proposition can change its meaning, so a short label is reviewed
+  like any other content, never generated on the fly.
 - **Structure** — decision questions, branches, outcomes, explicit gaps: the
   pathway machinery. Structural nodes assert nothing about the world; they
   arrange statements into something navigable, and they are pure modelling.
@@ -216,12 +238,16 @@ rerouted or deleted under review; there is no merge that has to be unpicked.
 ## 4. One pool, many views
 
 There is no monolith and there are no owned graphs; there is one pool, and there
-are **views**: named selections over it. What v0.1 called "a graph" is a view.
+are **views**: named selections over it. What a reader calls "a graph" is a view.
 
 A view is an entity (`views/<view-id>`) whose definition is a **filter** — a
 membership rule over the pool: by pathway namespace, by source set, by concept
 subtree, by schema compliance, or an explicit list. How filters are expressed is
-schema-governed and deliberately minimal for now (§13).
+schema-governed and deliberately minimal for now (§13). One filter form is
+worth naming because it looks like knowledge and is not: a **section** filter
+selects the statements supported by claims whose `section` lies under a given
+section of a source (§6.7). It is how a reader narrows a view to one chapter of
+a guideline; it selects, and it never adds a node or an edge.
 
 **Versioning.** The unadorned view URL is *floating*: the filter evaluated
 against the pool as of now. A **cut** freezes it:
@@ -239,9 +265,8 @@ bookkeeping exists.
 **Completeness lives at the cut.** A view intended as a decision pathway must
 pass the structural validation for pathways *at cut time* — every branch has its
 outcomes, every referenced statement is a member, nothing dangles. A filter that
-amputates a branch fails validation and the cut is not made. This is where
-v0.1's "a graph is complete and valid on its own" guarantee now lives — on the
-only object that can actually honour it.
+amputates a branch fails validation and the cut is not made. "A graph is complete
+and valid on its own" is a guarantee only a cut can honour, so it lives there.
 
 ---
 
@@ -264,6 +289,16 @@ the different jobs of edges apart:
 - **coding** — `codes_as`: concept → terminology concept. Codes are never bare
   strings inside a property; a code is a node and coding is an edge, so the link
   carries provenance and dangles visibly when a classification changes.
+- **subsumption** — `broader`: concept → concept, "is a special case of". *Offene
+  Leberresektion* is a *Leberresektion*; a concept may have several broader
+  concepts (a minimally invasive colorectal resection is both a colorectal
+  resection and a minimally invasive procedure) and a concept with none is a
+  root. Always `modelling`, with a rationale. The edge carries **no evidence and
+  no inheritance**: whether a recommendation about the broader concept holds for
+  the narrower one is a clinical question the source either answers explicitly,
+  in which case a statement says so, or leaves open, in which case the gap stays
+  visible. A build that propagates recommendations down a `broader` edge would
+  be inventing answers; it may only use the edge to group and to fold.
 - **structure** — `sequence`, `branch` (with a `guard` property), `about`:
   among structural nodes and from them to the statements they arrange.
 - **cross-source semantics** — `specializes`, `complements`, `conflicts`:
@@ -274,8 +309,8 @@ the different jobs of edges apart:
 endpoints' content records the endpoints' content hashes at assertion time. When
 an endpoint's current hash differs, the edge is **stale**: surfaced for
 re-evaluation, its derived weight downgraded — not silently applied, and not a
-blocker (§8). This replaces v0.1's `@version` pinning of cross-graph edges; the
-mechanism is the same one attestations use.
+blocker (§8). No version is ever pinned on an edge; the mechanism is the same one
+attestations use.
 
 ---
 
@@ -353,6 +388,45 @@ Which extraction run produced which claims is recorded as attribution to an
 agent (§8). Who reviewed what is recorded as attestations, never as a
 hand-written field. Review state is derived.
 
+
+### 6.7 Document structure is provenance, not knowledge
+
+A guideline has chapters; the knowledge in it does not. The pool records where in
+a document a claim was found and never turns that location into a node:
+
+- A claim may carry **`section`**, the number of the source section its passage
+  lies in (`'7.4.1.1'`), next to `recommendation_no`. Both are properties of the
+  anchor — document structure, read off the page — and they live on the claim
+  only. A statement can be supported from two chapters and a concept used in
+  five, so neither carries a section.
+- A source may carry **`outline`**, its complete table of contents: every section
+  with its number, title and physical page, including sections that contain no
+  recommendation. It is a property of the document, like its content hash, and
+  is verified against it. The validator checks that every claim's `section`
+  names a section of its source's outline, which makes the section a controlled
+  reference rather than a free string. Coverage is then a derived number: the
+  outline minus the sections any claim names is exactly the part of the
+  document nobody has extracted — a gap stays a visible white spot instead of
+  vanishing silently.
+- A source may carry **`structure`**, a list saying by which principles the
+  document is organised — `chronologisch_perioperativ`, `anatomisch`,
+  `modalitaetsbezogen`, `versorgungspfad`, `entitaetsbezogen`,
+  `stadien_schweregrad`, `populationsbezogen`, `settingbezogen`,
+  `leitsymptombezogen`, `berufsgruppen_prozessbezogen`, `querschnittskapitel`
+  (most S3 guidelines mix several). It is descriptive and steers nothing; its
+  value is the evidence that the pool presupposes no particular outline.
+
+There is deliberately no `outlines/` namespace and no chapter node, because a
+chapter is not something the pool knows, only something a source is arranged by.
+A chapter reaches the reader as a **filter** (§4) and as a tree beside the graph
+(`docs/publication.md`), never as a vertex in it. What a chapter *means* —
+POMGAT's headings encode an organ or procedure family and a perioperative phase —
+is knowledge, and it goes where knowledge goes: the family into `broader` edges
+between concepts, the phase into the statement's slots or a vocabulary of its own
+(`docs/open-questions.md` → phase-vocabulary). The heading is the extractor's hint
+for assigning those; the section number is never the key. That is what lets a
+second guideline with a different outline land in the same graph: "colorectal,
+postoperative" survives the change of document, "7.4" does not.
 ---
 
 ## 7. History, editing and schema evolution
@@ -445,9 +519,8 @@ Rules that follow:
 
 ## 9. One schema
 
-`schema/schema.yaml` is the single schema for the whole pool. v0.1 had a schema
-per graph kind because graphs owned their nodes; views own nothing, so there is
-nothing for a per-view schema to govern. Instead:
+`schema/schema.yaml` is the single schema for the whole pool. Views own nothing,
+so there is nothing for a per-view schema to govern. Instead:
 
 - the schema declares the **namespaces**, the **node types** with their
   properties and provenance requirements (§6.5), the **edge kinds** with the
@@ -464,8 +537,8 @@ nothing for a per-view schema to govern. Instead:
   (references resolve, claim ids hash correctly, edges are unique) that a document
   schema cannot express.
 
-What a pathway needed a "graph kind" for — its node types, its edge vocabulary,
-its completeness rules — is now a *view kind* inside the one schema.
+What a pathway needs a kind for — its node types, its edge vocabulary, its
+completeness rules — is a *view kind* inside the one schema.
 
 ---
 
@@ -619,7 +692,8 @@ No inference semantics are assumed: relations are asserted, not entailed.
   the same entities and tuples is acceptable; one entity per file is a
   diff-ergonomics choice, not a rule.
 - **The view-filter language.** The schema starts with a minimal set of filter
-  forms; how far it grows toward a query language is undecided
+  forms, extended one proven need at a time (the section filter, §4, is the
+  first); how far it grows toward a query language is undecided
   (`docs/open-questions.md`).
 - **Statement slot vocabularies and grade derivation.** Which slot shape each
   statement type needs, and how supporting claims' grades compose, are open —
@@ -647,4 +721,4 @@ contributors, `.claude/rules/environment/sandbox-environment.md` for agents.
 
 ---
 
-Version 0.2 · 2026-09-05
+Version 0.3 · 2026-09-10

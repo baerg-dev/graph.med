@@ -92,11 +92,12 @@ rather than all of it, always:
 │       └── no-personal-information.md  nothing that identifies a person or a machine, anywhere
 ├── memory/                      durable facts, one per file, filed by level
 │   ├── environment/
-│   └── conventions/
+│   ├── conventions/
+│   └── design/
 ├── agents/                      subagent definitions — empty; add one .md per agent
 └── skills/
     ├── handover/                end a session: update docs/open-questions.md
-    └── parse-next-chunk/        continue parsing a source: one chunk, then hand over
+    └── parse-next-chunk/        do the next registered chunk of work: one, then hand over
 ```
 
 Rules without a `paths:` scope load at the start of every session; the two that have
@@ -111,9 +112,10 @@ it is reviewed and shared rather than private to one machine.
 or skill that automates nothing would be guidance pretending to be capability — the
 validator is a check, not a task to automate — and both exceptions earned their place
 as real, repeated tasks. `handover` ends a session by maintaining
-`docs/open-questions.md`. `parse-next-chunk` continues parsing a registered source
-into `data/` — one chunk per session, ending with an updated `data/PROGRESS.yaml` and
-a pull request. Add another only for another such task — then say in the pull
-request what it does and what it is allowed to touch.
+`docs/open-questions.md`. `parse-next-chunk` does the next chunk registered in
+`data/PROGRESS.yaml` — an extraction, a linking pass, a schema change or a build
+feature — one per session, ending with an updated registry and a pull request.
+Add another only for another such task — then say in the pull request what it
+does and what it is allowed to touch.
 
 One fact, one home: guidance that belongs in a rule is not restated here.
