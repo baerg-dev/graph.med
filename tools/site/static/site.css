@@ -58,6 +58,8 @@ ol.claims li { padding: .6rem 0; border-top: 1px solid var(--line); }
 ol.claims li.contests { border-left: 3px solid var(--contested); padding-left: .6rem; }
 ol.claims p { margin: .3rem 0; }
 blockquote { margin: .3rem 0; padding-left: .7rem; border-left: 3px solid var(--line); color: var(--mute); font-style: italic; }
+button.copy { font: inherit; font-style: normal; font-size: .72rem; padding: 0 .5rem; margin-left: .3rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--bg); color: var(--mute); cursor: pointer; vertical-align: middle; min-height: 28px; }
+button.copy:hover, button.copy:focus-visible { color: var(--fg); border-color: var(--fg); }
 .cite { font-size: .85rem; color: var(--mute); }
 .node-link { min-height: 44px; display: inline-flex; align-items: center; }   /* touch target */
 

@@ -25,6 +25,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote as urlquote
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -114,7 +115,7 @@ class Pool:
         src = self.entities.get(src_id, {})
         link = src.get("url", "")
         if link and page:
-            link = f"{link}#page={page}"
+            link = source_link(link, page, claim["source"]["quote"])
         row = {k: claim.get(k) for k in ("id", "kind", "recommendation_no", "section", "label", "grade", "verb", "direction", "consensus", "lang")}
         row.update({"quote": claim["source"]["quote"], "page": page, "source": src_id, "link": link})
         for kind, frm, _ in self.inc.get(claim["id"], []):   # what the body text adds to this claim (spec §5)
@@ -123,7 +124,7 @@ class Pool:
                 frag = b["source"]["at"].partition("#")[2]
                 row.setdefault("body", []).append({"kind": kind, "id": frm, "label": b["label"], "quote": b["source"]["quote"], "lang": b["lang"],
                                                    "page": frag.split("=", 1)[1] if frag.startswith("page=") else None, "section": b.get("section"),
-                                                   "link": f"{src.get('url', '')}#{frag}" if frag else src.get("url", "")})
+                                                   "link": source_link(src.get("url", ""), frag.split("=", 1)[1] if frag.startswith("page=") else None, b["source"]["quote"])})
         for kind, to, _ in self.out.get(claim["id"], []):
             if kind in EVIDENCE:
                 row.setdefault("statements", []).append({"edge": kind, "id": to, "label": self.entities.get(to, {}).get("label", to)})
@@ -137,6 +138,16 @@ class Pool:
                     rows.append({"id": st["id"], "label": st["label"], "slot": slot})
         rows.sort(key=lambda r: r["id"])
         return rows
+
+
+def source_link(url: str, page: str | None, quote: str) -> str:
+    """The link into a PDF source (docs/publication.md §5, spec §6.1): the physical page, and the
+    quote as a search so that viewers which understand it highlight the passage — Firefox's
+    pdf.js (`phrase=true` makes it search the whole quote, not its words) and Acrobat do; Chrome,
+    Edge and Safari ignore the search and still land on the page."""
+    if not url or not page:
+        return url
+    return f"{url}#page={page}&search={urlquote(quote, safe='')}&phrase=true"
 
 
 def natural(s: str):

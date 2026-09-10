@@ -22,7 +22,7 @@
     <span class="tag">{{ c.edge }}</span>
     <span class="tag">{{ c.kind }}</span>
     <p lang="{{ c.lang }}">{{ c.label }}</p>
-    <blockquote lang="{{ c.lang }}">„{{ c.quote }}“</blockquote>
+    <blockquote lang="{{ c.lang }}">„{{ c.quote }}“ <button type="button" class="copy" data-copy="{{ c.quote }}" title="copy the quote, then find it in the document with Ctrl+F">copy</button></blockquote>
     <p class="cite">{% if c.recommendation_no %}No. {{ c.recommendation_no }} · {% endif %}<a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a>{% if c.section %} · section {{ c.section }}{% endif %} · <a href="{{ base }}{{ c.id }}/">{{ c.id | short }}</a></p>
   </li>
 {% endfor %}
@@ -66,7 +66,7 @@
   {% if c.consensus %}<span class="tag">{{ c.consensus }}</span>{% endif %}
 </p>
 <p class="label" lang="{{ c.lang }}">{{ c.label }}</p>
-<blockquote lang="{{ c.lang }}">„{{ c.quote }}“</blockquote>
+<blockquote lang="{{ c.lang }}">„{{ c.quote }}“ <button type="button" class="copy" data-copy="{{ c.quote }}" title="copy the quote, then find it in the document with Ctrl+F">copy</button></blockquote>
 <p class="cite"><a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a>{% if c.section %} · section {{ c.section }}{% endif %}</p>
 {% if c.statements %}
 <h3>Bears on</h3>
