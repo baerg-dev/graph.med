@@ -205,7 +205,9 @@ Three kinds of entity, kept apart because different edges attach to them:
   tell siblings apart — six boxes reading "Magensonde ziehen" hide exactly the
   staging the drawing exists to show, so the short form carries the
   distinguishing feature ("Magensonde vor Ausleitung (kolorektal)"). Concepts
-  and structural nodes may carry a `short_label` for the same reason. Shortening
+  and structural nodes may carry a `short_label` for the same reason. A short
+  label is at most 60 characters (the schema enforces it: a box holds two lines
+  of about thirty); aim for 55. Shortening
   a clinical proposition can change its meaning, so a short label is reviewed
   like any other content, never generated on the fly.
 - **Structure** — decision questions, branches, outcomes, explicit gaps: the

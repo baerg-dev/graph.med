@@ -109,7 +109,13 @@ sources:
           counts "n matches in m sections". No data change.
       - id: short-labels-a
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Limit settled at 60 (schema), target 55. Concepts got a short label
+          above ~45 characters. Direction words kept ("Keine …", "… erwägbar"
+          for kann); the organ or procedure in parentheses where siblings
+          share a question. Two ICG statements in different groups were still
+          told apart (Anastomose / Magenschlauch).
         depends: [schema-0.4]
         does: >
           short_label for every statement of ch04, ch05 and ch06 and for the
@@ -161,7 +167,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: short-labels-a
+    next: short-labels-b
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,

@@ -81,12 +81,6 @@ and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
 **Leaning:** on the statement: "postoperativ" qualifies the recommendation, not the patient, and a small controlled vocabulary makes "colorectal, postoperative" a cross-guideline query the way "7.4" never can be. Not part of the current pass; decide when the second source arrives or when the site wants a phase filter. (2026-09-10)
 **Settled by:** the first cross-source query or view that needs the phase.
 
-## short-label-limit  (graph-representation.md §3.2; schema `short_label`)
-**Question:** What is the maximum length of a `short_label`, and does the schema enforce it?
-**Options:** a hard `maxLength` in the schema, calibrated on the longest existing statements · a soft target the reviewer judges, no schema limit · the box width decides — the build measures, the data has no limit
-**Leaning:** a hard limit in the schema, so a label that no longer fits fails validation instead of overflowing a box; the physician's target is 40 to 55 characters. Calibrate on the longest statements when writing the first short labels (chunk `short-labels-a`) and set `maxLength` there. (2026-09-10)
-**Settled by:** chunk `short-labels-a` of the current pass.
-
 ## concept-hierarchy-depth  (graph-representation.md §5 `broader`; publication.md §3)
 **Question:** How many levels does the concept hierarchy need — one family layer above the existing concepts (Leber, Kolorektum, …), or two (Organ, then Eingriffsart)?
 **Options:** one layer of eight to ten families · two layers where a family has both open and minimally invasive members · as many as the source's headings warrant, per family
