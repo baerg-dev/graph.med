@@ -47,7 +47,10 @@ uv run tools/build.py --base /graph.med/    # for baerg-dev.github.io/graph.med/
 ```
 
 Open `site/index.html` in a browser to see a change. Templates and the client script
-live in `tools/site/`. Deployment to GitHub Pages is a workflow file, committed by a
+live in `tools/site/`. Inside the sandbox, where there is no browser,
+`uv run tools/screenshot.py <view-id>` renders a view page in a Chromium container
+on the sandbox's Docker daemon and writes a PNG under `/tmp/graph.med/screenshots/`
+(the `screenshot` skill describes the actions it can take first). Deployment to GitHub Pages is a workflow file, committed by a
 person (`.github/workflows/pages.yml` once it exists): validate, build, deploy on
 every push to `main`.
 
@@ -97,7 +100,8 @@ rather than all of it, always:
 ├── agents/                      subagent definitions — empty; add one .md per agent
 └── skills/
     ├── handover/                end a session: update docs/open-questions.md
-    └── parse-next-chunk/        do the next registered chunk of work: one, then hand over
+    ├── parse-next-chunk/        do the next registered chunk of work: one, then hand over
+    └── screenshot/              look at a view page in a real browser before proposing it
 ```
 
 Rules without a `paths:` scope load at the start of every session; the two that have
@@ -108,14 +112,15 @@ record — why a constraint exists, what was decided and rejected. It is checked
 it is reviewed and shared rather than private to one machine.
 `rules/conventions/memory.md` carries its index.
 
-`agents/` is deliberately empty, and `skills/` holds exactly two skills. A subagent
+`agents/` is deliberately empty, and `skills/` holds exactly three skills. A subagent
 or skill that automates nothing would be guidance pretending to be capability — the
-validator is a check, not a task to automate — and both exceptions earned their place
-as real, repeated tasks. `handover` ends a session by maintaining
+validator is a check, not a task to automate — and each exception earned its place
+as a real, repeated task. `handover` ends a session by maintaining
 `docs/open-questions.md`. `parse-next-chunk` does the next chunk registered in
 `data/PROGRESS.yaml` — an extraction, a linking pass, a schema change or a build
 feature — one per session, ending with an updated registry and a pull request.
-Add another only for another such task — then say in the pull request what it
+`screenshot` renders a view page in a browser container so a build change is looked
+at, not only built. Add another only for another such task — then say in the pull request what it
 does and what it is allowed to touch.
 
 One fact, one home: guidance that belongs in a rule is not restated here.

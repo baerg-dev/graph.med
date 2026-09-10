@@ -1,0 +1,63 @@
+---
+name: screenshot
+description: Capture a view page of the built site in a real browser — Chromium in a container on the sandbox's own Docker daemon — before proposing a build change, or when the maintainer asks to see the page. Runs tools/screenshot.py; installs nothing in the sandbox.
+---
+
+# Screenshot the site
+
+A build chunk is not checked by building alone: the graph is laid out by a
+library in the browser, and a headless run in Node cannot see overlapping
+labels, a box drawn too narrow, or a control that runs into another on a phone.
+Look at the page before proposing it.
+
+## Why it works, and what does not persist
+
+The sandbox has no browser and cannot download one: the Playwright and Chrome
+download hosts are blocked by the network policy, and `apt` is not the answer
+either (a package needed by the project belongs in a manifest, not in a shell
+history). What the sandbox *does* have is a **Docker daemon of its own**, and
+image pulls from Docker Hub pass the proxy. So the page is rendered by Chromium
+inside a container from an image that bundles Node and Puppeteer
+(`zenika/alpine-chrome:with-puppeteer`, about a gigabyte), driven by a script
+that waits for the layout to settle and runs the actions you ask for.
+
+The daemon lives **inside the sandbox**, so the image is pulled again in every
+new sandbox — once, on the first run, taking a minute or two — and nothing
+needs to be installed in the sandbox itself. The recipe is entirely in the
+repository: `tools/screenshot.py` (the runner) and `tools/screenshot.js` (the
+driver that runs inside the container). If `docker` is missing, the runner says
+so and stops; report that rather than looking for another browser.
+
+## How
+
+```bash
+uv run tools/screenshot.py pomgat-lv-1.0            # the folded start, 1280×900
+uv run tools/screenshot.py pomgat-lv-1.0 --phone    # 390×844 at device scale 2
+uv run tools/screenshot.py pomgat-lv-1.0 \
+    --do toggle=concepts/leberresektion \
+    --do open=statements/drainage-komplexe-leberresektion-optional \
+    --do chapters --out /tmp/graph.med/screenshots/liver.png
+```
+
+The runner builds the site into a temporary directory with base path `/site/`,
+copies it and the driver into a fresh container, captures, copies the PNG out,
+and removes the container. Actions run in order before the capture and map onto
+the hooks `tools/site/static/graph.js` exposes as `window.graphmed`:
+`toggle=<concept id>` folds or unfolds a patient group, `open=<entity id>` is a
+deep link (unfold and select), `section=<number>` sets the chapter filter,
+`search=<text>` and `facet=<kind>` set the search, `chapters` opens the chapter
+panel, `wait=<ms>` waits. The runner prints how many graph elements were shown
+and any page error.
+
+Output goes under `/tmp/graph.med/screenshots/` by default — a neutral path,
+never one derived from a home directory (`conventions/no-personal-information.md`).
+Read the PNG to look at it. To show it to the maintainer, put it on a page they
+can open; it does not belong in the repository.
+
+## For a build chunk
+
+Before the pull request: capture the folded start on desktop and on a phone, and
+one state that exercises what the chunk changed (a family unfolded, a box
+selected, a filter, a search). Say in the PR description which captures you
+took and what you saw — including what is wrong, so the reviewer does not have
+to find it. "Not opened in a browser" is no longer an acceptable line in a PR.
