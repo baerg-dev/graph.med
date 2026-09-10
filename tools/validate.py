@@ -10,7 +10,9 @@ rules a document schema cannot state because they span files:
   - every entity reference in the data resolves (terminology codes excepted);
   - a claim's id is claims/<source-id>/<first 8 hex of sha256("<at>|<quote>")>;
   - edges are unique per (from, kind, to, discriminator);
-  - a view id is not a namespace name (views are served at the site root).
+  - a view id is not a namespace name (views are served at the site root);
+  - a claim's `section` names an entry of its source's `outline` (spec §6.7);
+  - `broader` edges form no cycle (spec §5).
 
 With --verify-quotes it also downloads each source (hash-checked, cached) and
 verifies every quote is a verbatim substring of `pdftotext -layout` on the cited
@@ -100,8 +102,23 @@ def main(argv=None) -> int:
                 if eid != expected:
                     errors.append(f"{rel}: claim {eid} should be {expected} (sha256 of locator|quote)")
 
+    # a claim's section must be a section of its source's outline (spec §6.7)
+    outlines: dict[str, set[str]] = {}
+    for _, doc, _ in docs:
+        if isinstance(doc, dict) and doc.get("type") == "source" and isinstance(doc.get("outline"), list):
+            outlines[doc["id"]] = {str(e.get("section")) for e in doc["outline"] if isinstance(e, dict)}
+    for rel, doc, _ in docs:
+        for ent in (doc if isinstance(doc, list) else [doc]):
+            if isinstance(ent, dict) and ent.get("type") == "claim" and "section" in ent and isinstance(ent.get("source"), dict):
+                src = str(ent["source"].get("at", "")).split("#")[0]
+                if src not in outlines:
+                    errors.append(f"{rel}: claim {ent.get('id')} has section {ent['section']!r} but {src} has no outline")
+                elif str(ent["section"]) not in outlines[src]:
+                    errors.append(f"{rel}: claim {ent.get('id')} names section {ent['section']!r}, not in the outline of {src}")
+
     ref_pattern = re.compile(rf"^({'|'.join(map(re.escape, namespaces))})/")
     seen_edges: set[tuple] = set()
+    broader: dict[str, list[str]] = {}
     for rel, doc, _ in docs:
         for path, value in walk(doc):
             if isinstance(value, str) and ref_pattern.match(value) and value.split("#")[0] not in ids:
@@ -113,6 +130,12 @@ def main(argv=None) -> int:
                     if key in seen_edges:
                         errors.append(f"{rel} at {i}: duplicate edge; parallel edges need a discriminator")
                     seen_edges.add(key)
+                    if edge[1] == "broader":
+                        broader.setdefault(edge[0], []).append(edge[2])
+
+    # broader is a hierarchy: no concept may be a special case of itself (spec §5)
+    for cycle in cycles(broader):
+        errors.append(f"broader edges form a cycle: {' -> '.join(cycle)}")
 
     n_entities, n_edges = len(ids), len(seen_edges)
     print(f"checked {n_entities} entities and {n_edges} edges against schema {schema.get('x-version')}")
@@ -129,6 +152,27 @@ def main(argv=None) -> int:
         print(f"error: {line}")
     print(f"{len(errors)} error(s)" if errors else "ok")
     return 1 if errors else 0
+
+
+def cycles(graph: dict[str, list[str]]) -> list[list[str]]:
+    """Every elementary cycle reachable in a directed graph, each reported once from its first node."""
+    found: list[list[str]] = []
+    state: dict[str, int] = {}          # 1 on the current path, 2 finished
+    path: list[str] = []
+    def visit(node: str) -> None:
+        state[node] = 1
+        path.append(node)
+        for nxt in graph.get(node, []):
+            if state.get(nxt) == 1:
+                found.append(path[path.index(nxt):] + [nxt])
+            elif nxt not in state:
+                visit(nxt)
+        path.pop()
+        state[node] = 2
+    for start in sorted(graph):
+        if start not in state:
+            visit(start)
+    return found
 
 
 def verify_quotes(docs, sources: dict[str, dict], cache: Path) -> list[str]:

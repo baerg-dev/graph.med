@@ -8,8 +8,9 @@
 # Enforced by tools/validate.py (`uv run tools/validate.py`), which validates every
 # file under data/ against the definition `x-layout` assigns to it, then checks the
 # few rules a document schema cannot state: ids resolve across files, claim ids are
-# the hash of their anchor, edges are unique. CI runs it on every pull request and
-# push to main (.github/workflows/validate.yml).
+# the hash of their anchor, edges are unique, a claim's section is in its source's
+# outline, `broader` has no cycles. CI runs it on every pull request and push to
+# main (.github/workflows/validate.yml).
 #
 # Keywords prefixed `x-` are this project's annotations; JSON Schema validators
 # ignore them, tools/validate.py and the spec read them.
@@ -17,7 +18,7 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: https://graph.med/schema/schema.yaml
 title: graph.med pool
-x-version: 0.3.0
+x-version: 0.4.0
 
 # ── layout: which definition each data file validates against ────────────────
 # (data/README.md). Globs are relative to the repository root. `one_per_file`
@@ -63,6 +64,10 @@ x-view-filters:
     example: {pathway: pathways/pomgat-drains, closure: [about, supports, refines, codes_as]}
   selection: # explicit membership or property predicates; deliberately minimal
     example: {sources: [sources/pomgat-lv-1.0], modified_after: "2026-01-01"}
+    # `section: {source, under}` narrows to the statements supported by claims of
+    # that source whose `section` is `under` or lies beneath it (spec §4, §6.7);
+    # it selects, it never adds a node or an edge
+    section_example: {sources: [sources/pomgat-lv-1.0], section: {source: sources/pomgat-lv-1.0, under: "7.4"}}
 x-cut-validations:
   pathway:
     - every branch edge's endpoints are members
@@ -96,11 +101,29 @@ $defs:
   source_ref:     {type: string, pattern: '^sources/[A-Za-z0-9._-]+$'}
   claim_ref:      {type: string, pattern: '^claims/[A-Za-z0-9._-]+/[0-9a-f]{8}$'}
   concept_ref:    {type: string, pattern: '^(concepts|icd10gm-2026|ops-2026)/[A-Za-z0-9._-]+$'}  # uncoded or terminology
+  uncoded_concept_ref: {type: string, pattern: '^concepts/[A-Za-z0-9._-]+$'}
   terminology_ref: {type: string, pattern: '^(icd10gm-2026|ops-2026)/[A-Za-z0-9._-]+$'}
   statement_ref:  {type: string, pattern: '^statements/[A-Za-z0-9._-]+$'}
   structural_ref: {type: string, pattern: '^pathways/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$'}
   agent_ref:      {type: string, pattern: '^agents/[A-Za-z0-9._-]+$'}
   entity_ref:     {type: string, pattern: '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$'}
+
+  # what kind of thing a concept is (spec §3.2) — its nature, not its role in a statement
+  facet: {enum: [procedure, patient_state, medication, intervention, outcome, finding]}
+  # by which principles a source document is organised (spec §6.7); descriptive only
+  structure_kind:
+    enum: [chronologisch_perioperativ, versorgungspfad, anatomisch, entitaetsbezogen,
+           modalitaetsbezogen, stadien_schweregrad, populationsbezogen, settingbezogen,
+           leitsymptombezogen, berufsgruppen_prozessbezogen, querschnittskapitel]
+  # one entry of a source's table of contents (spec §6.7); page is the physical PDF page
+  outline_entry:
+    type: object
+    required: [section, title, page]
+    additionalProperties: false
+    properties:
+      section: {type: string, minLength: 1}
+      title:   {$ref: '#/$defs/text'}
+      page:    {type: integer, minimum: 1}
 
   # ── provenance (spec §6.2–6.4) ────────────────────────────────────────────
   locator:
@@ -141,6 +164,17 @@ $defs:
       media_type:    {$ref: '#/$defs/text',   x-provenance: not_applicable}
       awmf_register: {$ref: '#/$defs/text',   x-provenance: not_applicable}
       lang:          {$ref: '#/$defs/lang',   x-provenance: not_applicable}
+      outline:       # the complete table of contents, sections without a recommendation included (spec §6.7)
+        type: array
+        minItems: 1
+        items: {$ref: '#/$defs/outline_entry'}
+        x-provenance: not_applicable   # verified against the document, like content_hash
+      structure:     # how the document is organised; most S3 guidelines mix several
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {$ref: '#/$defs/structure_kind'}
+        x-provenance: not_applicable
 
   claim:
     description: >
@@ -162,6 +196,9 @@ $defs:
         enum: [recommendation, criterion, definition, fact, gap_notice]
         x-provenance: not_applicable
       recommendation_no: {type: string, minLength: 1, x-provenance: required}
+      section:           {type: string, minLength: 1, x-provenance: required}
+             # the source section the passage lies in ('7.4.1.1'); must name an entry of the
+             # source's outline (validator). Document structure, on the claim only (spec §6.7)
       grade:     {enum: ["A", "B", "0", "EK"],   x-provenance: required}   # never from the extractor
       verb:      {enum: [soll, sollte, kann],     x-provenance: required}
       direction: {enum: [for, against],           x-provenance: required}
@@ -174,6 +211,7 @@ $defs:
         properties:
           label:             {$ref: '#/$defs/provenance_value'}
           recommendation_no: {$ref: '#/$defs/references'}
+          section:           {$ref: '#/$defs/references'}
           grade:             {$ref: '#/$defs/references'}
           verb:              {$ref: '#/$defs/references'}
           direction:         {$ref: '#/$defs/references'}
@@ -188,6 +226,8 @@ $defs:
       type:       {const: concept}
       lang:       {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:      {$ref: '#/$defs/text', x-provenance: not_applicable}
+      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}   # for a box; reviewed content, never truncated by a build
+      facet:      {$ref: '#/$defs/facet', x-provenance: not_applicable}
       definition: {$ref: '#/$defs/text', x-provenance: optional}
       source:     {$ref: '#/$defs/provenance_value'}
       provenance:
@@ -211,6 +251,9 @@ $defs:
       type:  {const: statement}
       lang:  {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label: {$ref: '#/$defs/text', x-provenance: not_applicable}
+      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
+             # the proposition compressed for a box; must still tell siblings apart (spec §3.2).
+             # No maxLength until calibrated (docs/open-questions.md → short-label-limit)
       slots:
         type: object
         additionalProperties: false
@@ -236,6 +279,7 @@ $defs:
       type:     {const: decision}
       lang:     {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:    {$ref: '#/$defs/text', x-provenance: not_applicable}
+      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
       criteria: {type: object,          x-provenance: optional}
       source:   {$ref: '#/$defs/provenance_value'}
       provenance:
@@ -252,6 +296,7 @@ $defs:
       type:   {const: outcome}
       lang:   {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:  {$ref: '#/$defs/text', x-provenance: not_applicable}
+      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
       source: {$ref: '#/$defs/provenance_value'}
   gap:
     description: An explicit "no recommendation possible" in the source (spec §11.7); its label is quoted from the source.
@@ -263,6 +308,7 @@ $defs:
       type:   {const: gap}
       lang:   {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:  {$ref: '#/$defs/text', x-provenance: required}
+      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
       source: {$ref: '#/$defs/references'}   # required provenance: never modelling
 
   agent:
@@ -347,7 +393,7 @@ $defs:
     maxItems: 4
     prefixItems:
       - $ref: '#/$defs/entity_ref'
-      - enum: [supports, contests, refines, supplements, limits, codes_as,
+      - enum: [supports, contests, refines, supplements, limits, codes_as, broader,
                sequence, branch, about, specializes, complements, conflicts]
       - $ref: '#/$defs/entity_ref'
       - $ref: '#/$defs/edge_props'
@@ -361,6 +407,12 @@ $defs:
       # coding — a code is a node, coding is an edge
       - if: {prefixItems: [true, {const: codes_as}]}
         then: {prefixItems: [{$ref: '#/$defs/concept_ref'}, true, {$ref: '#/$defs/terminology_ref'}]}
+      # subsumption — "is a special case of", between uncoded concepts, modelling with a
+      # rationale; carries no evidence and nothing is inherited along it (spec §5); acyclic (validator)
+      - if: {prefixItems: [true, {const: broader}]}
+        then:
+          prefixItems: [{$ref: '#/$defs/uncoded_concept_ref'}, true, {$ref: '#/$defs/uncoded_concept_ref'},
+                        {$ref: '#/$defs/modelling_edge_props'}]
       # structure — among structural nodes, and from them to statements
       - if: {prefixItems: [true, {const: sequence}]}
         then: {prefixItems: [{$ref: '#/$defs/structural_ref'}, true, {$ref: '#/$defs/structural_ref'}]}
