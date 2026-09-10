@@ -6,8 +6,10 @@
     uv run tools/build.py --cname graph.med    # also emit the CNAME file for Pages
 
 Every view becomes <view-id>/index.html — one decision tree (which patient group? →
-which condition? → recommendation → aim; answers on the edges; laid out top-down
-in the browser by dagre) with a detail section below it — plus <view-id>.json; every entity becomes
+which condition? → recommendation → aim; answers on the edges; laid out left to right
+in the browser by dagre), a chapter tree that filters it and a search that fades it
+(both from the sources' outline and the claims' sections, docs/publication.md §3),
+with a detail section beside or below it — plus <view-id>.json; every entity becomes
 <namespace>/<entity-id>/index.html and <namespace>/<entity-id>.json; the schema is
 copied to schema/schema.yaml. Offline, deterministic, nothing authored.
 """
@@ -85,7 +87,7 @@ class Pool:
         link = src.get("url", "")
         if link and page:
             link = f"{link}#page={page}"
-        row = {k: claim.get(k) for k in ("id", "kind", "recommendation_no", "label", "grade", "verb", "direction", "consensus", "lang")}
+        row = {k: claim.get(k) for k in ("id", "kind", "recommendation_no", "section", "label", "grade", "verb", "direction", "consensus", "lang")}
         row.update({"quote": claim["source"]["quote"], "page": page, "source": src_id, "link": link})
         for kind, to, _ in self.out.get(claim["id"], []):
             if kind in EVIDENCE:
@@ -169,12 +171,17 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
                   grade=grades.pop() if len(grades) == 1 else ("mixed" if grades else None),
                   against={c["direction"] for c in claims if c["edge"] == "supports" and c.get("direction")} == {"against"},
                   contested=any(c["edge"] == "contests" for c in claims),
-                  no=min((c["recommendation_no"] for c in claims if c.get("recommendation_no")), default=None))
+                  no=min((c["recommendation_no"] for c in claims if c.get("recommendation_no")), default=None),
+                  sections=sorted({c["section"] for c in claims if c.get("section")}, key=natural),
+                  # what the search matches: the statement, its short form, its slot concepts, its claims (spec §6.7)
+                  text=" ".join(filter(None, [st["label"], st.get("short_label")] + [label(c) for c in slots.values() if c in members]
+                                              + [c.get("label") for c in claims])).lower())
         at = q0
         if pop in members:   # the answer sits on the edge; a junction fans out into what follows
             j = f"j:{pop}"
             if j not in seen:
-                add(j, ref=pop, type="junction", label=str(per_group[pop]), lang=members[pop]["lang"], group=label(pop))
+                add(j, ref=pop, type="junction", label=str(per_group[pop]), lang=members[pop]["lang"], group=label(pop),
+                    text=" ".join(filter(None, [label(pop), members[pop].get("short_label")])).lower())
                 edge(q0, j, "answer", label(pop), ref=pop)
             at = j
         if cond in members:  # a further question, asked within the patient group
@@ -186,7 +193,8 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
         else:
             edge(at, sid, "flow")
         if outc in members:
-            add(outc, ref=outc, type="aim", lang=members[outc]["lang"], label=label(outc))
+            add(outc, ref=outc, type="aim", lang=members[outc]["lang"], label=label(outc),
+                text=" ".join(filter(None, [label(outc), members[outc].get("short_label")])).lower())
             edge(sid, outc, "aim")
         for kind, to, _ in pool.out.get(st["id"], []):
             if kind in STATEMENT_EDGES and to in members:
@@ -270,7 +278,8 @@ def main(argv=None) -> int:
         sources = [members[s] for s in view["filter"]["sources"]]
         title = sources[0]["title"] if len(sources) == 1 else vid
         counts = {t: sum(1 for m in members.values() if m["type"] == t) for t in ("statement", "concept", "claim")}
-        data = {"id": view["id"], "title": title, "sources": [s["id"] for s in sources], "commit": commit, **graph}
+        outline = [{"source": s["id"], **e} for s in sources for e in s.get("outline") or []]   # spec §6.7; a chapter is a filter, never a node
+        data = {"id": view["id"], "title": title, "sources": [s["id"] for s in sources], "commit": commit, "outline": outline, **graph}
         (out / vid).mkdir(parents=True, exist_ok=True)
         (out / vid / "index.html").write_text(
             view_tpl.render(view=view, vid=vid, title=title, sources=sources, counts=counts,

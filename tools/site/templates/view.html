@@ -5,6 +5,12 @@
 {% block main %}
 <section class="graph-wrap">
   <div id="graph" role="img" aria-label="{{ title }}"></div>
+  <div class="tools left">
+    <button type="button" id="chapters-toggle" title="chapters" aria-controls="chapters" aria-expanded="false">§</button>
+    <input type="search" id="search" placeholder="search" aria-label="search the graph" autocomplete="off">
+    <span class="count" id="count" hidden></span>
+  </div>
+  <nav class="chapters" id="chapters" aria-label="chapters" hidden></nav>
   <div class="tools">
     <button type="button" id="fit" title="fit what is open">⤢</button>
   </div>

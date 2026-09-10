@@ -2,11 +2,12 @@
 
 > **Status: design, built in part.** The build (`tools/build.py`, `CLAUDE.md`
 > "Build") renders §2–§5 for `selection` views over sources: the URL layout, the
-> graph-and-sheet page, entity pages and JSON, source links. Not built yet, and
-> registered as chunks of the current pass in `data/PROGRESS.yaml`: the chapter
-> tree and the search (§3, "Chapters and search"), short labels in the boxes, the
-> direction legend and the order of the detail section (§3, "What the section
-> shows"), and the grouping of patient groups by `broader` edges. Not built and
+> graph-and-sheet page, entity pages and JSON, source links, the chapter tree and
+> the search (§3, "Chapters and search"; facet filters wait for `facet`). Not built
+> yet, and registered as chunks of the current pass in `data/PROGRESS.yaml`: short
+> labels in the boxes, the direction legend and the order of the detail section
+> (§3, "What the section shows"), and the grouping of patient groups by `broader`
+> edges. Not built and
 > not registered: the deploy workflow until a person commits it (§6), cuts (§7),
 > pathway views, and everything under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
 > the site is *meant* to be so that the build is written to it, not the other way

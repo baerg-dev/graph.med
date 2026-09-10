@@ -68,3 +68,20 @@ blockquote { margin: .3rem 0; padding-left: .7rem; border-left: 3px solid var(--
   main.view #graph { height: 100%; }
   main.view .sheet { border-top: 0; border-left: 1px solid var(--line); padding: .6rem 1rem 2rem; overflow: auto; min-height: 0; }
 }
+
+/* chapters and search (docs/publication.md §3 "Chapters and search"): a hard filter and a soft highlight */
+.tools.left { right: auto; left: .6rem; align-items: center; }
+.tools input[type=search] { height: 44px; width: 11rem; max-width: 40vw; padding: 0 .8rem; border: 1px solid var(--line); border-radius: 22px; background: var(--bg); color: var(--fg); font: inherit; font-size: .95rem; }
+.tools .count { font-size: .78rem; color: var(--mute); background: var(--bg); padding: .1rem .5rem; border-radius: 1rem; white-space: nowrap; }
+.chapters { position: absolute; left: .6rem; top: 3.9rem; z-index: 2; max-width: min(24rem, calc(100% - 1.2rem)); max-height: calc(100% - 6rem); overflow: auto;
+  background: var(--bg); border: 1px solid var(--line); border-radius: .6rem; padding: .4rem .6rem; font-size: .85rem; line-height: 1.35; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.chapters ul { list-style: none; margin: 0; padding: 0 0 0 .9rem; }
+.chapters > ul { padding-left: 0; }
+.chapters button { display: flex; gap: .5rem; width: 100%; text-align: left; background: none; border: 0; color: var(--fg); font: inherit; padding: .3rem .2rem; border-radius: .3rem; cursor: pointer; }
+.chapters button:hover { background: var(--line); }
+.chapters button .n { margin-left: auto; color: var(--mute); font-size: .78rem; }
+.chapters button.empty { color: var(--mute); cursor: default; }
+.chapters button.empty:hover { background: none; }
+.chapters button.active { font-weight: 700; }
+.chapters button.all { border-bottom: 1px solid var(--line); border-radius: 0; margin-bottom: .2rem; }
+.chapters .sec { color: var(--mute); min-width: 3.2rem; font-variant-numeric: tabular-nums; }
