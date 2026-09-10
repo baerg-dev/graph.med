@@ -29,7 +29,10 @@ folded by default (the maintainer found the top-down, all-open tree "much too
 wide" on a desktop, with labels still spilling out of the diamonds); the first
 answers are the family concepts (`broader`), each unfolding into its members
 level by level, and a recommendation stays on the group it was made for; keep the
-answers on the edges and the questions as the only text the build adds; boxes
+answers on the edges and the questions as the only text the build adds, in the
+view's source language ("Welche Population?", "Welche Bedingung?" — the
+maintainer saw "Which patient group?" live and asked for it to be corrected,
+content and language); boxes
 show the short label behind the direction glyph; keep the grade colours and the
 node forms; keep Cytoscape.js + dagre vendored and pinned. Do not split
 the page by chapter, reintroduce an outline, or hand-write layout again. The tree

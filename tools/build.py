@@ -38,6 +38,10 @@ EVIDENCE = ("supports", "contests")
 STATEMENT_EDGES = ("specializes", "complements", "conflicts")
 BODY_TEXT = ("refines", "supplements", "limits")
 DIRECTION_GLYPH = {"für": "✓", "gegen": "✗", "abwägen": "⚖", "Lücke": "∅"}
+# The only words the build adds inside the graph, in the view's source language (docs/publication.md §3):
+# the two questions whose answers are the population and condition slots. Add a row per language;
+# a view in a language without one fails the build rather than falling back to another language.
+QUESTIONS = {"de": {"population": "Welche Population?", "condition": "Welche Bedingung?"}}
 
 
 def direction_of(claims: list[dict]) -> dict | None:
@@ -194,7 +198,10 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     facet = lambda cid: members[cid].get("facet") if cid in members else None
     sources = [members[s] for s in view["filter"]["sources"]]
     root = add(view["id"], ref=sources[0]["id"], type="root", lang=sources[0]["lang"], label=sources[0]["title"])
-    q0 = add("q:population", type="question", label="Which patient group?")
+    lang = sources[0]["lang"]
+    if lang not in QUESTIONS:
+        raise SystemExit(f"{view['id']}: no question words for language {lang!r} — add a row to QUESTIONS in tools/build.py")
+    q0 = add("q:population", type="question", lang=lang, label=QUESTIONS[lang]["population"])
     edge(root, q0, "flow")
     statements = sorted((m for m in members.values() if m["type"] == "statement"),
                         key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")) + [s["id"]])
@@ -252,7 +259,7 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
         if cond in members:  # a further question, asked within the patient group
             q = f"q:{at}"
             if q not in seen:
-                add(q, type="question", label="Which condition?")
+                add(q, type="question", lang=lang, label=QUESTIONS[lang]["condition"])
                 edge(at, q, "flow")
             edge(q, sid, "answer", short(cond), ref=cond)
         else:
