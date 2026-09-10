@@ -126,7 +126,12 @@ sources:
           commit, first), and settle open-questions → short-label-limit.
       - id: short-labels-b
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Same rules as short-labels-a. The six nasogastric-tube statements
+          read "Magensonde … (kolorektal | Leber | Magen | Whipple |
+          Ösophagektomie)". Every statement now has a short label; 62
+          concepts do.
         depends: [short-labels-a]
         does: >
           The same for ch07a, ch07b, ch07c, ch08 and ch09 and their concepts.
@@ -167,7 +172,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: short-labels-b
+    next: facets
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,
