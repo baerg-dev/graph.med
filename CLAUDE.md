@@ -83,6 +83,7 @@ rather than all of it, always:
 ```
 .claude/
 ├── README.md                    what lives here, and how rules load
+├── settings.json                project settings: plugins enabled for every session here
 ├── rules/
 │   ├── environment/             the world you run in
 │   │   ├── sandbox-environment.md   mounts, egress, persistence, shell mechanics

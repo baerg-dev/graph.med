@@ -230,6 +230,14 @@ recorded on the source entity, is shown on its page and on every view drawn from
 
 ## 6. The build
 
+**Design guidance for the site.** An agent changing the site's look — the
+stylesheet, the templates, the drawing — works with the `frontend-design` plugin,
+enabled for every session in this repository by `.claude/settings.json`. It informs
+choices *within* what this document and the decision-tree memory fix (the one
+tree, the node forms, the grade colours, folding by family, answers on the edges);
+it never licenses a restyle of those. Before a build change is proposed, the page
+is looked at in a browser (the `screenshot` skill), on a desktop and on a phone.
+
 The build is a script in the repository, `tools/build.py`, run with `uv` like the
 validator. It reads `data/` and `schema/schema.yaml`, writes a `site/` directory
 (gitignored), and takes the base path and output directory as parameters. It runs
