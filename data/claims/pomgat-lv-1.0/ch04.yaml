@@ -3,6 +3,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.1'
+  section: "4.1"
   label: Ein präoperatives Neuansetzen einer Betablockade kann aus kardiologischer Indikation heraus für kardiovaskuläre Hochrisikopatienten
     mit bekannter koronarer Herzerkrankung und manifester Myokardischämie oder Patienten mit 2 oder mehr kardialen Risikofaktoren
     erwogen werden.
@@ -18,6 +19,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.1'
+  section: "4.1"
   label: Dabei soll ein ausreichender Zeitabstand zur Dosistitration der Betablockertherapie nach Herzfrequenz und Blutdruck
     vor der geplanten Operation gewährleistet sein.
   grade: EK
@@ -32,6 +34,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.1'
+  section: "4.1"
   label: Ein grundsätzliches Neuansetzen einer präoperativen Betablockertherapie sollte nicht erfolgen.
   grade: EK
   verb: sollte
@@ -45,6 +48,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.1'
+  section: "4.1"
   label: Eine bestehende Betablockertherapie soll prä-, peri- und postoperativ weitergeführt werden.
   grade: EK
   verb: soll
@@ -58,6 +62,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.2'
+  section: "4.1"
   label: Eine antianginöse Therapie mit Nitraten sollte perioperativ fortgeführt werden, da ein Absetzen eine Myokardischämie
     begünstigen könnte.
   grade: EK
@@ -72,6 +77,7 @@
   lang: de
   kind: gap_notice
   recommendation_no: '4.3'
+  section: "4.1"
   label: Zum perioperativen Umgang mit Calciumantagonisten bei gastrointestinalen Tumoren existieren keine ausreichenden Literaturdaten,
     so dass keine Empfehlung formuliert werden kann.
   grade: EK
@@ -83,6 +89,7 @@
   type: claim
   lang: de
   kind: criterion
+  section: "4.1"
   label: 'Als kardiovaskuläre Hochrisikopatienten gelten Patienten mit mindestens zwei klinischen Risikofaktoren (nach dem
     Revised Cardiac Risk Index (RCRI) score: ischämische Herzerkrankung, zerebrovaskuläre Erkrankung, Niereninsuffizienz mit
     einem Serumkreatinin von >2mg/dl oder insulinpflichtiger Diabetes mellitus), ferner Patienten mit einem ASA Status von
@@ -94,6 +101,7 @@
   type: claim
   lang: de
   kind: criterion
+  section: "4.1"
   label: ein ausreichender Abstand - idealerweise eine Woche - zur Operation, um eine Dosistitration der Betablockertherapie
     nach Ruheherzfrequenz (Ziel 60-70/min) und Blutdruck (RRsyst>100mmHg) zu gewährleisten
   source:
@@ -104,6 +112,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.4'
+  section: "4.1.1"
   label: Eine bereits präoperativ indizierte und begonnene Statin-Therapie soll peri- und postoperativ fortgeführt werden.
   grade: EK
   verb: soll
@@ -117,6 +126,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.4'
+  section: "4.1.1"
   label: Bei Patienten mit hohem kardiovaskulärem Risiko, die sich einem elektiven abdominalchirurgischen Tumoreingriff unterziehen,
     kann die Einleitung einer Statintherapie zwei Wochen präoperativ begonnen werden.
   grade: EK
@@ -131,6 +141,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.5'
+  section: "4.1.2"
   label: 'Patienten unter einer Dauertherapie mit ACE-Hemmern oder Angiotension-II-Rezeptorblockern (Sartane) sollten diese
     perioperativ fortsetzen mit folgender Ausnahme: Nur am Morgen der Operation (bzw. in den 24h davor) sollte auf eine Einnahme
     der o.g. Medikamente verzichtet werden, da andernfalls häufiger mit intraoperativen Blutdruckabfällen zu rechnen ist.'
@@ -146,6 +157,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.5'
+  section: "4.1.2"
   label: Nur am Morgen der Operation (bzw. in den 24h davor) sollte auf eine Einnahme der o.g. Medikamente verzichtet werden,
     da andernfalls häufiger mit intraoperativen Blutdruckabfällen zu rechnen ist.
   grade: EK
@@ -160,6 +172,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.5'
+  section: "4.1.2"
   label: Bei kardial stabilen Patienten mit einer frisch diagnostizierten linksventrikulären Herzinsuffizienz (und keiner
     vorbestehenden Therapie mit ACE-Hemmern/Sartanen) kann erwogen werden die Operation zur Eindosierung von ACE-Hemmern/Sartanen
     um mindestens eine Woche zu verschieben. Dies sollte von Fall zu Fall entschieden werden.
@@ -175,6 +188,7 @@
   lang: de
   kind: gap_notice
   recommendation_no: '4.6'
+  section: "4.2"
   label: Eine Empfehlung zur perioperativen Verabreichung von Glukokortikoiden in der gastrointestinalen Tumorchirurgie kann
     aufgrund heterogener Studienlage außerhalb der Indikation zur PONV-Prophylaxe grundsätzlich nicht gegeben werden.
   grade: EK
@@ -187,6 +201,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.7'
+  section: "4.2"
   label: In der Pankreas- und Leberchirurgie kann eine perioperative Glukokortikoidgabe erwogen werden.
   grade: EK
   verb: kann
@@ -200,6 +215,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.8'
+  section: "4.3"
   label: Die Empfehlung zur Erhaltung und Verbesserung körperlicher Aktivität, ausgewogener Ernährung und Nikotin-/Alkoholverzicht
     vor einer Tumoroperation ist als internationaler Standard anzusehen.
   grade: '0'
@@ -213,6 +229,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.8'
+  section: "4.3"
   label: Auf eine darüber hinausgehende intensivierte ressourcenaufwändige Prähabilitation mit strukturierten Programmen kann
     verzichtet werden.
   grade: '0'
@@ -227,6 +244,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.9'
+  section: "4.4"
   label: Eine spezifische Unterweisung hinsichtlich eines multimodalen perioperativen Behandlungskonzeptes sollte bei Patienten
     vor einer Operation routinemäßig durchgeführt werden.
   grade: EK
@@ -241,6 +259,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.10'
+  section: "4.5"
   label: Ein validiertes Risikostratifizierungsinstrument sollte verwendet werden, um die klinische Untersuchung zur Planung
     der Operation zu ergänzen.
   grade: B
@@ -255,6 +274,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '4.10'
+  section: "4.5"
   label: Die Ergebnisse der Risikostratifizierung sollten mit dem Patienten besprochen werden, um eine partizipative Entscheidungsfindung
     zu ermöglichen.
   grade: B

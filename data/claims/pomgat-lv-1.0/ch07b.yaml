@@ -3,6 +3,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.14'
+  section: "7.4.1.1"
   label: Die unmittelbar postoperative s.c. Gabe von Methylnaltrexon zur Prophylaxe des postoperativen (paralytischen) Ileus
     nach onkologischen kolorektalen Resektionen soll bei systemischer opioidbasierter Schmerztherapie nicht erfolgen.
   grade: A
@@ -17,6 +18,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.15'
+  section: "7.4.1.1"
   label: Die präoperativ begonnene und postoperativ fortgesetzte Gabe von NSAR kann zur Prophylaxe des postoperativen (paralytischen)
     Ileus nach onkologischen kolorektalen Resektionen durchgeführt werden.
   grade: '0'
@@ -31,6 +33,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.16'
+  section: "7.4.1.1"
   label: Propranolol soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach onkologischen kolorektalen Resektionen
     angewendet werden.
   grade: A
@@ -45,6 +48,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.17'
+  section: "7.4.1.1"
   label: Neostigmin kann als Ultima ratio zur Therapie des klinisch manifesten postoperativen (paralytischen) Ileus angewendet
     werden.
   grade: '0'
@@ -59,6 +63,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.18'
+  section: "7.4.1.1"
   label: Prucaloprid zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen sollte
     nicht eingesetzt werden.
   grade: B
@@ -73,6 +78,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.19'
+  section: "7.4.1.1"
   label: Metoclopramid soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
     eingesetzt werden.
   grade: A
@@ -87,6 +93,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.20'
+  section: "7.4.1.1"
   label: Erythromycin soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
     eingesetzt werden.
   grade: A
@@ -101,6 +108,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.21'
+  section: "7.4.1.1"
   label: Laxantien sollten frühzeitig in eine multimodale Prophylaxe und / oder Therapie des postoperativen (paralytischen)
     Ileus nach onkologischen kolorektalen Resektionen implementiert werden.
   grade: B
@@ -115,6 +123,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.22'
+  section: "7.4.1.1"
   label: Simethicon soll nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
     eingesetzt werden.
   grade: A
@@ -129,6 +138,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.23'
+  section: "7.4.1.1"
   label: Osmotisch wirksame Röntgenkontrastmittel (z.B. Gastrografin®) sollen nicht zur Therapie des postoperativen (paralytischen)
     Ileus nach gastrointestinalen Tumorresektionen eingesetzt werden.
   grade: A
@@ -143,6 +153,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.24'
+  section: "7.4.1.2"
   label: Daikenchuto sollte nicht zur Prophylaxe des postoperativen (paralytischen) Ileus nach gastrointestinalen Tumorresektionen
     eingesetzt werden.
   grade: B
