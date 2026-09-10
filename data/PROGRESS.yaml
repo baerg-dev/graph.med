@@ -72,7 +72,16 @@ sources:
       - id: outline
         kind: extraction
         pages: 1-130
-        status: pending
+        status: done
+        note: >
+          Outline of 100 sections from pp. 2–5, every heading verified on its
+          physical page. Sections assigned by the quote's position relative to
+          the headings on its page; box headers ("7.1 Konsensbasierte
+          Empfehlung") and running page headers look like headings, so a
+          heading counts only when its title follows the number. 4.1 and
+          7.3.2 hold boxes directly, above their first subsection. In chapters
+          4–9 only 5.7 (no box) has no claim; chapters 1–3 and 10–12 are front
+          and back matter.
         depends: [schema-0.4]
         does: >
           Write the complete outline of POMGAT onto sources/pomgat-lv-1.0 from
@@ -146,7 +155,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: outline
+    next: site-chapters-search
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,
