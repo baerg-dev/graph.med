@@ -5,7 +5,7 @@ The entities and edges of the knowledge pool, laid out by namespace
 
 ```
 data/
-├── PROGRESS.yaml            parsing progress per source — the handover between sessions
+├── PROGRESS.yaml            passes and chunks per source — the handover between sessions
 ├── sources/<source-id>.yaml one entity per source document
 ├── claims/<source-id>/<chunk>.yaml    the claims extracted from one chunk
 ├── concepts/<id>.yaml       one entity per file
@@ -29,4 +29,9 @@ Rules that bind everything here:
   `-abgelaufen` suffix, banner "wird aktuell überarbeitet") is not parsed — its
   successor will be, when published.
 - **One chunk per session**, then a handover: `PROGRESS.yaml` updated, a pull
-  request opened. The `parse-next-chunk` skill runs this loop.
+  request opened. The `parse-next-chunk` skill runs this loop; a chunk is an
+  extraction, a linking pass, a schema change or a build feature, registered
+  in a pass with its instruction.
+- **Document structure is provenance.** A claim's `section` and a source's
+  `outline` say where in the document something was found; nothing in
+  `concepts/` or `statements/` carries a chapter (spec §6.7).

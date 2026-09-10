@@ -2,9 +2,13 @@
 
 > **Status: design, built in part.** The build (`tools/build.py`, `CLAUDE.md`
 > "Build") renders §2–§5 for `selection` views over sources: the URL layout, the
-> graph-and-sheet page, entity pages and JSON, source links. Not built: the deploy
-> workflow until a person commits it (§6), cuts (§7), pathway views, and everything
-> under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
+> graph-and-sheet page, entity pages and JSON, source links. Not built yet, and
+> registered as chunks of the current pass in `data/PROGRESS.yaml`: the chapter
+> tree and the search (§3, "Chapters and search"), short labels in the boxes, the
+> direction legend and the order of the detail section (§3, "What the section
+> shows"), and the grouping of patient groups by `broader` edges. Not built and
+> not registered: the deploy workflow until a person commits it (§6), cuts (§7),
+> pathway views, and everything under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
 > the site is *meant* to be so that the build is written to it, not the other way
 > round. It is the design-level counterpart of
 > `graph-representation.md`: that file says how knowledge is stored; this one says
@@ -116,9 +120,16 @@ it. Three choices keep the tree readable at ninety recommendations:
   A deep link unfolds the group its target is in.
 - **Answers in order of weight.** The patient groups with the most recommendations
   come first, so the general ones lead and the single-use ones trail. A real
-  hierarchy of groups — organ, then procedure — would shrink the fan-out further; it
-  is data the pool does not have yet (broader/narrower edges between concepts) and
-  will be drawn when it does.
+  hierarchy of groups — organ, then procedure — shrinks the fan-out further: once
+  concepts carry `broader` edges (`graph-representation.md` §5), an answer is a
+  family (*Leberresektion*) that unfolds into its members, and the thirty-odd
+  groups become eight to ten. The edge only groups and folds; it never moves a
+  recommendation from a family to a member.
+
+**Boxes show the short form.** A box shows a statement's `short_label` when it
+has one and its `label` otherwise; the section always shows the full label. The
+same holds for the answers on the edges (concepts). Short labels are data, reviewed
+like everything else, never truncated by the build.
 
 The data carries no positions; the layout is deterministic for a given set of open
 groups. This replaces the earlier hand-written renderer, whose fixed boxes could not
@@ -133,12 +144,44 @@ place. Tapping the background clears. Tapping a neighbour listed in the section
 moves there. Deep links carry `#<entity id>`. There are no modal dialogs and no page
 loads needed to read a view; the entity pages (§4) exist for linking, not for reading.
 
+**Chapters and search.** Two ways to narrow the tree, deliberately different in
+kind:
+
+- **A chapter tree beside the graph**, built from the source's `outline` and the
+  claims' `section` (`graph-representation.md` §6.7). Tapping a section is a
+  *hard filter*: the tree shows only the statements supported from that section
+  and its subsections, plus their groups, conditions and aims; nothing is redrawn
+  and no edge is computed, the rest is simply not shown. Sections without a claim
+  are listed greyed, so the reader sees what the pool has not extracted. The
+  chapter tree is a control, not the graph: the graph stays the one decision tree,
+  and the tree of headings never becomes its shape.
+- **A search box** is a *soft highlight*: it matches the label, short label and
+  claim text of statements and concepts; matches keep their colour and everything
+  else fades without disappearing, so "Leber" shows every branch the liver occurs
+  in and, just as usefully, where it does not. A counter reads "n matches in m
+  sections". Hiding would destroy the overview the search exists to give; fading
+  keeps the structure.
+
+Once concepts carry a `facet`, the search gets facet filters (only procedures,
+only outcomes). Everything here runs in the browser on the view's JSON.
+
+**Direction, in four words.** The legend shows a recommendation's direction as one
+of *für*, *gegen*, *abwägen*, *Lücke* — derived at build time from the supporting
+claims (`direction: against` → gegen; `kind: gap_notice` → Lücke; the mapping of
+`kann` to *abwägen* is open, `open-questions.md` → direction-legend) — next to the
+grade colours. Timing ("innerhalb von 24 Stunden") is not a direction; it stays in
+the label.
+
 **What the section shows.**
 
-- *statement*: the label, in its source language; the slots with their concepts;
-  every claim linked to it by `supports` or `contests` — each with its
-  recommendation number, **its own grade**, verb and direction, the verbatim quote,
-  and a link to the cited page of the source (§5).
+- *statement*, in this order: the direction as a banner, so the clinical answer is
+  read in a second; the full label, in its source language; the slots with their
+  concepts; every claim linked to it by `supports` or `contests` — each with
+  **its own grade** highlighted, then verb, direction and consensus, its
+  recommendation number, page and section, the verbatim quote, and a link to the
+  cited page of the source (§5); last, what the body text adds, grouped by
+  relation — *refines*, *supplements*, *limits* — each with its page. The order
+  goes from the answer to its evidence to its limits.
 - *concept*: the label and definition, the statements that use it and in which slot,
   and its codes (`codes_as`) once terminology imports exist.
 - *structural node*: its label, its branches or outcomes, and the statements it is
@@ -211,8 +254,6 @@ cut-publication).
 
 - **Cut publication** — how cuts are built and served alongside the floating view;
   whether a cut has a PDF export.
-- **Search** — finding a statement by word is not built; the root question is the
-  entry point.
 - **Branch guards** — yes/no and value-range branches come with authored pathways
   (`branch` edges carry a `guard`); the derived tree has only slot answers.
 - **Translation** — a build-layer projection, not started.

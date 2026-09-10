@@ -33,4 +33,6 @@ the page by chapter, reintroduce an outline, or hand-write layout again. The tre
 is *derived* from slots until pathways are authored (`docs/open-questions.md` →
 decision-graph-derivation); never invent yes/no branches or an ordering the data
 does not carry. Add information to the section below the graph rather than to
-the graph.
+the graph. A chapter tree *beside* the graph, as a filter over what is shown, is
+not the outline form the maintainer rejected: it narrows the one tree, it never
+becomes its shape ([[document-structure-is-provenance]]).

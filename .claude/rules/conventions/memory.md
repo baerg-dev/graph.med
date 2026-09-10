@@ -36,6 +36,8 @@ pre-emptively.
 | `design/two-layer-identity.md` | Claims have deterministic source-anchored identity and never merge; semantic nodes are minted; sameness is an edge. |
 | `design/staleness-and-verification.md` | One content-hash mechanism for review, verification and references; stale downgrades, only invalid blocks. |
 | `design/view-page-is-a-decision-tree.md` | The view page is one decision tree (which patient group? → which condition? → recommendation → aim, answers on the edges), drawn by Cytoscape.js + dagre, self-hosted; not chapters, not an outline. |
+| `design/document-structure-is-provenance.md` | Chapters are provenance (`section` on the claim, `outline` on the source) and filters, never nodes; no `outlines/` namespace. |
+| `design/relations-are-edges-not-fields.md` | A relation is an edge with provenance (`broader`, `codes_as`), never a field; `broader` inherits nothing. |
 
 ## Writing one
 
