@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Nicht-kolorektale viszeralonkologische Resektion (Ösophagus, Magen, Pankreas, Leber)
 short_label: "Ösophagus-, Magen-, Pankreas-, Leberresektion"
+facet: procedure
 source: modelling

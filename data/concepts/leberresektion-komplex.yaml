@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Komplexe Leberresektion (mit biliären und/oder vaskulären Rekonstruktionen)
 short_label: "Komplexe Leberresektion"
+facet: procedure
 source: modelling

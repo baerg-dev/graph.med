@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Rein mechanische präoperative Darmvorbereitung
 short_label: "Rein mechanische Darmvorbereitung"
+facet: intervention
 source: modelling

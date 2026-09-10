@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Präoperatives Neuansetzen einer Betablockertherapie
 short_label: "Betablocker-Neuansetzen"
+facet: medication
 source: modelling

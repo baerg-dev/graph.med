@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Unmittelbar postoperative subkutane Gabe von Methylnaltrexon
 short_label: "Methylnaltrexon s.c. postoperativ"
+facet: medication
 source: modelling

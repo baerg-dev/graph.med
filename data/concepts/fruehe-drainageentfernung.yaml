@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Frühe Entfernung der abdominellen Drainage (bis 4. postoperativer Tag)
 short_label: "Frühe Drainageentfernung (bis Tag 4)"
+facet: intervention
 source: modelling

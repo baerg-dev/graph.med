@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Minimalinvasive Kolonresektion oder (tiefe) anteriore Rektumresektion
 short_label: "Minimalinvasive kolorektale Resektion"
+facet: procedure
 source: modelling

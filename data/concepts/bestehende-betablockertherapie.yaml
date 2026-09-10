@@ -2,4 +2,5 @@ id: concepts/bestehende-betablockertherapie
 type: concept
 lang: de
 label: Bestehende Betablockertherapie
+facet: medication
 source: modelling

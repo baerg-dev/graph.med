@@ -2,4 +2,5 @@ id: concepts/onkologische-oesophagusresektion
 type: concept
 lang: de
 label: Onkologische Ösophagusresektion
+facet: procedure
 source: modelling

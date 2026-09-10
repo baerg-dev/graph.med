@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Intraoperative Einlage einer doppellumigen Magensonde zur Dekompression des hochgezogenen Magens
 short_label: "Doppellumige Magensonde intraoperativ"
+facet: intervention
 source: modelling

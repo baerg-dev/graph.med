@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Intensivierte, ressourcenaufwändige Prähabilitation mit strukturierten Programmen
 short_label: "Strukturierte Prähabilitation"
+facet: intervention
 source: modelling

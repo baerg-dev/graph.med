@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Operative Tumorresektion des oberen Gastrointestinaltraktes und des Pankreas
 short_label: "Tumorresektion oberer GI-Trakt/Pankreas"
+facet: procedure
 source: modelling

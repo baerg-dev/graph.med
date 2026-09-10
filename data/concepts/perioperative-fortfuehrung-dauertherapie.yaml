@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Perioperative Fortführung einer bestehenden Dauertherapie
 short_label: "Perioperative Fortführung"
+facet: intervention
 source: modelling

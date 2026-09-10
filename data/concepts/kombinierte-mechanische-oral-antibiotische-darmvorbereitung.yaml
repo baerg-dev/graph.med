@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Kombinierte mechanische und oral-antibiotische Darmvorbereitung
 short_label: "Mechanisch + oral-antibiotisch"
+facet: intervention
 source: modelling

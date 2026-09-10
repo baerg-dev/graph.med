@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Geringes Risiko einer postoperativen Pankreasfistel (nach initialem Drainagesekret)
 short_label: "Geringes Pankreasfistelrisiko"
+facet: finding
 source: modelling

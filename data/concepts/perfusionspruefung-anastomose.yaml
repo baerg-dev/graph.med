@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Intraoperative Prüfung der Anastomosenperfusion
 short_label: "Perfusionsprüfung der Anastomose"
+facet: intervention
 source: modelling

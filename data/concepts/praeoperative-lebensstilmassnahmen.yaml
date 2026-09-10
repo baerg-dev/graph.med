@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Erhaltung und Verbesserung körperlicher Aktivität, ausgewogene Ernährung und Nikotin-/Alkoholverzicht vor der Operation
 short_label: "Präoperative Lebensstilmaßnahmen"
+facet: intervention
 source: modelling

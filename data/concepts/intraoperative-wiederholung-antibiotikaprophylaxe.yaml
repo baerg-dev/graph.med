@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Intraoperative Wiederholung der Antibiotikaprophylaxe (nach Halbwertzeit oder bei starkem Blutverlust)
 short_label: "Intraoperative Wiederholung (Antibiotikum)"
+facet: intervention
 source: modelling

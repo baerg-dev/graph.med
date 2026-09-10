@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Offene (konventionelle) Operation eines gastrointestinalen Tumors
 short_label: "Offene gastrointestinale Tumoroperation"
+facet: procedure
 source: modelling

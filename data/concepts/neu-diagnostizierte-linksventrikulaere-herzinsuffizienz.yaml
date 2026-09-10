@@ -3,4 +3,5 @@ type: concept
 lang: de
 label: Frisch diagnostizierte linksventrikuläre Herzinsuffizienz bei kardial stabilen Patienten ohne vorbestehende ACE-Hemmer-/Sartan-Therapie
 short_label: "Frisch diagnostizierte LV-Herzinsuffizienz"
+facet: patient_state
 source: modelling
