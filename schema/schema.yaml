@@ -96,6 +96,7 @@ $defs:
   date:    {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}
   slug:    {type: string, pattern: '^[A-Za-z0-9._-]+$'}
   text:    {type: string, minLength: 1}
+  short_text: {type: string, minLength: 1, maxLength: 60}   # a box holds two lines of ~30 characters; aim for 55 (spec §3.2)
 
   # entity references, by namespace (spec §2)
   source_ref:     {type: string, pattern: '^sources/[A-Za-z0-9._-]+$'}
@@ -226,7 +227,7 @@ $defs:
       type:       {const: concept}
       lang:       {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:      {$ref: '#/$defs/text', x-provenance: not_applicable}
-      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}   # for a box; reviewed content, never truncated by a build
+      short_label: {$ref: '#/$defs/short_text', x-provenance: not_applicable}   # for a box; reviewed content, never truncated by a build
       facet:      {$ref: '#/$defs/facet', x-provenance: not_applicable}
       definition: {$ref: '#/$defs/text', x-provenance: optional}
       source:     {$ref: '#/$defs/provenance_value'}
@@ -251,9 +252,8 @@ $defs:
       type:  {const: statement}
       lang:  {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label: {$ref: '#/$defs/text', x-provenance: not_applicable}
-      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
-             # the proposition compressed for a box; must still tell siblings apart (spec §3.2).
-             # No maxLength until calibrated (docs/open-questions.md → short-label-limit)
+      short_label: {$ref: '#/$defs/short_text', x-provenance: not_applicable}
+             # the proposition compressed for a box; must still tell siblings apart (spec §3.2)
       slots:
         type: object
         additionalProperties: false
@@ -279,7 +279,7 @@ $defs:
       type:     {const: decision}
       lang:     {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:    {$ref: '#/$defs/text', x-provenance: not_applicable}
-      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
+      short_label: {$ref: '#/$defs/short_text', x-provenance: not_applicable}
       criteria: {type: object,          x-provenance: optional}
       source:   {$ref: '#/$defs/provenance_value'}
       provenance:
@@ -296,7 +296,7 @@ $defs:
       type:   {const: outcome}
       lang:   {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:  {$ref: '#/$defs/text', x-provenance: not_applicable}
-      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
+      short_label: {$ref: '#/$defs/short_text', x-provenance: not_applicable}
       source: {$ref: '#/$defs/provenance_value'}
   gap:
     description: An explicit "no recommendation possible" in the source (spec §11.7); its label is quoted from the source.
@@ -308,7 +308,7 @@ $defs:
       type:   {const: gap}
       lang:   {$ref: '#/$defs/lang', x-provenance: not_applicable}
       label:  {$ref: '#/$defs/text', x-provenance: required}
-      short_label: {$ref: '#/$defs/text', x-provenance: not_applicable}
+      short_label: {$ref: '#/$defs/short_text', x-provenance: not_applicable}
       source: {$ref: '#/$defs/references'}   # required provenance: never modelling
 
   agent:
