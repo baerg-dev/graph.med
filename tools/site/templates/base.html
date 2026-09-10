@@ -20,6 +20,14 @@
   <a href="https://github.com/baerg-dev/graph.med">repository</a> ·
   PolyForm Noncommercial 1.0.0
 </footer>
+<script>
+/* the "copy" button beside a quote: for viewers that cannot highlight a search from the link
+   (Chrome, Edge, Safari), the quote goes to the clipboard so that Ctrl+F in the document finds it */
+document.addEventListener("click", function (e) {
+  var b = e.target.closest("button.copy"); if (!b || !navigator.clipboard) return;
+  navigator.clipboard.writeText(b.dataset.copy).then(function () { b.textContent = "copied"; setTimeout(function () { b.textContent = "copy"; }, 1500); });
+});
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

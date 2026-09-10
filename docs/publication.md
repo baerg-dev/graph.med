@@ -221,9 +221,13 @@ on. Both are generated; neither is authored.
 
 The site never hosts a source document
 (`.claude/memory/design/sources-referenced-never-rehosted.md`). A claim's locator
-becomes a link to the source's public URL with the page fragment,
-`<url>#page=<N>`, so a reader lands on the cited physical page; the verbatim quote
-is shown beside it so the passage can be found. The source's license line, as
+becomes a link to the source's public URL with the page fragment and the quote as
+a search, `<url>#page=<N>&search=<quote>&phrase=true`. Every PDF viewer lands on
+the cited physical page; those that understand the search highlight the passage —
+Firefox's pdf.js and Acrobat do, Chrome, Edge and Safari do not. No link form
+highlights in every browser and the document is never rehosted in a viewer of our
+own, so the verbatim quote is shown beside the link with a **copy** button: in a
+viewer that cannot highlight, the reader pastes it into the document's find. The source's license line, as
 recorded on the source entity, is shown on its page and on every view drawn from it.
 
 ---
