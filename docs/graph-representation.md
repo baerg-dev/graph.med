@@ -1,14 +1,13 @@
 # Graph Representation — how knowledge is stored in this repository
 
 > **Status: design intent, partly enforced.** The schema (`schema/schema.yaml`,
-> currently 0.3.0) exists and `tools/validate.py` enforces it, locally and in CI
+> currently 0.4.0) exists and `tools/validate.py` enforces it, locally and in CI
 > (`CLAUDE.md`, "Checks"): ids, enums, provenance requirements, claim hashes, slots,
-> edges, and with `--verify-quotes` every quote against its source. What this
-> document describes and the schema does not yet carry — the document-structure
-> properties `section` and `outline` (§6.7), `short_label` and `facet` (§3.2), the
-> `broader` edge (§5), the `section` view filter (§4) — is registered as schema
-> 0.4.0 in `data/PROGRESS.yaml` and lands there before any data uses it (§7).
-> Everything else described as checked or computed — the canonical form and content
+> edges, a claim's `section` against its source's `outline`, `broader` without
+> cycles, and with `--verify-quotes` every quote against its source. The data does
+> not yet use `section`, `outline`, `short_label`, `facet` or `broader`; the chunks
+> that write them are registered in `data/PROGRESS.yaml`. Everything else described
+> as checked or computed — the canonical form and content
 > hashes (§2), staleness (§5, §8), attestations and review state (§8), view cuts
 > (§4), the derived statement properties (§3.3) — is not implemented yet. Statements
 > about those describe the model this repository is being built to, not behaviour
