@@ -3,6 +3,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '8.1'
+  section: "8.1.1"
   label: Eine onkologische Ösophagusresektion sollte in dem Kontext eines multimodalen perioperativen Managementkonzepts stattfinden.
   grade: B
   verb: sollte
@@ -16,6 +17,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '8.2'
+  section: "8.1.2"
   label: Eine onkologische Magenresektion sollte eingebettet in ein multimodales perioperatives Managementkonzept stattfinden.
   grade: B
   verb: sollte
@@ -29,6 +31,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '8.3'
+  section: "8.1.3"
   label: Eine onkologische Pankreasresektion sollte im Rahmen eines multimodalen perioperativen Managementkonzepts erfolgen.
   grade: B
   verb: sollte
@@ -42,6 +45,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '8.4'
+  section: "8.1.4"
   label: Eine onkologische Leberresektion sollte eingebettet in ein multimodales perioperatives Managementkonzept (mPOM) stattfinden.
   grade: B
   verb: sollte
@@ -55,6 +59,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '8.5'
+  section: "8.1.5"
   label: Eine kolorektale Resektion soll eingebettet in ein multimodales perioperatives Managementkonzept (mPOM) stattfinden.
   grade: A
   verb: soll
@@ -68,6 +73,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '8.6'
+  section: "8.2"
   label: Perioperativ können Patienten, die sich einer kolorektalen Resektion im Kontext eines multimodalen perioperativen
     Managementkonzepts (mPOM) unterziehen, durch eine auf perioperative Interventionen spezialisierte Fachkraft begleitet
     werden.
@@ -83,6 +89,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '8.7'
+  section: "8.2"
   label: Für Patienten, die sich einer nicht-kolorektalen viszeralonkologischen Resektion im Kontext eines multimodalen perioperativen
     Managementkonzepts unterziehen, kann die Betreuung durch eine auf perioperative Interventionen spezialisierte Fachkraft
     erwogen werden.

@@ -4,14 +4,14 @@
 > currently 0.4.0) exists and `tools/validate.py` enforces it, locally and in CI
 > (`CLAUDE.md`, "Checks"): ids, enums, provenance requirements, claim hashes, slots,
 > edges, a claim's `section` against its source's `outline`, `broader` without
-> cycles, and with `--verify-quotes` every quote against its source. The data does
-> not yet use `section`, `outline`, `short_label`, `facet` or `broader`; the chunks
-> that write them are registered in `data/PROGRESS.yaml`. Everything else described
-> as checked or computed — the canonical form and content
-> hashes (§2), staleness (§5, §8), attestations and review state (§8), view cuts
-> (§4), the derived statement properties (§3.3) — is not implemented yet. Statements
-> about those describe the model this repository is being built to, not behaviour
-> anyone can rely on today.
+> cycles, and with `--verify-quotes` every quote against its source. The pool uses
+> all of it: one source with its outline, its claims with sections, statements and
+> concepts with short labels, every concept with a facet, and a `broader`
+> hierarchy over the patient groups. Everything else described as checked or
+> computed — the canonical form and content hashes (§2), staleness (§5, §8),
+> attestations and review state (§8), view cuts (§4), the derived statement
+> properties (§3.3) — is not implemented yet. Statements about those describe the
+> model this repository is being built to, not behaviour anyone can rely on today.
 
 This file explains the approach behind the knowledge in this repository. It is
 written for humans who review changes and for AI agents that read or write graph
@@ -205,7 +205,9 @@ Three kinds of entity, kept apart because different edges attach to them:
   tell siblings apart — six boxes reading "Magensonde ziehen" hide exactly the
   staging the drawing exists to show, so the short form carries the
   distinguishing feature ("Magensonde vor Ausleitung (kolorektal)"). Concepts
-  and structural nodes may carry a `short_label` for the same reason. Shortening
+  and structural nodes may carry a `short_label` for the same reason. A short
+  label is at most 60 characters (the schema enforces it: a box holds two lines
+  of about thirty); aim for 55. Shortening
   a clinical proposition can change its meaning, so a short label is reviewed
   like any other content, never generated on the fly.
 - **Structure** — decision questions, branches, outcomes, explicit gaps: the
@@ -550,29 +552,41 @@ POMGAT S3 guideline (AWMF 088-010OL), quotes verified against the document.
 # ── source ────────────────────────────────────────────────────────────────
 - id: sources/pomgat-lv-1.0
   type: source
+  lang: de
   title: "S3-Leitlinie Perioperatives Management bei gastrointestinalen Tumoren (POMGAT), Langversion 1.0"
   awmf_register: "088-010OL"
   url: "https://register.awmf.org/assets/guidelines/008-010OLl_S3_Perioperatives-Management-bei-gastrointestinalen-Tumoren-POMGAT_2023-12.pdf"
   content_hash: "sha256:…"
   license: "© Leitlinienprogramm Onkologie; referenced, not rehosted"
+  structure: [chronologisch_perioperativ, anatomisch, modalitaetsbezogen]   # how the document is organised (§6.7)
+  outline:                                                                  # its complete table of contents
+    - {section: "6.1",   title: "Intraoperative Einlage einer Drainage in das OP-Feld", page: 58}
+    - {section: "6.1.3", title: "Pankreas", page: 61}
+    # … every numbered section, those without a recommendation included
 
 # ── claims (phase one: deterministic, verifiable against the source) ──────
 - id: claims/pomgat-lv-1.0/7c31a2f0        # hash over (locator, quote); validator-checked
   type: claim
+  lang: de
   kind: recommendation
   recommendation_no: "6.5"
+  section: "6.1.3"                          # where in the document (§6.7); must be in the outline
+  label: "Nach Pankreasresektion kann eine intraabdominelle Drainage erwogen werden."
   grade: "0"
   verb: kann
   direction: for
-  consensus: strong_consensus
+  consensus: starker_konsens
   source: {at: sources/pomgat-lv-1.0#page=61, quote: "kann die Einlage einer intraabdominellen"}
   provenance:
     consensus: {at: sources/pomgat-lv-1.0#page=61, quote: "Starker Konsens"}
 
 - id: claims/pomgat-lv-1.0/e945b1d8
   type: claim
+  lang: de
   kind: recommendation
   recommendation_no: "6.7"
+  section: "6.1.3"
+  label: "Nach Pankreasresektion kann die abdominelle Drainage früh entfernt werden, wenn …"
   grade: "0"
   verb: kann
   direction: for
@@ -580,35 +594,52 @@ POMGAT S3 guideline (AWMF 088-010OL), quotes verified against the document.
 
 - id: claims/pomgat-lv-1.0/1f80c3aa
   type: claim
+  lang: de
   kind: criterion
+  section: "6.1.3"
+  label: "Drainageamylase unter 5000 U/L am ersten postoperativen Tag"
   source: {at: sources/pomgat-lv-1.0#page=64, quote: "unter 5000 U/L am ersten postop. Tag"}
 
 # ── semantic layer (phase two: linking, all modelling) ────────────────────
 - id: concepts/pankreasresektion
   type: concept
+  lang: de
   label: "Pankreasresektion"
+  facet: procedure                          # what kind of thing it is (§3.2), not its role
   source: modelling
 
-- id: statements/drain-early-removal-low-risk
+- id: concepts/pankreaskopfresektion
+  type: concept
+  lang: de
+  label: "Pankreaskopfresektion"
+  facet: procedure
+  source: modelling
+
+- id: statements/fruehe-drainageentfernung-pankreasresektion
   type: statement
-  label: "Nach Pankreasresektion kann die Drainage früh entfernt werden, wenn das Sekret ein geringes Fistelrisiko anzeigt"
+  lang: de
+  label: "Nach Pankreasresektion kann die abdominelle Drainage früh (bis 4. postoperativer Tag) entfernt werden, wenn das Drainagesekret ein geringes Pankreasfistelrisiko anzeigt."
+  short_label: "Frühe Drainageentfernung bei geringem Fistelrisiko"   # for a box; at most 60 characters
   slots:
     population: concepts/pankreasresektion
-    action: concepts/drainage-entfernung
-    condition: concepts/geringes-fistelrisiko
+    action: concepts/fruehe-drainageentfernung
+    condition: concepts/geringes-pankreasfistelrisiko
   source: modelling
 
 # ── structure (the pathway arranging the statements) ──────────────────────
 - id: pathways/pomgat-drains/removal_q
   type: decision
+  lang: de
   label: "Frühe Drainageentfernung möglich?"
   source: modelling
 
 # ── edges (derived ids; endpoint hashes recorded for staleness) ───────────
-- [claims/pomgat-lv-1.0/e945b1d8, supports, statements/drain-early-removal-low-risk, {source: modelling}]
+- [claims/pomgat-lv-1.0/e945b1d8, supports, statements/fruehe-drainageentfernung-pankreasresektion, {source: modelling}]
 - [claims/pomgat-lv-1.0/1f80c3aa, refines,  claims/pomgat-lv-1.0/e945b1d8, {source: modelling}]
 - [concepts/pankreasresektion, codes_as, ops-2026/5-52, {source: modelling}]
-- [pathways/pomgat-drains/removal_q, about, statements/drain-early-removal-low-risk, {source: modelling}]
+- [concepts/pankreaskopfresektion, broader, concepts/pankreasresektion,      # subsumption (§5): groups and folds, inherits nothing
+   {source: modelling, as_of: "2026-09-10", lang: de, rationale: "Die Pankreaskopfresektion ist eine Pankreasresektion."}]
+- [pathways/pomgat-drains/removal_q, about, statements/fruehe-drainageentfernung-pankreasresektion, {source: modelling}]
 
 # ── a view: the pathway as a citable unit ─────────────────────────────────
 - id: views/pomgat-drains
@@ -622,7 +653,11 @@ POMGAT S3 guideline (AWMF 088-010OL), quotes verified against the document.
 Things to notice: the grade sits on the *claim*, extracted verbatim from the
 recommendation box, and the statement carries no grade at all — its effective
 grade is derived; the criterion is a claim of its own, related by an edge, never
-inheriting the grade; the classification code is a URL; a second guideline
+inheriting the grade; where in the document a claim was found (`section`) sits on
+the claim and nowhere else, and the outline that makes it checkable sits on the
+source; the classification code is a URL; the head resection is a special case
+of the resection by an edge that carries a reason and no evidence, so a
+recommendation about one says nothing about the other; a second guideline
 discussing early drain removal would add claims and `supports`/`contests` edges
 to the *same statement* — the statement's evidence grows without the statement
 changing; and the view's cut, not any entity, is the thing a publication would
@@ -678,6 +713,8 @@ W3C-style provenance. The mapping:
 | view, cut | RDF named graphs / datasets; a cut is a versioned release of one |
 | `modelling` | PROV-O `wasAttributedTo` with no `wasDerivedFrom` |
 | codes as nodes, coding as edge | SKOS mappings; FHIR `Coding` |
+| `broader` between concepts, no inheritance | SKOS `skos:broader` (a thesaurus relation, not a subclass axiom) |
+| `section` on the claim, `outline` on the source | W3C Web Annotation selectors on the source; document structure kept in provenance, never as resources |
 | agents, attestations, proofs | PROV-O agents; W3C Data Integrity proofs |
 | one schema | SHACL/ShEx shapes plus application-level checks |
 
@@ -720,4 +757,4 @@ contributors, `.claude/rules/environment/sandbox-environment.md` for agents.
 
 ---
 
-Version 0.3 · 2026-09-10
+Version 0.4 · 2026-09-10

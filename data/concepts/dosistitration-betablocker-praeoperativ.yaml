@@ -2,4 +2,6 @@ id: concepts/dosistitration-betablocker-praeoperativ
 type: concept
 lang: de
 label: Präoperative Dosistitration der Betablockertherapie nach Herzfrequenz und Blutdruck
+short_label: "Präoperative Betablocker-Dosistitration"
+facet: intervention
 source: modelling

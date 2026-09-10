@@ -2,6 +2,7 @@ id: statements/perfusionspruefung-kolorektale-anastomose
 type: statement
 lang: de
 label: Die Perfusion der Anastomose wird nach Rektum- und Kolonresektionen überprüft.
+short_label: "Perfusion der Anastomose prüfen"
 slots:
   population: concepts/kolorektale-anastomose
   action: concepts/perfusionspruefung-anastomose

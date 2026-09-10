@@ -1,6 +1,7 @@
 {# The detail section for one entity: the sheet under the graph, and the entity page. #}
 {% set e = entity %}
 {% if e.type == "statement" %}
+{% if direction %}<p class="banner dir-{{ direction.word }}" lang="de"><span class="glyph">{{ direction.glyph }}</span> {{ direction.word }}{% if direction.verbs %} <small>{{ direction.verbs | join(" · ") }}</small>{% endif %}</p>{% endif %}
 <p class="kind">statement{% if contested %} · <mark>contested</mark>{% endif %}</p>
 <p class="label" lang="{{ e.lang }}">{{ e.label }}</p>
 {% if slots %}
@@ -15,17 +16,28 @@
 <ol class="claims">
 {% for c in claims %}
   <li class="claim {{ c.edge }}">
-    <span class="tag">{{ c.edge }}</span>
-    {% if c.recommendation_no %}<span class="tag">No. {{ c.recommendation_no }}</span>{% endif %}
     {% if c.grade %}<span class="tag grade">grade {{ c.grade }}</span>{% endif %}
     {% if c.verb %}<span class="tag">{{ c.verb }}{% if c.direction == "against" %} nicht{% endif %}</span>{% endif %}
+    {% if c.consensus %}<span class="tag">{{ c.consensus }}</span>{% endif %}
+    <span class="tag">{{ c.edge }}</span>
     <span class="tag">{{ c.kind }}</span>
     <p lang="{{ c.lang }}">{{ c.label }}</p>
     <blockquote lang="{{ c.lang }}">„{{ c.quote }}“</blockquote>
-    <p class="cite"><a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a> · <a href="{{ base }}{{ c.id }}/">{{ c.id | short }}</a></p>
+    <p class="cite">{% if c.recommendation_no %}No. {{ c.recommendation_no }} · {% endif %}<a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a>{% if c.section %} · section {{ c.section }}{% endif %} · <a href="{{ base }}{{ c.id }}/">{{ c.id | short }}</a></p>
   </li>
 {% endfor %}
 </ol>
+{% endif %}
+{% if body %}
+<h3>From the body text</h3>
+{% for kind, rows in body.items() %}
+<ul class="plain body">
+{% for b in rows %}<li><span class="tag">{{ kind }}</span>{% if b.claim %} <span class="tag">No. {{ b.claim }}</span>{% endif %}
+  <p lang="{{ b.lang }}">{{ b.label }}</p>
+  <p class="cite"><a href="{{ b.link }}" rel="noopener">page {{ b.page }}</a>{% if b.section %} · section {{ b.section }}{% endif %} · <a href="{{ base }}{{ b.id }}/">{{ b.id | short }}</a></p></li>
+{% endfor %}
+</ul>
+{% endfor %}
 {% endif %}
 {% if related %}
 <h3>Related statements</h3>
@@ -34,7 +46,7 @@
 </ul>
 {% endif %}
 {% elif e.type == "concept" %}
-<p class="kind">concept</p>
+<p class="kind">concept{% if e.facet %} · {{ e.facet }}{% endif %}</p>
 <p class="label" lang="{{ e.lang }}">{{ e.label }}</p>
 {% if e.definition %}<p lang="{{ e.lang }}">{{ e.definition }}</p>{% endif %}
 {% if codes %}<p>codes: {% for c in codes %}<code>{{ c }}</code> {% endfor %}</p>{% endif %}
@@ -55,7 +67,7 @@
 </p>
 <p class="label" lang="{{ c.lang }}">{{ c.label }}</p>
 <blockquote lang="{{ c.lang }}">„{{ c.quote }}“</blockquote>
-<p class="cite"><a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a></p>
+<p class="cite"><a href="{{ c.link }}" rel="noopener">{{ c.source | short }}{% if c.page %}, page {{ c.page }}{% endif %}</a>{% if c.section %} · section {{ c.section }}{% endif %}</p>
 {% if c.statements %}
 <h3>Bears on</h3>
 <ul class="plain">

@@ -81,7 +81,8 @@ ephemeral, like everything outside the repository.
 ## Build
 
 `tools/build.py` renders `data/` into a static site — one decision-tree page per view,
-one page and one JSON document per entity, read on a phone first — as designed in
+with a chapter tree that filters it and a search that highlights, one page and one
+JSON document per entity, read on a phone first — as designed in
 `docs/publication.md`. The tree is drawn by Cytoscape.js with the dagre layout,
 vendored under `tools/site/static/vendor/` (MIT, pinned; see its `LICENSES.md`). The command is in [`CLAUDE.md`](CLAUDE.md) under "Build"; run
 it locally and open `site/index.html`. Deployment to GitHub Pages is a workflow, and

@@ -2,4 +2,6 @@ id: concepts/minimalinvasive-gastrointestinale-tumoroperation
 type: concept
 lang: de
 label: Minimalinvasive (MIC-)Operation eines gastrointestinalen Tumors
+short_label: "Minimalinvasive (MIC-)Tumoroperation"
+facet: procedure
 source: modelling

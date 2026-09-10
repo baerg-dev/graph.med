@@ -3,6 +3,7 @@ type: statement
 lang: de
 label: Nach Gastrektomie oder Magenteilresektion soll eine intraoperativ eingelegte Magensonde vor Narkoseausleitung gezogen
   werden.
+short_label: "Magensonde vor Narkoseausleitung ziehen (Magen)"
 slots:
   population: concepts/gastrektomie-oder-magenteilresektion
   action: concepts/magensondenentfernung-vor-narkoseausleitung

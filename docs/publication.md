@@ -2,17 +2,15 @@
 
 > **Status: design, built in part.** The build (`tools/build.py`, `CLAUDE.md`
 > "Build") renders §2–§5 for `selection` views over sources: the URL layout, the
-> graph-and-sheet page, entity pages and JSON, source links. Not built yet, and
-> registered as chunks of the current pass in `data/PROGRESS.yaml`: the chapter
-> tree and the search (§3, "Chapters and search"), short labels in the boxes, the
-> direction legend and the order of the detail section (§3, "What the section
-> shows"), and the grouping of patient groups by `broader` edges. Not built and
-> not registered: the deploy workflow until a person commits it (§6), cuts (§7),
-> pathway views, and everything under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
-> the site is *meant* to be so that the build is written to it, not the other way
-> round. It is the design-level counterpart of
-> `graph-representation.md`: that file says how knowledge is stored; this one says
-> how it is shown.
+> graph-and-sheet page with patient groups folded by family, the chapter tree and
+> the search with facet filters, short labels, direction glyphs, legend and banner,
+> the order of the detail section (§3), entity pages and JSON (§4), source links
+> (§5). Not built and not registered: the deploy workflow until a person commits
+> it (§6), cuts (§7), pathway views, and everything under §8. The domain
+> `graph.med` points at GitHub Pages. This document fixes what the site is *meant*
+> to be so that the build is written to it, not the other way round. It is the
+> design-level counterpart of `graph-representation.md`: that file says how
+> knowledge is stored; this one says how it is shown.
 
 ---
 
@@ -118,13 +116,16 @@ it. Three choices keep the tree readable at ninety recommendations:
   behind it. Tapping an answer or its junction unfolds that group's conditions and
   recommendations; tapping again folds it. Only what the reader opened takes space.
   A deep link unfolds the group its target is in.
-- **Answers in order of weight.** The patient groups with the most recommendations
-  come first, so the general ones lead and the single-use ones trail. A real
-  hierarchy of groups — organ, then procedure — shrinks the fan-out further: once
-  concepts carry `broader` edges (`graph-representation.md` §5), an answer is a
-  family (*Leberresektion*) that unfolds into its members, and the thirty-odd
-  groups become eight to ten. The edge only groups and folds; it never moves a
-  recommendation from a family to a member.
+- **Answers in order of weight, families first.** The patient groups are the
+  population concepts and the families above them (`broader` edges,
+  `graph-representation.md` §5): the first question's answers are the ten roots
+  (*Leberresektion*, *Kolorektale Chirurgie*, …), each with the number of
+  recommendations anywhere below it, heaviest first. Opening a family shows its own
+  recommendations and its member groups, each folded until opened in turn; closing
+  it folds everything below. A recommendation hangs from the group it was made
+  for, never from a family — the edge only groups and folds, it never moves a
+  recommendation from a family to a member, and a group with two parents appears
+  under both.
 
 **Boxes show the short form.** A box shows a statement's `short_label` when it
 has one and its `label` otherwise; the section always shows the full label. The
@@ -165,12 +166,15 @@ kind:
 Once concepts carry a `facet`, the search gets facet filters (only procedures,
 only outcomes). Everything here runs in the browser on the view's JSON.
 
-**Direction, in four words.** The legend shows a recommendation's direction as one
-of *für*, *gegen*, *abwägen*, *Lücke* — derived at build time from the supporting
-claims (`direction: against` → gegen; `kind: gap_notice` → Lücke; the mapping of
-`kann` to *abwägen* is open, `open-questions.md` → direction-legend) — next to the
-grade colours. Timing ("innerhalb von 24 Stunden") is not a direction; it stays in
-the label.
+**Direction, in four words.** A recommendation's direction is one of *für*,
+*gegen*, *abwägen*, *Lücke*, derived at build time from the supporting claims:
+`soll`/`sollte` with `direction: for` → für, with `against` → gegen; `kann` → abwägen,
+because in the AWMF scheme "kann" *is* the open recommendation, the guideline's own
+third category (the banner adds the lean, "eher für" or "eher gegen"); `kind:
+gap_notice` → Lücke; claims that disagree in direction → abwägen; a fact has no
+direction. A glyph before the box label (✓ ✗ ⚖ ∅) and a banner at the top of the
+details carry it; the legend lists the four words next to the grade colours. Timing
+("innerhalb von 24 Stunden") is not a direction; it stays in the label.
 
 **What the section shows.**
 
@@ -256,5 +260,9 @@ cut-publication).
   whether a cut has a PDF export.
 - **Branch guards** — yes/no and value-range branches come with authored pathways
   (`branch` edges carry a `guard`); the derived tree has only slot answers.
+- **The build's own words** — the two questions the build adds, the legend, the
+  counter and the page chrome are English; the maintainer wants the graph in the
+  view's source language and deferred it to a later phase. The four direction
+  words are already German.
 - **Translation** — a build-layer projection, not started.
 - **Other projections** — FHIR, RDF, diagram formats (`graph-representation.md` §13).

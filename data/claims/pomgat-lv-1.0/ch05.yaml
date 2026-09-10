@@ -3,6 +3,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.1'
+  section: "5.1.1"
   label: Im Rahmen abdominalchirurgischer Tumoroperationen soll bei Patienten mit Risikofaktoren eine PONV-Prophylaxe erfolgen.
   grade: A
   verb: soll
@@ -16,6 +17,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.1'
+  section: "5.1.1"
   label: Hierfür sollte eine Kombinationstherapie aus verschiedenen Medikamentenklassen verwendet werden, für die ein hohes
     oder zumindest moderates Vertrauen in die Evidenz besteht.
   grade: B
@@ -29,6 +31,7 @@
   type: claim
   lang: de
   kind: criterion
+  section: "5.1.1"
   label: Risikofaktoren nach Apfel 1999 [93] gelten weibliches Geschlecht, Nichtraucher, PONV oder Reiseübelkeit in der Anamnese
     sowie postoperativer Opioidbedarf; zusätzlich können Inhalationsanästhesie oder abdominalchirurgische Eingriffe auch als
     Risikofaktoren betrachtet werden.
@@ -40,6 +43,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.2'
+  section: "5.1.2"
   label: Im Rahmen abdominalchirurgischer Tumoroperationen sollte eine Propofol-basierte totalintravenöse Anästhesie (TIVA)
     anstelle einer volatilen Anästhesie durchgeführt werden, sofern keine zusätzlichen Antiemetika verabreicht werden.
   grade: B
@@ -54,6 +58,7 @@
   lang: de
   kind: fact
   recommendation_no: '5.2'
+  section: "5.1.2"
   label: Wird hingegen eine volatile Anästhesie durch ein Antiemetikum ergänzt, so ist sie in Bezug auf das PONV-Risiko einer
     TIVA gleich zu setzen.
   consensus: starker_konsens
@@ -65,6 +70,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.3'
+  section: "5.2"
   label: Auf eine präoperative Haarentfernung soll verzichtet werden.
   grade: EK
   verb: soll
@@ -78,6 +84,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.3'
+  section: "5.2"
   label: Bei operationsbedingter Notwendigkeit zur (Teil-) Haarentfernung sollten elektrische Haarschneidemaschinen (Clipper)
     mit Einwegköpfen genutzt werden.
   grade: EK
@@ -92,6 +99,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.3'
+  section: "5.2"
   label: Die präoperative Rasur soll vermieden werden.
   grade: EK
   verb: soll
@@ -105,6 +113,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.4'
+  section: "5.3"
   label: Vor dem Hautschnitt sollte eine Desinfektion mit Chlorhexidin-haltigen alkoholischen Lösungen vorgenommen werden.
   grade: B
   verb: sollte
@@ -118,6 +127,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.4'
+  section: "5.3"
   label: Bei Unverträglichkeit oder Kontraindikationen kann die Verwendung von Povidon-Iod-haltigen Lösungen erwogen werden.
   grade: '0'
   verb: kann
@@ -131,6 +141,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.5'
+  section: "5.4"
   label: Präoperativ (60 Minuten bis kurz vor der Inzision) soll im Rahmen der Resektion gastrointestinaler Tumoren eine intravenöse
     perioperative Antibiotikaprophylaxe (iv PAP) durchgeführt werden.
   grade: EK
@@ -145,6 +156,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.5'
+  section: "5.4"
   label: Die iv PAP soll entsprechend der Halbwertzeit der verwendeten Substanzen oder bei starkem Blutverlust ggf. nochmals
     intraoperativ wiederholt werden.
   grade: EK
@@ -159,6 +171,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.5'
+  section: "5.4"
   label: Postoperativ soll die iv PAP nicht fortgeführt werden.
   grade: EK
   verb: soll
@@ -172,6 +185,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.6'
+  section: "5.5.1"
   label: Sofern eine präoperative Darmvorbereitung vor kolorektalen Operationen durchgeführt wird, sollte diese als kombinierte
     mechanische und oral-antibiotische Darmvorbereitung erfolgen.
   grade: B
@@ -186,6 +200,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.6'
+  section: "5.5.1"
   label: Eine rein mechanische Darmvorbereitung soll nicht durchgeführt werden.
   grade: A
   verb: soll
@@ -199,6 +214,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.7'
+  section: "5.5.1"
   label: Alternativ kann eine rein oral-antibiotische Darmvorbereitung erwogen werden.
   grade: '0'
   verb: kann
@@ -212,6 +228,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.8'
+  section: "5.5.2"
   label: Vor operativen Tumorresektionen des oberen Gastrointestinaltraktes und des Pankreas sollte keine präoperative mechanische
     Darmvorbereitung durchgeführt werden
   grade: EK
@@ -226,6 +243,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.9'
+  section: "5.5.2"
   label: Vor Leberresektion bei hepatozellulären Karzinomen sollte keine präoperative mechanische Darmvorbereitung durchgeführt
     werden
   grade: B
@@ -240,6 +258,7 @@
   lang: de
   kind: gap_notice
   recommendation_no: '5.10'
+  section: "5.5.2"
   label: Aufgrund fehlender Evidenz kann keine Empfehlung für die Verwendung einer oralen antibiotischen Darmvorbereitung
     vor nicht-kolorektalen Eingriffen gegeben werden.
   consensus: starker_konsens
@@ -251,6 +270,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.11'
+  section: "5.6.1"
   label: Eine perioperative selektive Darmdekontamination vor Operationen am oberen Gastrointestinaltrakt kann erwogen werden.
   grade: '0'
   verb: kann
@@ -264,6 +284,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '5.12'
+  section: "5.6.2"
   label: Eine präoperative selektive Darmdekontamination vor kolorektalen Operationen sollte nicht durchgeführt werden.
   grade: B
   verb: sollte
@@ -277,6 +298,7 @@
   lang: de
   kind: gap_notice
   recommendation_no: '5.13'
+  section: "5.6.3"
   label: Aufgrund fehlender Evidenz zur selektiven Darmdekontamination in der hepato-pankreato-biliären onkologischen Chirurgie
     kann keine Empfehlung ausgesprochen werden.
   consensus: starker_konsens

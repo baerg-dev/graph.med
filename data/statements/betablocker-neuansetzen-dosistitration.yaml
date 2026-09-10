@@ -3,6 +3,7 @@ type: statement
 lang: de
 label: Beim präoperativen Neuansetzen einer Betablockade soll ein ausreichender Zeitabstand zur Dosistitration nach Herzfrequenz
   und Blutdruck vor der Operation gewährleistet sein.
+short_label: "Betablocker-Neuansetzen: Zeit zur Dosistitration"
 slots:
   population: concepts/kardiovaskulaerer-hochrisikopatient
   action: concepts/dosistitration-betablocker-praeoperativ

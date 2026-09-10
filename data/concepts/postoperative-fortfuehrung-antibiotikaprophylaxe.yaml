@@ -2,4 +2,6 @@ id: concepts/postoperative-fortfuehrung-antibiotikaprophylaxe
 type: concept
 lang: de
 label: Postoperative Fortführung der Antibiotikaprophylaxe
+short_label: "Postoperative Antibiotikaprophylaxe"
+facet: intervention
 source: modelling

@@ -2,7 +2,10 @@
    recommendation → aim — drawn left to right by Cytoscape.js with the dagre layout
    (self-hosted, see assets/vendor/LICENSES.md). Folded by default: tap an answer to
    unfold that patient group. Tap a box for its details in the section beside or below
-   the graph. Data: the #graph-data JSON written by tools/build.py. */
+   the graph. A chapter tree (from the source's outline and the claims' sections) is a
+   hard filter: only what that section supports is shown. The search is a soft
+   highlight: matches keep their colour, the rest fades (docs/publication.md §3).
+   Data: the #graph-data JSON written by tools/build.py. */
 (function () {
   "use strict";
   var hint = document.getElementById("hint"), sheet = document.getElementById("sheet");
@@ -20,7 +23,8 @@
   var elements = [];
   data.nodes.forEach(function (n) {
     elements.push({ data: { id: n.id, ref: n.ref || "", type: n.type, label: n.label || "", group: n.group || "",
-      fill: n.grade ? css(GRADE[n.grade] || "--line") : css("--bg"), against: n.against ? 1 : 0, contested: n.contested ? 1 : 0 } });
+      fill: n.grade ? css(GRADE[n.grade] || "--line") : css("--bg"), against: n.against ? 1 : 0, contested: n.contested ? 1 : 0,
+      sections: n.sections || [], text: n.text || "", facets: n.facets || [] } });
   });
   data.edges.forEach(function (e, i) {
     elements.push({ data: { id: "e" + i, source: e.from, target: e.to, kind: e.kind, label: e.label || "", ref: e.ref || "" } });
@@ -56,24 +60,58 @@
       { selector: "edge[kind = 'relation']", style: { "line-style": "dotted", "line-color": css("--statement"), "target-arrow-color": css("--statement") } },
       { selector: ".folded", style: { "display": "none" } },
       { selector: ".dim", style: { "opacity": 0.12 } },
+      { selector: ".faded", style: { "opacity": 0.15 } },
       { selector: ".picked", style: { "border-width": 3, "border-color": css("--fg"), "line-color": css("--fg"), "width": 3 } }
     ],
     layout: { name: "preset" }
   });
 
-  /* folding: the root, the first question and its answers are always shown; a patient
-     group's subtree only while its junction is open */
-  var junctions = cy.nodes("[type = 'junction']"), open = {};
-  var always = cy.nodes("[type = 'root'], [type = 'question']").filter(function (n) { return n.id() === "q:population" || n.data("type") === "root"; })
-               .union(junctions).union(junctions.connectedEdges()).union(cy.nodes("[type = 'root']").connectedEdges());
+  /* the chapter filter: the statements supported from a section or its subsections,
+     what leads to them and their aims — nothing else is shown, no edge is computed */
+  var statements = cy.nodes("[type = 'statement']"), junctions = cy.nodes("[type = 'junction']"), open = {}, section = "";
+  function under(sec, s) { return s === sec || s.indexOf(sec + ".") === 0; }
+  function statementsIn(sec) {
+    return sec ? statements.filter(function (n) { return n.data("sections").some(function (s) { return under(sec, s); }); }) : statements;
+  }
+  function scope() {
+    if (!section) return cy.elements();
+    var st = statementsIn(section);
+    var nodes = st.union(st.predecessors().nodes()).union(st.outgoers("edge[kind = 'aim']").targets());
+    return nodes.union(nodes.edgesWith(nodes));
+  }
+  var counts = {};
+  junctions.forEach(function (j) { counts[j.id()] = j.data("label"); });
+
+  /* folding: the root, the first question and its answers — the families — are always
+     shown; an open junction shows what hangs directly from it: its own recommendations
+     (with their conditions and aims) and the junctions of its member groups, each folded
+     until opened in turn */
+  var frame = cy.nodes("[type = 'root'], [type = 'question']").filter(function (n) { return n.id() === "q:population" || n.data("type") === "root"; });
+  var families = junctions.filter(function (j) { return j.incomers("node").intersection(frame).nonempty(); });
+  var always = frame.union(cy.nodes("[type = 'root']").connectedEdges()).union(families).union(families.incomers("edge"));
   function relayout(fitTo) {
-    var shown = always;
-    junctions.forEach(function (j) { if (open[j.id()]) shown = shown.union(j.successors()); });
+    var shown = always, inScope = scope();
+    var done = {}, grew = true;
+    while (grew) {   /* an open junction unfolds only while it is itself shown, so closing a family folds its members too */
+      grew = false;
+      junctions.forEach(function (j) {
+        if (done[j.id()] || !open[j.id()] || !shown.contains(j)) return;
+        done[j.id()] = true; grew = true;
+        var out = j.outgoers();
+        shown = shown.union(out);
+        out.nodes().not("[type = 'junction']").forEach(function (n) { shown = shown.union(n.successors()); });
+      });
+    }
+    shown = shown.intersection(inScope);
     cy.elements().addClass("folded"); shown.removeClass("folded");
-    junctions.forEach(function (j) { j.toggleClass("open", !!open[j.id()]); });
+    junctions.forEach(function (j) {
+      j.toggleClass("open", !!open[j.id()]);
+      j.data("label", section ? String(j.successors("node[type = 'statement']").intersection(inScope).length) : counts[j.id()]);
+    });
     var lay = shown.layout({ name: "dagre", rankDir: "LR", nodeSep: 14, rankSep: 90, edgeSep: 10, align: "UL", animate: true, animationDuration: 250, fit: false });
     lay.one("layoutstop", function () { if (fitTo) cy.animate({ fit: { eles: fitTo.not(".folded"), padding: 30 }, duration: 250 }); });
     lay.run();
+    highlight();
   }
   function toggle(j, force) {
     open[j.id()] = force === undefined ? !open[j.id()] : force;
@@ -120,8 +158,86 @@
     var a = e.target.closest("a.node-link");
     if (a && cy.elements("[ref = '" + a.dataset.node + "']").nonempty()) { e.preventDefault(); open_(a.dataset.node, true); if (window.innerWidth < 900) window.scrollTo({ top: 0, behavior: "smooth" }); }
   });
+
+  /* the chapter tree: every section of the outline with the number of recommendations
+     under it; sections without one are greyed; tapping one filters, "all" clears */
+  var chapters = document.getElementById("chapters"), chaptersToggle = document.getElementById("chapters-toggle");
+  var outline = data.outline || [];
+  function setSection(sec) {
+    section = sec;
+    open = {};
+    if (sec) statementsIn(sec).predecessors("node[type = 'junction']").forEach(function (j) { open[j.id()] = true; });   /* a chapter opens unfolded */
+    chapters.querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", (b.dataset.section || "") === sec); });
+    chaptersToggle.textContent = sec ? "§ " + sec : "§";
+    select(null, null, true);
+    relayout(cy.elements());
+  }
+  if (outline.length) {
+    var byNumber = {};
+    outline.forEach(function (e) { byNumber[e.section] = e; });
+    function item(e) {
+      var n = statementsIn(e.section).length;
+      var b = document.createElement("button"); b.type = "button"; b.dataset.section = e.section;
+      b.innerHTML = '<span class="sec">' + e.section + '</span><span lang="' + (data.lang || "") + '">' + e.title.replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</span><span class="n">' + (n || "") + "</span>";
+      if (!n) { b.classList.add("empty"); b.disabled = true; b.title = "no recommendation extracted from this section"; }
+      return b;
+    }
+    var lists = { "": document.createElement("ul") };
+    var all = document.createElement("button"); all.type = "button"; all.className = "all active"; all.dataset.section = "";
+    all.innerHTML = '<span class="sec">all</span><span>' + statements.length + " recommendations</span>";
+    var li0 = document.createElement("li"); li0.appendChild(all); lists[""].appendChild(li0);
+    outline.forEach(function (e) {
+      var parent = e.section.indexOf(".") >= 0 ? e.section.slice(0, e.section.lastIndexOf(".")) : "";
+      if (!(parent in lists)) parent = "";
+      var li = document.createElement("li"); li.appendChild(item(e));
+      lists[parent].appendChild(li);
+      var ul = document.createElement("ul"); lists[e.section] = ul; li.appendChild(ul);
+    });
+    chapters.appendChild(lists[""]);
+    chapters.querySelectorAll("ul:empty").forEach(function (ul) { ul.remove(); });
+    chapters.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b || b.disabled) return;
+      setSection(b.dataset.section || "");
+      if (window.innerWidth < 900) { chapters.hidden = true; chaptersToggle.setAttribute("aria-expanded", "false"); }
+    });
+    chaptersToggle.addEventListener("click", function () { chapters.hidden = !chapters.hidden; chaptersToggle.setAttribute("aria-expanded", String(!chapters.hidden)); });
+  } else {
+    chaptersToggle.hidden = true;
+  }
+
+  /* the search: a soft highlight — matches keep their colour, everything else fades but
+     stays; groups holding a match unfold; the counter reads "n matches in m sections" */
+  var search = document.getElementById("search"), count = document.getElementById("count"), facetSel = document.getElementById("facet"), query = "", facet = "";
+  (data.facets || []).forEach(function (f) { var o = document.createElement("option"); o.value = f; o.textContent = f.replace("_", " "); facetSel.appendChild(o); });
+  facetSel.hidden = !(data.facets || []).length;
+  function matches() {   /* the search text and the facet filter compose; either alone is a query */
+    if (!query && !facet) return cy.collection();
+    return scope().nodes().filter(function (n) {
+      return n.data("text") && (!query || n.data("text").indexOf(query) >= 0) && (!facet || n.data("facets").indexOf(facet) >= 0);
+    });
+  }
+  function highlight() {
+    cy.elements().removeClass("faded");
+    if (!query && !facet) { count.hidden = true; return; }
+    var m = matches().not(".folded");
+    cy.elements().not(".folded").not(m).not(m.connectedEdges()).not("node[type = 'root'], node[type = 'question']").addClass("faded");   /* the frame stays for orientation */
+    var st = m.filter("[type = 'statement']").union(m.not("[type = 'statement']").neighborhood("node[type = 'statement']")), secs = {};
+    st.forEach(function (n) { n.data("sections").forEach(function (s) { secs[s] = 1; }); });
+    var n = m.length, k = Object.keys(secs).length;
+    count.textContent = n + (n === 1 ? " match" : " matches") + " in " + k + (k === 1 ? " section" : " sections");
+    count.hidden = false;
+  }
+  function research() {
+    query = search.value.trim().toLowerCase(); facet = facetSel.value;
+    var m = matches(), changed = false;
+    m.predecessors("node[type = 'junction']").forEach(function (j) { if (!open[j.id()]) { open[j.id()] = true; changed = true; } });
+    if (changed) relayout(m.union(m.predecessors())); else highlight();
+  }
+  search.addEventListener("input", research);
+  facetSel.addEventListener("change", research);
+
   window.addEventListener("hashchange", function () { open_(decodeURIComponent(location.hash.slice(1)), false); });
   cy.ready(function () { open_(decodeURIComponent(location.hash.slice(1)), false); });
-  window.graphmed = { cy: cy, open: open_, toggle: toggle, isOpen: function (id) { return !!open[id]; } };   /* for the console and tests */
+  window.graphmed = { cy: cy, open: open_, toggle: toggle, isOpen: function (id) { return !!open[id]; }, section: setSection, search: function (q, f) { search.value = q; if (f !== undefined) facetSel.value = f; search.dispatchEvent(new Event("input")); } };   /* for the console and tests */
   }
 })();

@@ -18,7 +18,7 @@
 sources:
   pomgat-lv-1.0:
     entity: sources/pomgat-lv-1.0
-    status: in_progress      # in_progress | done
+    status: done             # in_progress | done — pass 2 complete; a later pass is a human decision (header)
     pass: 2
     chunking: pass 1 filed claims and edges by chapter (below); pass 2 is organised by task
     scope_policy: >
@@ -72,7 +72,16 @@ sources:
       - id: outline
         kind: extraction
         pages: 1-130
-        status: pending
+        status: done
+        note: >
+          Outline of 100 sections from pp. 2–5, every heading verified on its
+          physical page. Sections assigned by the quote's position relative to
+          the headings on its page; box headers ("7.1 Konsensbasierte
+          Empfehlung") and running page headers look like headings, so a
+          heading counts only when its title follows the number. 4.1 and
+          7.3.2 hold boxes directly, above their first subsection. In chapters
+          4–9 only 5.7 (no box) has no claim; chapters 1–3 and 10–12 are front
+          and back matter.
         depends: [schema-0.4]
         does: >
           Write the complete outline of POMGAT onto sources/pomgat-lv-1.0 from
@@ -85,7 +94,13 @@ sources:
           coverage (sections without a claim) in the PR.
       - id: site-chapters-search
         kind: build
-        status: pending
+        status: done
+        note: >
+          Chapter tree as an overlay panel (§ button), search box top left;
+          both client-side on the view JSON, which now carries the outline
+          and each statement's sections and search text. Facet filters wait
+          for facets. Checked headless (Cytoscape in Node with a stubbed DOM),
+          not in a browser — no browser is installable in the sandbox.
         depends: [outline]
         does: >
           publication.md §3 "Chapters and search": a chapter tree beside the
@@ -94,7 +109,13 @@ sources:
           counts "n matches in m sections". No data change.
       - id: short-labels-a
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Limit settled at 60 (schema), target 55. Concepts got a short label
+          above ~45 characters. Direction words kept ("Keine …", "… erwägbar"
+          for kann); the organ or procedure in parentheses where siblings
+          share a question. Two ICG statements in different groups were still
+          told apart (Anastomose / Magenschlauch).
         depends: [schema-0.4]
         does: >
           short_label for every statement of ch04, ch05 and ch06 and for the
@@ -105,20 +126,38 @@ sources:
           commit, first), and settle open-questions → short-label-limit.
       - id: short-labels-b
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Same rules as short-labels-a. The six nasogastric-tube statements
+          read "Magensonde … (kolorektal | Leber | Magen | Whipple |
+          Ösophagektomie)". Every statement now has a short label; 62
+          concepts do.
         depends: [short-labels-a]
         does: >
           The same for ch07a, ch07b, ch07c, ch08 and ch09 and their concepts.
       - id: facets
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Rule applied: medication when the concept names a substance, a
+          substance class or an ongoing drug therapy; intervention when it is
+          a measure even if drugs are involved (Antibiotikaprophylaxe,
+          Darmvorbereitung, PONV-Prophylaxe, anaesthesia techniques);
+          procedure for resections and operative situations including
+          anastomoses; finding for a circumstance that triggers a decision.
         depends: [schema-0.4]
         does: >
           facet on every concept, exactly one; no concept left unclassified.
           Name the borderline cases (procedure versus intervention) in the PR.
       - id: site-labels-panel
         kind: build
-        status: pending
+        status: done
+        note: >
+          Direction derived in build.py (direction_of) and settled in the
+          memory direction-legend. Boxes carry a glyph plus the short label;
+          the facet select composes with the search; body-text claims are
+          grouped under the statement's evidence. Chrome words stay English
+          except the four direction words. Checked headless, not in a browser.
         depends: [short-labels-b, facets]
         does: >
           Boxes and edge answers show short_label with fallback to label; the
@@ -129,7 +168,14 @@ sources:
           limits; facet filters next to the search.
       - id: broader-edges
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Ten roots over the 36 patient groups; three concept levels at most;
+          one concept with two parents. Organ families are not under the
+          general GI tumour operation (benign indications exist); the generic
+          chapter 4–5 populations are, with the guideline's scope as rationale.
+          Seven intervention concepts got a parent that already existed;
+          drainages, disinfectants and nasogastric-tube variants have none.
         depends: [facets]
         does: >
           Mint the family concepts (candidates: Ösophagus, Magen, Pankreas,
@@ -140,13 +186,18 @@ sources:
           open-questions → concept-hierarchy-depth.
       - id: site-hierarchy
         kind: build
-        status: pending
+        status: done
+        note: >
+          A junction per concept of the population hierarchy, families as the
+          first question's answers, folded level by level; the view's members
+          include the families above any slot concept. Checked headless, not
+          in a browser. Last chunk of pass 2.
         depends: [broader-edges]
         does: >
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: outline
+    next: null               # pass 2 complete
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,

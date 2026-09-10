@@ -2,4 +2,6 @@ id: concepts/mpom
 type: concept
 lang: de
 label: Multimodales perioperatives Managementkonzept (mPOM)
+short_label: "mPOM"
+facet: intervention
 source: modelling

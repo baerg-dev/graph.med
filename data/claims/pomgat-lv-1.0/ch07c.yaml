@@ -3,6 +3,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.25'
+  section: "7.4.2.1"
   label: Koffeinierter Kaffee (bis zu 3x150 ml) kann nach abdominalchirurgischen Operationen den Patienten angeboten werden.
   grade: EK
   verb: kann
@@ -16,6 +17,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.25'
+  section: "7.4.2.1"
   label: Der Kaffee-Konsum kann bereits im Aufwachraum begonnen werden.
   grade: EK
   verb: kann
@@ -29,6 +31,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.26'
+  section: "7.4.2.2"
   label: Nach kolorektalen Resektionen sollten die Patienten in den ersten fünf postoperativen Tagen 3-4 x für 10-15 min Kaugummi
     kauen.
   grade: EK
@@ -43,6 +46,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.27'
+  section: "7.4.2.2"
   label: Nach offenen Leberresektionen kann den Patienten Kaugummi angeboten werden.
   grade: EK
   verb: kann
@@ -56,6 +60,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.28'
+  section: "7.4.2.3"
   label: Akupunktur kann nach abdominalchirurgischen Eingriffen angewendet werden.
   grade: EK
   verb: kann
@@ -69,6 +74,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.28'
+  section: "7.4.2.3"
   label: Hierfür sollten die Akupunkturpunkte ZuSanLi und ShangJuXu als eine gering invasive und nebenwirkungsarme Option
     genutzt werden.
   grade: EK
@@ -83,6 +89,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.29'
+  section: "7.5"
   label: Patienten sollen postoperativ frühmobilisiert werden.
   grade: EK
   verb: soll
@@ -96,6 +103,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.30'
+  section: "7.6"
   label: Nach abdominellen und thorakalen Eingriffen kann auf eine Atemtherapie in Form einer Incentive-Spirometrie als alleinige
     Maßnahme zur Vermeidung postoperativer pulmonaler Komplikationen verzichtet werden.
   grade: '0'
@@ -110,6 +118,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.31'
+  section: "7.7"
   label: Nach medianer Laparotomie kann eine Bauchbinde zur Schmerzreduktion angelegt werden.
   grade: '0'
   verb: kann

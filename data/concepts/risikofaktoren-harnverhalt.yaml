@@ -2,4 +2,6 @@ id: concepts/risikofaktoren-harnverhalt
 type: concept
 lang: de
 label: Risikofaktoren für einen postoperativen Harnverhalt (männliches Geschlecht, tiefe anteriore Rektumresektion, Rektumexstirpation)
+short_label: "Risikofaktoren für Harnverhalt"
+facet: patient_state
 source: modelling

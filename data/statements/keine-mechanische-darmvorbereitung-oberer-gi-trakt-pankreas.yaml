@@ -3,6 +3,7 @@ type: statement
 lang: de
 label: Vor operativen Tumorresektionen des oberen Gastrointestinaltraktes und des Pankreas sollte keine präoperative mechanische
   Darmvorbereitung durchgeführt werden.
+short_label: "Keine mechanische Darmvorbereitung (oberer GI, Pankreas)"
 slots:
   population: concepts/tumorresektion-oberer-gi-trakt-und-pankreas
   action: concepts/mechanische-darmvorbereitung

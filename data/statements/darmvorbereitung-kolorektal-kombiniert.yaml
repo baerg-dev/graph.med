@@ -3,6 +3,7 @@ type: statement
 lang: de
 label: Wird vor kolorektalen Operationen eine präoperative Darmvorbereitung durchgeführt, sollte sie als kombinierte mechanische
   und oral-antibiotische Darmvorbereitung erfolgen.
+short_label: "Wenn Darmvorbereitung: mechanisch + oral-antibiotisch"
 slots:
   population: concepts/kolorektale-resektion
   action: concepts/kombinierte-mechanische-oral-antibiotische-darmvorbereitung

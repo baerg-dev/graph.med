@@ -2,4 +2,6 @@ id: concepts/operationsbedingte-notwendigkeit-haarentfernung
 type: concept
 lang: de
 label: Operationsbedingte Notwendigkeit zur (Teil-)Haarentfernung
+short_label: "Haarentfernung operativ nötig"
+facet: finding
 source: modelling

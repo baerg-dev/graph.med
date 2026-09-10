@@ -3,6 +3,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.1'
+  section: "7.1.1"
   label: Nach transthorakaler Ösophagektomie und gastraler Rekonstruktion sollte zur Dekompression des hochgezogenen Magens
     intraoperativ eine doppellumige Magensonde eingelegt werden.
   grade: EK
@@ -17,6 +18,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.2'
+  section: "7.1.1"
   label: Die nasogastrale Magensonde kann im frühen postoperativen Verlauf innerhalb der ersten 48 Stunden entfernt werden.
   grade: EK
   verb: kann
@@ -30,6 +32,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.3'
+  section: "7.1.2"
   label: Nach Gastrektomie oder Magenteilresektion soll eine intraoperativ eingelegte Magensonde vor Narkoseausleitung gezogen
     werden.
   grade: A
@@ -44,6 +47,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.4'
+  section: "7.1.3"
   label: Nach Pankreaskopfresektion als klassische Whipple-OP kann die nasogastralen Sonde am Ende der OP gezogen werden.
   grade: EK
   verb: kann
@@ -57,6 +61,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.5'
+  section: "7.1.4"
   label: Bei elektiven Leberresektionen soll eine intraoperativ eingelegte Magensonde vor Narkoseausleitung gezogen werden.
   grade: A
   verb: soll
@@ -70,6 +75,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.6'
+  section: "7.1.5"
   label: Bei elektiven kolorektalen Eingriffen soll eine nasogastrale Sonde vor Narkoseausleitung gezogen werden.
   grade: EK
   verb: soll
@@ -83,6 +89,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.7'
+  section: "7.2"
   label: Der transurethrale Dauerkatheter soll bei kolorektalen Resektionen innerhalb der ersten 24 Stunden entfernt werden.
   grade: EK
   verb: soll
@@ -96,6 +103,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.7'
+  section: "7.2"
   label: Bei Risikofaktoren für einen Harnverhalt (männliches Geschlecht, tiefe anteriore Rektumresektion, Rektumexstirpation)
     kann eine verlängerte Ableitung bis zum 3. postoperativen Tag erfolgen.
   grade: EK
@@ -110,6 +118,7 @@
   lang: de
   kind: gap_notice
   recommendation_no: '7.8'
+  section: "7.2"
   label: Zum Harnableitungs-Management bei nicht-kolorektalen Resektionen sowie zur Anlage einer suprapubischen Harnableitung
     kann mangels ausreichender Evidenz keine Empfehlung ausgesprochen werden.
   grade: EK
@@ -122,6 +131,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.9'
+  section: "7.3.1"
   label: Eine kontinuierliche Epiduralanalgesie sollte intra- und postoperativ zur perioperativen Analgesie bei offenen viszeralchirurgischen,
     onkologischen Eingriff eingesetzt werden.
   grade: B
@@ -136,6 +146,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.10'
+  section: "7.3.1"
   label: Bei MIC-Eingriffen kann dann eine Epiduralanalgesie eingesetzt werden, wenn deren Einsatz aufgrund von Risiko-Konstellationen
     (lange OP-Zeiten, zu erwartender hoher postoperativer Opioidverbrauch) Erfolg verspricht.
   grade: EK
@@ -150,6 +161,7 @@
   lang: de
   kind: fact
   recommendation_no: '7.11'
+  section: "7.3.2"
   label: Im Vergleich zu peripheren Regionalanalgesieverfahren ist die Epiduralanalgesie bei viszeralchirurgischen, onkologischen
     Eingriffen - nicht stratifiziert nach Organsystemen und unabhängig vom OP-Zugang - überlegen.
   consensus: konsens
@@ -161,6 +173,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.12'
+  section: "7.3.2.1"
   label: Bei minimalinvasiven Kolonresektionen oder (tiefen) anterioren Rektumresektionen kann zur perioperativen Analgesie
     ein TAP-Block (Transversus abdominis plane block) als Alternative zur EA verwendet werden.
   grade: '0'
@@ -174,6 +187,7 @@
   type: claim
   lang: de
   kind: criterion
+  section: "7.3.2.1"
   label: 'In Anbetracht der gleichwertigen analgetischen Wirkung und der deutlichen Verringerung der EA-assoziierten Nebenwirkungen
     kann daher bei minimalinvasiven kolorektalen Eingriffen (Ausnahme: Rektumexstirpationen) eine TAP-Blockade mit kontinuierlicher
     Applikation eines Lokalanästhetikums verwendet werden.'
@@ -185,6 +199,7 @@
   lang: de
   kind: recommendation
   recommendation_no: '7.13'
+  section: "7.3.3"
   label: Ein peripheres Regionalanalgesieverfahren kann zur perioperativen Analgesie bei onkologisch-viszeralchirurgischen
     Eingriffen eingesetzt werden.
   grade: '0'
