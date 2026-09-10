@@ -46,7 +46,12 @@ sources:
     chunks:
       - id: schema-0.4
         kind: schema
-        status: pending
+        status: done
+        note: >
+          Schema 0.4.0 as specified; the validator checks section against the
+          outline and rejects broader cycles. The section filter form is an
+          example in x-view-filters only — the build does not evaluate it yet
+          (site-chapters-search).
         does: >
           Bump schema/schema.yaml to 0.4.0 and teach tools/validate.py the new
           checks. claim.section (string, x-provenance required like
@@ -141,7 +146,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: schema-0.4
+    next: outline
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,
