@@ -100,8 +100,10 @@ decision-graph-derivation):
   junction, so the tree shows at a glance what the guideline says for, say,
   colorectal resection. A condition is asked within its group.
 - **Forms tell the types apart, colour tells the grade.** Diamond, box, tag for
-  question, recommendation, aim; the answers are bold edge labels, the aim a dashed
-  edge; the grade colours are the guideline's own scale. Legend under the graph.
+  question, recommendation, aim; the answers are bold edge labels written at the end
+  of their edge, beside the group or box they lead to, so that many answers from one
+  question do not pile up mid-edge; the aim a dashed edge; the grade colours are the
+  guideline's own scale. Legend under the graph.
   Claims are not nodes; they are the evidence and appear in the section.
 
 **Drawn by a library, left to right, folded.** The page uses Cytoscape.js with the
@@ -227,6 +229,14 @@ recorded on the source entity, is shown on its page and on every view drawn from
 ---
 
 ## 6. The build
+
+**Design guidance for the site.** An agent changing the site's look — the
+stylesheet, the templates, the drawing — works with the `frontend-design` plugin,
+enabled for every session in this repository by `.claude/settings.json`. It informs
+choices *within* what this document and the decision-tree memory fix (the one
+tree, the node forms, the grade colours, folding by family, answers on the edges);
+it never licenses a restyle of those. Before a build change is proposed, the page
+is looked at in a browser (the `screenshot` skill), on a desktop and on a phone.
 
 The build is a script in the repository, `tools/build.py`, run with `uv` like the
 validator. It reads `data/` and `schema/schema.yaml`, writes a `site/` directory

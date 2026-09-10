@@ -97,3 +97,10 @@ blockquote { margin: .3rem 0; padding-left: .7rem; border-left: 3px solid var(--
 .banner.dir-Lücke { background: var(--line); }
 ul.body li p { margin: .2rem 0; }
 .tools select { height: 44px; padding: 0 .6rem; border: 1px solid var(--line); border-radius: 22px; background: var(--bg); color: var(--fg); font: inherit; font-size: .9rem; max-width: 9rem; }
+
+/* narrow screens: the controls share one row and the counter wraps under them */
+@media (max-width: 520px) {
+  .tools.left { flex-wrap: wrap; max-width: calc(100% - 4.6rem); }
+  .tools input[type=search] { max-width: 34vw; }
+  .tools select { max-width: 6.6rem; }
+}

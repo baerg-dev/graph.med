@@ -20,14 +20,20 @@
   if (typeof cytoscape !== "function") throw new Error("library missing");
   if (typeof cytoscapeDagre === "function") cytoscape.use(cytoscapeDagre);
 
-  var elements = [];
+  var elements = [], types = {};
+  data.nodes.forEach(function (n) { types[n.id] = n.type; });
   data.nodes.forEach(function (n) {
     elements.push({ data: { id: n.id, ref: n.ref || "", type: n.type, label: n.label || "", group: n.group || "",
       fill: n.grade ? css(GRADE[n.grade] || "--line") : css("--bg"), against: n.against ? 1 : 0, contested: n.contested ? 1 : 0,
       sections: n.sections || [], text: n.text || "", facets: n.facets || [] } });
   });
   data.edges.forEach(function (e, i) {
-    elements.push({ data: { id: "e" + i, source: e.from, target: e.to, kind: e.kind, label: e.label || "", ref: e.ref || "" } });
+    /* an answer is written at the end of its edge, beside the group or box it leads to, so that
+       ten answers fanning out of one question do not pile up at the edges' midpoints; the margin
+       moves the label's centre left of the target by half the label plus the target's half width */
+    var width = Math.min(170, 6.2 * (e.label || "").length), half = types[e.to] === "junction" ? 24 : 130;
+    elements.push({ data: { id: "e" + i, source: e.from, target: e.to, kind: e.kind, label: e.label || "", ref: e.ref || "",
+      lm: -(width / 2 + half) } });
   });
 
   var cy = cytoscape({
@@ -55,13 +61,19 @@
           "target-arrow-shape": "triangle", "target-arrow-color": css("--edge"), "arrow-scale": 0.9,
           "label": "data(label)", "font-size": 11, "color": css("--fg"), "text-wrap": "wrap", "text-max-width": 170,
           "text-background-color": css("--bg"), "text-background-opacity": 1, "text-background-padding": 3, "text-background-shape": "round-rectangle" } },
-      { selector: "edge[kind = 'answer']", style: { "line-color": css("--fg"), "target-arrow-color": css("--fg"), "font-weight": 600 } },
+      /* answers fan out of one question orthogonally — a short trunk, then a horizontal run into each
+         group or box — so that an answer, written on its own run, is crossed by no other edge */
+      { selector: "edge[kind = 'answer']", style: { "line-color": css("--fg"), "target-arrow-color": css("--fg"), "font-weight": 600,
+          "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": 24, "taxi-turn-min-distance": 8,
+          "label": "", "target-label": "data(label)", "target-text-offset": 0, "target-text-margin-x": "data(lm)", "target-text-rotation": "none" } },
+      { selector: "edge[kind = 'flow']", style: { "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": 24, "taxi-turn-min-distance": 8 } },
       { selector: "edge[kind = 'aim']", style: { "line-style": "dashed", "target-arrow-shape": "none" } },
       { selector: "edge[kind = 'relation']", style: { "line-style": "dotted", "line-color": css("--statement"), "target-arrow-color": css("--statement") } },
       { selector: ".folded", style: { "display": "none" } },
       { selector: ".dim", style: { "opacity": 0.12 } },
       { selector: ".faded", style: { "opacity": 0.15 } },
-      { selector: ".picked", style: { "border-width": 3, "border-color": css("--fg"), "line-color": css("--fg"), "width": 3 } }
+      { selector: "node.picked", style: { "border-width": 3, "border-color": css("--fg") } },
+      { selector: "edge.picked", style: { "line-color": css("--fg"), "width": 3 } }
     ],
     layout: { name: "preset" }
   });
@@ -108,7 +120,11 @@
       j.toggleClass("open", !!open[j.id()]);
       j.data("label", section ? String(j.successors("node[type = 'statement']").intersection(inScope).length) : counts[j.id()]);
     });
-    var lay = shown.layout({ name: "dagre", rankDir: "LR", nodeSep: 14, rankSep: 90, edgeSep: 10, align: "UL", animate: true, animationDuration: 250, fit: false });
+    /* nodes just unfolded were display:none a moment ago, so their label-derived heights are not
+       computed yet and dagre would stack them; measuring their bounding boxes first fills them in */
+    shown.nodes().forEach(function (n) { n.boundingBox({ includeLabels: true }); });
+    var lay = shown.layout({ name: "dagre", rankDir: "LR", nodeSep: 18, rankSep: 230, edgeSep: 10, align: "UL", nodeDimensionsIncludeLabels: true,
+                             animate: true, animationDuration: 250, fit: false });
     lay.one("layoutstop", function () { if (fitTo) cy.animate({ fit: { eles: fitTo.not(".folded"), padding: 30 }, duration: 250 }); });
     lay.run();
     highlight();
