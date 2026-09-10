@@ -82,13 +82,26 @@
   var counts = {};
   junctions.forEach(function (j) { counts[j.id()] = j.data("label"); });
 
-  /* folding: the root, the first question and its answers are always shown; a patient
-     group's subtree only while its junction is open */
-  var always = cy.nodes("[type = 'root'], [type = 'question']").filter(function (n) { return n.id() === "q:population" || n.data("type") === "root"; })
-               .union(junctions).union(junctions.connectedEdges()).union(cy.nodes("[type = 'root']").connectedEdges());
+  /* folding: the root, the first question and its answers — the families — are always
+     shown; an open junction shows what hangs directly from it: its own recommendations
+     (with their conditions and aims) and the junctions of its member groups, each folded
+     until opened in turn */
+  var frame = cy.nodes("[type = 'root'], [type = 'question']").filter(function (n) { return n.id() === "q:population" || n.data("type") === "root"; });
+  var families = junctions.filter(function (j) { return j.incomers("node").intersection(frame).nonempty(); });
+  var always = frame.union(cy.nodes("[type = 'root']").connectedEdges()).union(families).union(families.incomers("edge"));
   function relayout(fitTo) {
     var shown = always, inScope = scope();
-    junctions.forEach(function (j) { if (open[j.id()]) shown = shown.union(j.successors()); });
+    var done = {}, grew = true;
+    while (grew) {   /* an open junction unfolds only while it is itself shown, so closing a family folds its members too */
+      grew = false;
+      junctions.forEach(function (j) {
+        if (done[j.id()] || !open[j.id()] || !shown.contains(j)) return;
+        done[j.id()] = true; grew = true;
+        var out = j.outgoers();
+        shown = shown.union(out);
+        out.nodes().not("[type = 'junction']").forEach(function (n) { shown = shown.union(n.successors()); });
+      });
+    }
     shown = shown.intersection(inScope);
     cy.elements().addClass("folded"); shown.removeClass("folded");
     junctions.forEach(function (j) {

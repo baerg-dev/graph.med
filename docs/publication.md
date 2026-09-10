@@ -5,9 +5,8 @@
 > graph-and-sheet page, entity pages and JSON, source links, the chapter tree and
 > the search with facet filters (§3, "Chapters and search"), short labels in the
 > boxes, the direction glyphs, legend and banner, and the order of the detail
-> section (§3, "What the section shows"). Not built yet, and registered as a chunk
-> of the current pass in `data/PROGRESS.yaml`: the grouping of patient groups by
-> `broader` edges. Not built and
+> section (§3, "What the section shows"), and the grouping of patient groups by
+> `broader` edges, folded level by level. Not built and
 > not registered: the deploy workflow until a person commits it (§6), cuts (§7),
 > pathway views, and everything under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
 > the site is *meant* to be so that the build is written to it, not the other way
@@ -119,13 +118,16 @@ it. Three choices keep the tree readable at ninety recommendations:
   behind it. Tapping an answer or its junction unfolds that group's conditions and
   recommendations; tapping again folds it. Only what the reader opened takes space.
   A deep link unfolds the group its target is in.
-- **Answers in order of weight.** The patient groups with the most recommendations
-  come first, so the general ones lead and the single-use ones trail. A real
-  hierarchy of groups — organ, then procedure — shrinks the fan-out further: once
-  concepts carry `broader` edges (`graph-representation.md` §5), an answer is a
-  family (*Leberresektion*) that unfolds into its members, and the thirty-odd
-  groups become eight to ten. The edge only groups and folds; it never moves a
-  recommendation from a family to a member.
+- **Answers in order of weight, families first.** The patient groups are the
+  population concepts and the families above them (`broader` edges,
+  `graph-representation.md` §5): the first question's answers are the ten roots
+  (*Leberresektion*, *Kolorektale Chirurgie*, …), each with the number of
+  recommendations anywhere below it, heaviest first. Opening a family shows its own
+  recommendations and its member groups, each folded until opened in turn; closing
+  it folds everything below. A recommendation hangs from the group it was made
+  for, never from a family — the edge only groups and folds, it never moves a
+  recommendation from a family to a member, and a group with two parents appears
+  under both.
 
 **Boxes show the short form.** A box shows a statement's `short_label` when it
 has one and its `label` otherwise; the section always shows the full label. The

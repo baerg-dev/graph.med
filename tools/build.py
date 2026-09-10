@@ -161,14 +161,22 @@ def members_of(view: dict, pool: Pool) -> dict[str, dict]:
                 cid = (ent.get("slots") or {}).get(slot)
                 if cid in pool.entities:
                     members[cid] = pool.entities[cid]
+    queue = [m["id"] for m in members.values() if m.get("type") == "concept"]   # and the families above them (spec §5 broader)
+    while queue:
+        for kind, to, _ in pool.out.get(queue.pop(), []):
+            if kind == "broader" and to in pool.entities and to not in members:
+                members[to] = pool.entities[to]
+                queue.append(to)
     return members
 
 
 def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     """One decision tree for the whole view, derived from the statements' slots
     (docs/publication.md §3). The question nodes are ours; every answer on an edge and
-    every box is a slot value or a claim's grade. Answers are ordered by how many
-    recommendations they lead to. Layout and folding happen in the browser (dagre)."""
+    every box is a slot value or a claim's grade. Patient groups are the population
+    concepts and the families above them (`broader`), answers ordered by how many
+    recommendations they lead to; a recommendation hangs from the group it was made for,
+    never from a family. Layout and folding happen in the browser (dagre)."""
     nodes: list[dict] = []
     edges: list[dict] = []
     seen: set = set()
@@ -190,10 +198,38 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     edge(root, q0, "flow")
     statements = sorted((m for m in members.values() if m["type"] == "statement"),
                         key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")) + [s["id"]])
-    per_group: dict = defaultdict(int)
+    own: dict = defaultdict(list)          # statements whose population is exactly this concept
     for st in statements:
-        per_group[(st.get("slots") or {}).get("population")] += 1
-    statements.sort(key=lambda s: (-per_group[(s.get("slots") or {}).get("population")], label((s.get("slots") or {}).get("population") or ""),
+        own[(st.get("slots") or {}).get("population")].append(st)
+    # the patient-group hierarchy: every population concept and every family above it (spec §5 broader);
+    # a junction per concept, its count the recommendations anywhere below it, families first by weight
+    concepts = set(own) & set(members)
+    children: dict = defaultdict(list)
+    stack = list(concepts)
+    while stack:
+        c = stack.pop()
+        for kind, to, _ in pool.out.get(c, []):
+            if kind == "broader" and to in members:
+                children[to].append(c)
+                if to not in concepts:
+                    concepts.add(to); stack.append(to)
+    parents = {c for cs in children.values() for c in cs}
+    def below(c, seen=()):
+        if c in seen:
+            return set()
+        return {st["id"] for st in own.get(c, [])} | {sid for k in children.get(c, []) for sid in below(k, seen + (c,))}
+    weight = {c: len(below(c)) for c in concepts}
+    def junction(c, parent):
+        j = f"j:{c}"
+        if j not in seen:
+            add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [],
+                text=" ".join(filter(None, [label(c), members[c].get("short_label")])).lower())
+        edge(parent, j, "answer", short(c), ref=c)
+        for k in sorted(children.get(c, []), key=lambda k: (-weight[k], short(k))):
+            junction(k, j)
+    for c in sorted(concepts - parents, key=lambda c: (-weight[c], short(c))):
+        junction(c, q0)
+    statements.sort(key=lambda s: (-weight.get((s.get("slots") or {}).get("population"), 0), label((s.get("slots") or {}).get("population") or ""),
                                    natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")), s["id"]))
     for st in statements:
         slots = st.get("slots") or {}
@@ -212,14 +248,7 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
                   # what the search matches: the statement, its short form, its slot concepts, its claims (spec §6.7)
                   text=" ".join(filter(None, [st["label"], st.get("short_label")] + [label(c) for c in slots.values() if c in members]
                                               + [c.get("label") for c in claims])).lower())
-        at = q0
-        if pop in members:   # the answer sits on the edge; a junction fans out into what follows
-            j = f"j:{pop}"
-            if j not in seen:
-                add(j, ref=pop, type="junction", label=str(per_group[pop]), lang=members[pop]["lang"], group=short(pop), facets=[facet(pop)] if facet(pop) else [],
-                    text=" ".join(filter(None, [label(pop), members[pop].get("short_label")])).lower())
-                edge(q0, j, "answer", short(pop), ref=pop)
-            at = j
+        at = f"j:{pop}" if pop in members else q0   # the statement hangs from its own group's junction, never from a family's
         if cond in members:  # a further question, asked within the patient group
             q = f"q:{at}"
             if q not in seen:
