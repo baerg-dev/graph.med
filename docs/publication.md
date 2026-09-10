@@ -76,10 +76,10 @@ decision-graph-derivation):
    ┌─────────────────────┐
    │ the guideline       │                       root
    └─────────┬───────────┘
-        ◇ Which patient group?                   question (ours)
+        ◇ Welche Population?                     question (ours, source language)
        ╱ Gastrektomie ╲ Kolorektale Resektion …  answers on the edges (population slot)
       ●                ●                          junction per group
-      │                ├──── ◇ Which condition?  question (ours)
+      │                ├──── ◇ Welche Bedingung? question (ours)
       │                │       ╲ Amylase < …     answer on the edge (condition slot)
    ┌──┴────────┐   ┌───┴───────┐ ┌───┴───────┐
    │ recommend.│   │ recommend.│ │ recommend.│    the statements — boxes coloured by
@@ -88,8 +88,10 @@ decision-graph-derivation):
          ▷ aim                                    outcome slot
 ```
 
-- **The questions are ours; every answer is data.** "Which patient group?" and
-  "Which condition?" are the only text the build adds. Each answer on an edge is a
+- **The questions are ours; every answer is data.** "Welche Population?" and
+  "Welche Bedingung?" are the only text the build adds, in the view's source
+  language (a language the build has no words for fails the build; nothing falls
+  back to English). Each answer on an edge is a
   population or condition concept; each box is a statement with its claims' grade;
   each aim an outcome concept. Nothing else is invented — in particular no yes/no
   branches and no ordering between conditions, which is what authored pathways will
@@ -260,9 +262,9 @@ cut-publication).
   whether a cut has a PDF export.
 - **Branch guards** — yes/no and value-range branches come with authored pathways
   (`branch` edges carry a `guard`); the derived tree has only slot answers.
-- **The build's own words** — the two questions the build adds, the legend, the
-  counter and the page chrome are English; the maintainer wants the graph in the
-  view's source language and deferred it to a later phase. The four direction
-  words are already German.
+- **The build's own words outside the graph** — the legend, the counter, the
+  chapter panel's "all" and the page chrome are English; the questions and the
+  direction words inside the graph are in the source language. The maintainer
+  deferred the rest to a later phase.
 - **Translation** — a build-layer projection, not started.
 - **Other projections** — FHIR, RDF, diagram formats (`graph-representation.md` §13).
