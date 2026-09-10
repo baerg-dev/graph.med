@@ -94,7 +94,13 @@ sources:
           coverage (sections without a claim) in the PR.
       - id: site-chapters-search
         kind: build
-        status: pending
+        status: done
+        note: >
+          Chapter tree as an overlay panel (§ button), search box top left;
+          both client-side on the view JSON, which now carries the outline
+          and each statement's sections and search text. Facet filters wait
+          for facets. Checked headless (Cytoscape in Node with a stubbed DOM),
+          not in a browser — no browser is installable in the sandbox.
         depends: [outline]
         does: >
           publication.md §3 "Chapters and search": a chapter tree beside the
@@ -155,7 +161,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: site-chapters-search
+    next: short-labels-a
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,
