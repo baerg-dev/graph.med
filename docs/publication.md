@@ -184,7 +184,10 @@ details carry it; the legend lists the four words next to the grade colours. Tim
 
 - *statement*, in this order: the direction as a banner, so the clinical answer is
   read in a second; the full label, in its source language; the slots with their
-  concepts; every claim linked to it by `supports` or `contests` — each with
+  concepts and, on the same footing, the **source** of each supporting claim —
+  document, page, section, recommendation number, linked into the document —
+  because where a recommendation comes from is as much part of the answer as whom
+  it is for; then every claim linked to it by `supports` or `contests` — each with
   **its own grade** highlighted, then verb, direction and consensus, its
   recommendation number, page and section, the verbatim quote, and a link to the
   cited page of the source (§5); last, what the body text adds, grouped by

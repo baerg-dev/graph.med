@@ -4,10 +4,14 @@
 {% if direction %}<p class="banner dir-{{ direction.word }}" lang="de"><span class="glyph">{{ direction.glyph }}</span> {{ direction.word }}{% if direction.verbs %} <small>{{ direction.verbs | join(" · ") }}</small>{% endif %}</p>{% endif %}
 <p class="kind">statement{% if contested %} · <mark>contested</mark>{% endif %}</p>
 <p class="label" lang="{{ e.lang }}">{{ e.label }}</p>
-{% if slots %}
+{% if slots or claims %}
 <dl class="slots">
 {% for s in slots %}
   <dt>{{ s.slot }}</dt><dd><a class="node-link" data-node="{{ s.id }}" href="{{ base }}{{ s.id }}/" lang="{{ e.lang }}">{{ s.label }}</a></dd>
+{% endfor %}
+{% for c in claims %}
+  <dt>source{% if c.edge == "contests" %} <mark>contests</mark>{% endif %}</dt>
+  <dd class="source"><a href="{{ c.link }}" rel="noopener">{{ c.source | short }}, page {{ c.page }}</a>{% if c.section %} · section {{ c.section }}{% endif %}{% if c.recommendation_no %} · No. {{ c.recommendation_no }}{% endif %}</dd>
 {% endfor %}
 </dl>
 {% endif %}
