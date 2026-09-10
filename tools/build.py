@@ -36,6 +36,30 @@ SITE_SRC = Path(__file__).resolve().parent / "site"
 SLOTS = ("population", "action", "condition", "outcome")
 EVIDENCE = ("supports", "contests")
 STATEMENT_EDGES = ("specializes", "complements", "conflicts")
+BODY_TEXT = ("refines", "supplements", "limits")
+DIRECTION_GLYPH = {"für": "✓", "gegen": "✗", "abwägen": "⚖", "Lücke": "∅"}
+
+
+def direction_of(claims: list[dict]) -> dict | None:
+    """The four-word direction of a statement, derived from its supporting claims (docs/publication.md §3):
+    soll/sollte for → für, soll/sollte against → gegen, kann → abwägen (the guideline's own open
+    recommendation), a gap notice → Lücke. Facts have no direction; claims that disagree give abwägen."""
+    sup = [c for c in claims if c["edge"] == "supports"]
+    if not sup:
+        return None
+    if all(c.get("kind") == "gap_notice" for c in sup):
+        word = "Lücke"
+    elif any(c.get("verb") == "kann" for c in sup):
+        word = "abwägen"
+    else:
+        dirs = {c.get("direction") for c in sup if c.get("direction")}
+        if not dirs:
+            return None
+        word = "abwägen" if len(dirs) > 1 else ("gegen" if dirs == {"against"} else "für")
+    verbs = sorted({c["verb"] for c in sup if c.get("verb")})
+    if word == "abwägen" and len({c.get("direction") for c in sup if c.get("direction")}) == 1:
+        verbs.append("eher gegen" if sup[0].get("direction") == "against" else "eher für")   # the lean of an open recommendation
+    return {"word": word, "glyph": DIRECTION_GLYPH[word], "verbs": verbs}
 
 
 # ── the pool ────────────────────────────────────────────────────────────────
@@ -89,6 +113,13 @@ class Pool:
             link = f"{link}#page={page}"
         row = {k: claim.get(k) for k in ("id", "kind", "recommendation_no", "section", "label", "grade", "verb", "direction", "consensus", "lang")}
         row.update({"quote": claim["source"]["quote"], "page": page, "source": src_id, "link": link})
+        for kind, frm, _ in self.inc.get(claim["id"], []):   # what the body text adds to this claim (spec §5)
+            if kind in BODY_TEXT and frm in self.entities:
+                b = self.entities[frm]
+                frag = b["source"]["at"].partition("#")[2]
+                row.setdefault("body", []).append({"kind": kind, "id": frm, "label": b["label"], "quote": b["source"]["quote"], "lang": b["lang"],
+                                                   "page": frag.split("=", 1)[1] if frag.startswith("page=") else None, "section": b.get("section"),
+                                                   "link": f"{src.get('url', '')}#{frag}" if frag else src.get("url", "")})
         for kind, to, _ in self.out.get(claim["id"], []):
             if kind in EVIDENCE:
                 row.setdefault("statements", []).append({"edge": kind, "id": to, "label": self.entities.get(to, {}).get("label", to)})
@@ -151,6 +182,8 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
         if ref: e["ref"] = ref
         edges.append(e)
     label = lambda cid: members[cid]["label"] if cid in members else cid
+    short = lambda cid: members[cid].get("short_label") or members[cid]["label"] if cid in members else cid   # boxes and answers show the short form
+    facet = lambda cid: members[cid].get("facet") if cid in members else None
     sources = [members[s] for s in view["filter"]["sources"]]
     root = add(view["id"], ref=sources[0]["id"], type="root", lang=sources[0]["lang"], label=sources[0]["title"])
     q0 = add("q:population", type="question", label="Which patient group?")
@@ -167,7 +200,10 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
         claims = pool.claims_for(st["id"])
         grades = {c["grade"] for c in claims if c["edge"] == "supports" and c.get("grade")}
         pop, cond, outc = slots.get("population"), slots.get("condition"), slots.get("outcome")
-        sid = add(st["id"], ref=st["id"], type="statement", lang=st["lang"], label=st["label"],
+        d = direction_of(claims)
+        sid = add(st["id"], ref=st["id"], type="statement", lang=st["lang"],
+                  label=(d["glyph"] + " " if d else "") + (st.get("short_label") or st["label"]), full=st["label"],
+                  direction=d["word"] if d else None, facets=sorted({f for f in (facet(c) for c in slots.values()) if f}),
                   grade=grades.pop() if len(grades) == 1 else ("mixed" if grades else None),
                   against={c["direction"] for c in claims if c["edge"] == "supports" and c.get("direction")} == {"against"},
                   contested=any(c["edge"] == "contests" for c in claims),
@@ -180,20 +216,20 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
         if pop in members:   # the answer sits on the edge; a junction fans out into what follows
             j = f"j:{pop}"
             if j not in seen:
-                add(j, ref=pop, type="junction", label=str(per_group[pop]), lang=members[pop]["lang"], group=label(pop),
+                add(j, ref=pop, type="junction", label=str(per_group[pop]), lang=members[pop]["lang"], group=short(pop), facets=[facet(pop)] if facet(pop) else [],
                     text=" ".join(filter(None, [label(pop), members[pop].get("short_label")])).lower())
-                edge(q0, j, "answer", label(pop), ref=pop)
+                edge(q0, j, "answer", short(pop), ref=pop)
             at = j
         if cond in members:  # a further question, asked within the patient group
             q = f"q:{at}"
             if q not in seen:
                 add(q, type="question", label="Which condition?")
                 edge(at, q, "flow")
-            edge(q, sid, "answer", label(cond), ref=cond)
+            edge(q, sid, "answer", short(cond), ref=cond)
         else:
             edge(at, sid, "flow")
         if outc in members:
-            add(outc, ref=outc, type="aim", lang=members[outc]["lang"], label=label(outc),
+            add(outc, ref=outc, type="aim", lang=members[outc]["lang"], label=short(outc), full=label(outc), facets=[facet(outc)] if facet(outc) else [],
                 text=" ".join(filter(None, [label(outc), members[outc].get("short_label")])).lower())
             edge(sid, outc, "aim")
         for kind, to, _ in pool.out.get(st["id"], []):
@@ -241,6 +277,9 @@ def main(argv=None) -> int:
                           for s in SLOTS if (cid := (ent.get("slots") or {}).get(s))]
             d["claims"] = pool.claims_for(ent["id"])
             d["contested"] = any(c["edge"] == "contests" for c in d["claims"])
+            d["direction"] = direction_of(d["claims"])
+            d["body"] = {k: [dict(b, claim=c["recommendation_no"]) for c in d["claims"] for b in c.get("body", []) if b["kind"] == k] for k in BODY_TEXT}
+            d["body"] = {k: v for k, v in d["body"].items() if v}
             d["related"] = [{"kind": k, "id": to, "label": pool.entities.get(to, {}).get("label", to)}
                             for k, to, _ in pool.out.get(ent["id"], []) if k in STATEMENT_EDGES]
         elif t == "concept":
@@ -279,7 +318,8 @@ def main(argv=None) -> int:
         title = sources[0]["title"] if len(sources) == 1 else vid
         counts = {t: sum(1 for m in members.values() if m["type"] == t) for t in ("statement", "concept", "claim")}
         outline = [{"source": s["id"], **e} for s in sources for e in s.get("outline") or []]   # spec §6.7; a chapter is a filter, never a node
-        data = {"id": view["id"], "title": title, "sources": [s["id"] for s in sources], "commit": commit, "outline": outline, **graph}
+        data = {"id": view["id"], "title": title, "sources": [s["id"] for s in sources], "commit": commit, "outline": outline,
+                "facets": sorted({f for n in graph["nodes"] for f in n.get("facets", [])}), **graph}
         (out / vid).mkdir(parents=True, exist_ok=True)
         (out / vid / "index.html").write_text(
             view_tpl.render(view=view, vid=vid, title=title, sources=sources, counts=counts,

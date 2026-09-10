@@ -87,8 +87,3 @@ and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
 **Leaning:** one layer until the candidate list says otherwise; the site folds by family, and a second layer only pays off where a family has more members than fit one fan. Decide while writing the edges (chunk `broader-edges`). (2026-09-10)
 **Settled by:** chunk `broader-edges` of the current pass.
 
-## direction-legend  (publication.md §3 "Direction, in four words"; schema `claim.verb`, `claim.direction`, `claim.kind`)
-**Question:** The site shows a recommendation as *für*, *gegen*, *abwägen* or *Lücke*. Which claim properties derive *abwägen*? `direction` has two values and `verb: kann` is the guideline's own weak grade, not a conditional.
-**Options:** `kann` → abwägen, soll/sollte → für · abwägen only for statements whose claims disagree in direction · abwägen for statements with a filled `condition` slot · drop abwägen, show für/gegen/Lücke and let the grade colour carry the strength
-**Leaning:** none yet. The first mapping is what the physician's four-word legend suggests but it conflates strength with conditionality; the second is honest but rare. Decide when building the legend (chunk `site-labels-panel`), against the ninety statements. (2026-09-10)
-**Settled by:** chunk `site-labels-panel` of the current pass, read by the physician.

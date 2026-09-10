@@ -39,6 +39,7 @@ pre-emptively.
 | `design/document-structure-is-provenance.md` | Chapters are provenance (`section` on the claim, `outline` on the source) and filters, never nodes; no `outlines/` namespace. |
 | `design/relations-are-edges-not-fields.md` | A relation is an edge with provenance (`broader`, `codes_as`), never a field; `broader` inherits nothing. |
 | `design/short-label-limit.md` | `short_label` is at most 60 characters (schema), target 55; concepts get one only above about 45. |
+| `design/direction-legend.md` | The four-word direction (für, gegen, abwägen, Lücke) is derived from claims; kann → abwägen with a lean; facts have none. |
 
 ## Writing one
 

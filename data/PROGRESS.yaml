@@ -151,7 +151,13 @@ sources:
           Name the borderline cases (procedure versus intervention) in the PR.
       - id: site-labels-panel
         kind: build
-        status: pending
+        status: done
+        note: >
+          Direction derived in build.py (direction_of) and settled in the
+          memory direction-legend. Boxes carry a glyph plus the short label;
+          the facet select composes with the search; body-text claims are
+          grouped under the statement's evidence. Chrome words stay English
+          except the four direction words. Checked headless, not in a browser.
         depends: [short-labels-b, facets]
         does: >
           Boxes and edge answers show short_label with fallback to label; the
@@ -179,7 +185,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: site-labels-panel
+    next: broader-edges
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,

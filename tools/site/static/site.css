@@ -85,3 +85,15 @@ blockquote { margin: .3rem 0; padding-left: .7rem; border-left: 3px solid var(--
 .chapters button.active { font-weight: 700; }
 .chapters button.all { border-bottom: 1px solid var(--line); border-radius: 0; margin-bottom: .2rem; }
 .chapters .sec { color: var(--mute); min-width: 3.2rem; font-variant-numeric: tabular-nums; }
+
+/* the direction banner at the top of a statement's details, and the facet select */
+.banner { margin: .4rem 0 .2rem; padding: .35rem .7rem; border-radius: .4rem; font-weight: 700; background: var(--line); }
+.banner .glyph { margin-right: .2rem; }
+.banner small { font-weight: 400; color: var(--mute); margin-left: .4rem; }
+.banner.dir-für { background: var(--gA); color: #111; }
+.banner.dir-gegen { background: var(--contested); color: #fff; }
+.banner.dir-gegen small { color: #fee; }
+.banner.dir-abwägen { background: var(--gB); color: #111; }
+.banner.dir-Lücke { background: var(--line); }
+ul.body li p { margin: .2rem 0; }
+.tools select { height: 44px; padding: 0 .6rem; border: 1px solid var(--line); border-radius: 22px; background: var(--bg); color: var(--fg); font: inherit; font-size: .9rem; max-width: 9rem; }

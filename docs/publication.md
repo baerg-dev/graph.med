@@ -3,11 +3,11 @@
 > **Status: design, built in part.** The build (`tools/build.py`, `CLAUDE.md`
 > "Build") renders §2–§5 for `selection` views over sources: the URL layout, the
 > graph-and-sheet page, entity pages and JSON, source links, the chapter tree and
-> the search (§3, "Chapters and search"; facet filters wait for `facet`). Not built
-> yet, and registered as chunks of the current pass in `data/PROGRESS.yaml`: short
-> labels in the boxes, the direction legend and the order of the detail section
-> (§3, "What the section shows"), and the grouping of patient groups by `broader`
-> edges. Not built and
+> the search with facet filters (§3, "Chapters and search"), short labels in the
+> boxes, the direction glyphs, legend and banner, and the order of the detail
+> section (§3, "What the section shows"). Not built yet, and registered as a chunk
+> of the current pass in `data/PROGRESS.yaml`: the grouping of patient groups by
+> `broader` edges. Not built and
 > not registered: the deploy workflow until a person commits it (§6), cuts (§7),
 > pathway views, and everything under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
 > the site is *meant* to be so that the build is written to it, not the other way
@@ -166,12 +166,15 @@ kind:
 Once concepts carry a `facet`, the search gets facet filters (only procedures,
 only outcomes). Everything here runs in the browser on the view's JSON.
 
-**Direction, in four words.** The legend shows a recommendation's direction as one
-of *für*, *gegen*, *abwägen*, *Lücke* — derived at build time from the supporting
-claims (`direction: against` → gegen; `kind: gap_notice` → Lücke; the mapping of
-`kann` to *abwägen* is open, `open-questions.md` → direction-legend) — next to the
-grade colours. Timing ("innerhalb von 24 Stunden") is not a direction; it stays in
-the label.
+**Direction, in four words.** A recommendation's direction is one of *für*,
+*gegen*, *abwägen*, *Lücke*, derived at build time from the supporting claims:
+`soll`/`sollte` with `direction: for` → für, with `against` → gegen; `kann` → abwägen,
+because in the AWMF scheme "kann" *is* the open recommendation, the guideline's own
+third category (the banner adds the lean, "eher für" or "eher gegen"); `kind:
+gap_notice` → Lücke; claims that disagree in direction → abwägen; a fact has no
+direction. A glyph before the box label (✓ ✗ ⚖ ∅) and a banner at the top of the
+details carry it; the legend lists the four words next to the grade colours. Timing
+("innerhalb von 24 Stunden") is not a direction; it stays in the label.
 
 **What the section shows.**
 

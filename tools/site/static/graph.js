@@ -24,7 +24,7 @@
   data.nodes.forEach(function (n) {
     elements.push({ data: { id: n.id, ref: n.ref || "", type: n.type, label: n.label || "", group: n.group || "",
       fill: n.grade ? css(GRADE[n.grade] || "--line") : css("--bg"), against: n.against ? 1 : 0, contested: n.contested ? 1 : 0,
-      sections: n.sections || [], text: n.text || "" } });
+      sections: n.sections || [], text: n.text || "", facets: n.facets || [] } });
   });
   data.edges.forEach(function (e, i) {
     elements.push({ data: { id: "e" + i, source: e.from, target: e.to, kind: e.kind, label: e.label || "", ref: e.ref || "" } });
@@ -194,14 +194,18 @@
 
   /* the search: a soft highlight — matches keep their colour, everything else fades but
      stays; groups holding a match unfold; the counter reads "n matches in m sections" */
-  var search = document.getElementById("search"), count = document.getElementById("count"), query = "";
-  function matches() {
-    if (!query) return cy.collection();
-    return scope().nodes().filter(function (n) { return n.data("text") && n.data("text").indexOf(query) >= 0; });
+  var search = document.getElementById("search"), count = document.getElementById("count"), facetSel = document.getElementById("facet"), query = "", facet = "";
+  (data.facets || []).forEach(function (f) { var o = document.createElement("option"); o.value = f; o.textContent = f.replace("_", " "); facetSel.appendChild(o); });
+  facetSel.hidden = !(data.facets || []).length;
+  function matches() {   /* the search text and the facet filter compose; either alone is a query */
+    if (!query && !facet) return cy.collection();
+    return scope().nodes().filter(function (n) {
+      return n.data("text") && (!query || n.data("text").indexOf(query) >= 0) && (!facet || n.data("facets").indexOf(facet) >= 0);
+    });
   }
   function highlight() {
     cy.elements().removeClass("faded");
-    if (!query) { count.hidden = true; return; }
+    if (!query && !facet) { count.hidden = true; return; }
     var m = matches().not(".folded");
     cy.elements().not(".folded").not(m).not(m.connectedEdges()).not("node[type = 'root'], node[type = 'question']").addClass("faded");   /* the frame stays for orientation */
     var st = m.filter("[type = 'statement']").union(m.not("[type = 'statement']").neighborhood("node[type = 'statement']")), secs = {};
@@ -210,15 +214,17 @@
     count.textContent = n + (n === 1 ? " match" : " matches") + " in " + k + (k === 1 ? " section" : " sections");
     count.hidden = false;
   }
-  search.addEventListener("input", function () {
-    query = search.value.trim().toLowerCase();
+  function research() {
+    query = search.value.trim().toLowerCase(); facet = facetSel.value;
     var m = matches(), changed = false;
     m.predecessors("node[type = 'junction']").forEach(function (j) { if (!open[j.id()]) { open[j.id()] = true; changed = true; } });
     if (changed) relayout(m.union(m.predecessors())); else highlight();
-  });
+  }
+  search.addEventListener("input", research);
+  facetSel.addEventListener("change", research);
 
   window.addEventListener("hashchange", function () { open_(decodeURIComponent(location.hash.slice(1)), false); });
   cy.ready(function () { open_(decodeURIComponent(location.hash.slice(1)), false); });
-  window.graphmed = { cy: cy, open: open_, toggle: toggle, isOpen: function (id) { return !!open[id]; }, section: setSection, search: function (q) { search.value = q; search.dispatchEvent(new Event("input")); } };   /* for the console and tests */
+  window.graphmed = { cy: cy, open: open_, toggle: toggle, isOpen: function (id) { return !!open[id]; }, section: setSection, search: function (q, f) { search.value = q; if (f !== undefined) facetSel.value = f; search.dispatchEvent(new Event("input")); } };   /* for the console and tests */
   }
 })();
