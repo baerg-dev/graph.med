@@ -2,17 +2,15 @@
 
 > **Status: design, built in part.** The build (`tools/build.py`, `CLAUDE.md`
 > "Build") renders §2–§5 for `selection` views over sources: the URL layout, the
-> graph-and-sheet page, entity pages and JSON, source links, the chapter tree and
-> the search with facet filters (§3, "Chapters and search"), short labels in the
-> boxes, the direction glyphs, legend and banner, and the order of the detail
-> section (§3, "What the section shows"), and the grouping of patient groups by
-> `broader` edges, folded level by level. Not built and
-> not registered: the deploy workflow until a person commits it (§6), cuts (§7),
-> pathway views, and everything under §8. The domain `graph.med` points at GitHub Pages. This document fixes what
-> the site is *meant* to be so that the build is written to it, not the other way
-> round. It is the design-level counterpart of
-> `graph-representation.md`: that file says how knowledge is stored; this one says
-> how it is shown.
+> graph-and-sheet page with patient groups folded by family, the chapter tree and
+> the search with facet filters, short labels, direction glyphs, legend and banner,
+> the order of the detail section (§3), entity pages and JSON (§4), source links
+> (§5). Not built and not registered: the deploy workflow until a person commits
+> it (§6), cuts (§7), pathway views, and everything under §8. The domain
+> `graph.med` points at GitHub Pages. This document fixes what the site is *meant*
+> to be so that the build is written to it, not the other way round. It is the
+> design-level counterpart of `graph-representation.md`: that file says how
+> knowledge is stored; this one says how it is shown.
 
 ---
 
@@ -262,5 +260,9 @@ cut-publication).
   whether a cut has a PDF export.
 - **Branch guards** — yes/no and value-range branches come with authored pathways
   (`branch` edges carry a `guard`); the derived tree has only slot answers.
+- **The build's own words** — the two questions the build adds, the legend, the
+  counter and the page chrome are English; the maintainer wants the graph in the
+  view's source language and deferred it to a later phase. The four direction
+  words are already German.
 - **Translation** — a build-layer projection, not started.
 - **Other projections** — FHIR, RDF, diagram formats (`graph-representation.md` §13).
