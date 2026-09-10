@@ -34,6 +34,10 @@ What that means in practice for a contributor:
 - **Installed packages are ephemeral.** They live as long as the sandbox does.
   A tool needed to build or test this project belongs in a manifest in the
   repository, not in someone's shell history.
+- **A Docker daemon runs inside the sandbox**, and image pulls from Docker Hub
+  pass the proxy. Images are as ephemeral as packages. The site's screenshots
+  (`tools/screenshot.py`, see "Build") render in a Chromium container this way,
+  because no browser can be installed in the sandbox.
 - **Services are not reachable from the host** until the port is published, and
   they must bind to `0.0.0.0` or `::` rather than `127.0.0.1`:
 

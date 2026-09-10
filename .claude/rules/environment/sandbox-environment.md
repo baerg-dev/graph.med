@@ -31,6 +31,10 @@ Consequences of the above that come up when actually running something:
   test this project belongs in a manifest in the repo, not in your shell history.
 - **The sandbox has its own `localhost`.** To reach a service on the host machine,
   use `host.docker.internal:<port>`.
+- **A Docker daemon runs inside the sandbox**, not on the host: `docker` works,
+  image pulls from Docker Hub pass the proxy, and images vanish with the sandbox
+  like installed packages. There is no browser and none can be downloaded; a page
+  is rendered in a Chromium container instead (the `screenshot` skill).
 - **Services you start are not reachable from the host** until the user publishes the
   port from the host side. Bind to `0.0.0.0` or `::`, never `127.0.0.1`, or
   publishing cannot reach them.

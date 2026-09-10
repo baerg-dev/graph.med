@@ -72,7 +72,8 @@ edges under the rules of spec §11 (every change `modelling` or sourced, search
 before minting, nothing inherited, no review status written). A schema chunk
 changes `schema/schema.yaml` and `tools/validate.py` together and leaves the
 data valid. A build chunk changes `tools/build.py` and `tools/site/` and is
-checked by building (`CLAUDE.md`, "Build") and reading the result.
+checked by building (`CLAUDE.md`, "Build"), reading the result, and looking at
+the page in a browser (the `screenshot` skill) — say in the PR what you saw.
 
 ## The handover
 
