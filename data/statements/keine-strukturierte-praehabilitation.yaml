@@ -3,6 +3,7 @@ type: statement
 lang: de
 label: Auf eine intensivierte, ressourcenaufwändige Prähabilitation mit strukturierten Programmen vor einer Tumoroperation
   kann verzichtet werden.
+short_label: "Strukturierte Prähabilitation verzichtbar"
 slots:
   population: concepts/gastrointestinale-tumoroperation
   action: concepts/strukturierte-praehabilitation

@@ -3,6 +3,7 @@ type: statement
 lang: de
 label: Vor Leberresektion bei hepatozellulärem Karzinom sollte keine präoperative mechanische Darmvorbereitung durchgeführt
   werden.
+short_label: "Keine mechanische Darmvorbereitung (Leber, HCC)"
 slots:
   population: concepts/leberresektion-hcc
   action: concepts/mechanische-darmvorbereitung
