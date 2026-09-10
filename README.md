@@ -1,15 +1,25 @@
 # graph.med
 
-Open Medical Knowledge Graph.
+A collaborative public medical knowledge graph: clinical guidelines taken apart into
+source-anchored claims, linked into statements and concepts, and drawn as decision
+trees. The site is **[graph.med](https://graph.med/)**; the first view, the POMGAT
+guideline, is at [graph.med/pomgat-lv-1.0](https://graph.med/pomgat-lv-1.0/).
 
-> **Status: at inception.** What exists is the design (`docs/`), the one schema
+New here? Read [`docs/tutorial.md`](docs/tutorial.md) — one recommendation followed
+from the page to the graph, and every word the project uses. The model is specified
+in [`docs/graph-representation.md`](docs/graph-representation.md), the site in
+[`docs/publication.md`](docs/publication.md).
+
+> **Status.** One source is in the pool (POMGAT, 90 recommendations), validated and
+> published. What exists is the design (`docs/`), the one schema
 > (`schema/schema.yaml`), the validator that enforces it and the CI that runs it (see
 > "Checks"), the pool under `data/` as it lands through pull requests, and the build
-> that renders the pool into the site (see "Build"). The domain `graph.med` points at
-> GitHub Pages; the site is designed in `docs/publication.md` and goes live with the
-> first deployment.
-> This README describes how the project is worked on; it will describe what the
-> project *is* once there is more to describe.
+> that renders the pool into the site (see "Build"). This README describes how the
+> project is worked on.
+
+## Authors
+
+Robert Schwarzenberg (<graph.med@alias.r-schwarzenberg.de>) and Anton Zolkin.
 
 ## Development environment (sbx)
 
@@ -107,5 +117,9 @@ ephemeral and never committed. The reasoning is recorded in
 
 ## License
 
-PolyForm Noncommercial License 1.0.0 — see [`LICENSE`](LICENSE).
+The repository is public and collaborative, and it is **not open source** in the
+OSI sense: it is licensed under the PolyForm Noncommercial License 1.0.0 — see
+[`LICENSE`](LICENSE) — which permits use, copying and modification for
+noncommercial purposes only. The source documents the pool refers to are not part
+of the repository and carry their own licences (see "Source documents").
 Copyright 2026 Robert Schwarzenberg, Anton Zolkin.
