@@ -1,8 +1,8 @@
 # graph.med
 
 A collaborative public medical knowledge graph, published at
-[graph.med](https://graph.med/). An intuitive walk through the model is
-`docs/tutorial.md`.
+[graph.med](https://graph.med/). An intuitive walk through the model opens
+`README.md`.
 
 Licensed under the PolyForm Noncommercial License 1.0.0 (see `LICENSE`).
 Copyright 2026 Robert Schwarzenberg, Anton Zolkin.
@@ -72,7 +72,6 @@ built, and how we intend to get there). The levels and what each owes the reader
 defined in `.claude/rules/conventions/documentation.md`.
 
 This file describes the **project** and maps the rest. Design lives in `docs/`:
-`docs/tutorial.md` is the onboarding walk, explanation only, never authority;
 `docs/graph-representation.md` is the authority on how knowledge is represented —
 one pool of source-anchored claims and a semantic layer, graphs as versioned views,
 provenance, attestations, review — with `schema/schema.yaml` as the authority on
