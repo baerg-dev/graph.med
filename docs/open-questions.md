@@ -80,10 +80,3 @@ and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
 **Options:** a `phase` vocabulary on the statement · a phase concept in the population or condition slot · a facet value on the action concept · nothing — the phase stays in the label
 **Leaning:** on the statement: "postoperativ" qualifies the recommendation, not the patient, and a small controlled vocabulary makes "colorectal, postoperative" a cross-guideline query the way "7.4" never can be. Not part of the current pass; decide when the second source arrives or when the site wants a phase filter. (2026-09-10)
 **Settled by:** the first cross-source query or view that needs the phase.
-
-## concept-hierarchy-depth  (graph-representation.md §5 `broader`; publication.md §3)
-**Question:** How many levels does the concept hierarchy need — one family layer above the existing concepts (Leber, Kolorektum, …), or two (Organ, then Eingriffsart)?
-**Options:** one layer of eight to ten families · two layers where a family has both open and minimally invasive members · as many as the source's headings warrant, per family
-**Leaning:** one layer until the candidate list says otherwise; the site folds by family, and a second layer only pays off where a family has more members than fit one fan. Decide while writing the edges (chunk `broader-edges`). (2026-09-10)
-**Settled by:** chunk `broader-edges` of the current pass.
-

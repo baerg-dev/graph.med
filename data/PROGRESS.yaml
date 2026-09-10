@@ -168,7 +168,14 @@ sources:
           limits; facet filters next to the search.
       - id: broader-edges
         kind: linking
-        status: pending
+        status: done
+        note: >
+          Ten roots over the 36 patient groups; three concept levels at most;
+          one concept with two parents. Organ families are not under the
+          general GI tumour operation (benign indications exist); the generic
+          chapter 4–5 populations are, with the guideline's scope as rationale.
+          Seven intervention concepts got a parent that already existed;
+          drainages, disinfectants and nasogastric-tube variants have none.
         depends: [facets]
         does: >
           Mint the family concepts (candidates: Ösophagus, Magen, Pankreas,
@@ -185,7 +192,7 @@ sources:
           Patient groups fold by family: an answer is a root concept, unfolding
           into its members; recommendations stay on the member they were made
           for. publication.md §3 "Answers in order of weight".
-    next: broader-edges
+    next: site-hierarchy
     deferred:
       - >
         codes_as: no terminology namespace is imported yet. Rule once one is,
