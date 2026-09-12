@@ -13,8 +13,9 @@ rules a document schema cannot state because they span files:
   - a view id is not a namespace name (views are served at the site root);
   - a claim's `section` names an entry of its source's `outline` (spec §6.7);
   - `broader` edges form no cycle (spec §5);
-  - WORK.yaml, the registry of work packages, is well-formed: ids unique,
-    `depends` name packages earlier in the list, initiatives and sources resolve.
+  - docs/work/, the registry of work packages, is sound: numbers unique, ids match
+    file names, `depends_on` name lower-numbered packages that still exist,
+    initiatives and sources resolve, the sections a session works from exist.
 
 With --verify-quotes it also downloads each source (hash-checked, cached) and
 verifies every quote is a verbatim substring of `pdftotext -layout` on the cited
@@ -158,64 +159,88 @@ def main(argv=None) -> int:
     return 1 if errors else 0
 
 
-WORK = ROOT / "WORK.yaml"
+WORK = ROOT / "docs" / "work"
 WORK_KINDS = ("extraction", "linking", "schema", "build", "docs", "tooling")
+WORK_SECTIONS = ("Outcome", "Scope", "Constraints", "Verification")
+WORK_KEYS = {"id", "initiative", "kind", "depends_on", "source", "pages"}
+
+
+def frontmatter(path: Path) -> tuple[dict | None, str]:
+    """The YAML between the leading '---' lines, and the body after it."""
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---\n"):
+        return None, text
+    end = text.find("\n---\n", 4)
+    if end < 0:
+        return None, text
+    return yaml.safe_load(text[4:end]) or {}, text[end + 5:]
 
 
 def check_work(ids: set[str]) -> list[str]:
-    """WORK.yaml (the registry of work packages) is a list a session takes the first
-    entry of, so its order has to be sound: every package has an id, a kind, an
-    initiative that exists and an instruction; `depends` names packages above it
-    (a done package is removed, so a dependency still listed below would never be
-    satisfied); an extraction package names a source entity and its pages."""
-    if not WORK.exists():
+    """docs/work/ is the registry of work packages (docs/work/README.md): one file
+    NNNN-<id>.md per package, taken in number order, removed when done. So the
+    numbers must be unique, the id must match the file name, `depends_on` must name
+    packages with a lower number that still exist (a done package is removed, so a
+    dependency on a higher number would never be satisfied), the initiative must
+    exist and keep at least one package, an extraction package must name a source
+    entity and its pages, and the sections a session works from must be present."""
+    if not WORK.is_dir():
         return []
     errs: list[str] = []
-    try:
-        work = load(WORK) or {}
-    except yaml.YAMLError as exc:
-        return [f"WORK.yaml: YAML error: {exc}"]
-    if set(work) - {"initiatives", "packages", "later"}:
-        errs.append(f"WORK.yaml: unknown top-level keys {sorted(set(work) - {'initiatives', 'packages', 'later'})}")
-    initiatives = work.get("initiatives") or {}
-    for name, ini in initiatives.items():
-        if not isinstance(ini, dict) or not ini.get("title") or not ini.get("scope"):
-            errs.append(f"WORK.yaml: initiative {name} needs a title and a scope")
-    if not all(isinstance(x, str) and x.strip() for x in (work.get("later") or [])):
-        errs.append("WORK.yaml: every entry under later is a non-empty string")
-    above: set[str] = set()
-    for i, pkg in enumerate(work.get("packages") or []):
-        where = f"WORK.yaml package {i}"
-        if not isinstance(pkg, dict) or not pkg.get("id"):
-            errs.append(f"{where}: needs an id"); continue
-        pid = pkg["id"]; where = f"WORK.yaml package {pid}"
-        if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", pid):
-            errs.append(f"{where}: id is not kebab-case")
-        if pid in above:
-            errs.append(f"{where}: duplicate id")
-        if set(pkg) - {"id", "initiative", "kind", "depends", "does", "source", "pages"}:
-            errs.append(f"{where}: unknown keys {sorted(set(pkg) - {'id', 'initiative', 'kind', 'depends', 'does', 'source', 'pages'})}")
-        if pkg.get("kind") not in WORK_KINDS:
-            errs.append(f"{where}: kind must be one of {', '.join(WORK_KINDS)}")
-        if pkg.get("initiative") not in initiatives:
-            errs.append(f"{where}: initiative {pkg.get('initiative')!r} is not declared")
-        if not isinstance(pkg.get("does"), str) or not pkg["does"].strip():
-            errs.append(f"{where}: needs a does")
-        for dep in pkg.get("depends") or []:
-            if dep not in above:
-                errs.append(f"{where}: depends on {dep}, which is not a package above it (done packages are removed — drop the dependency with them)")
-        if pkg.get("kind") == "extraction":
-            if pkg.get("source") not in ids:
-                errs.append(f"{where}: an extraction package names a source entity")
-            if not re.fullmatch(r"\d+(-\d+)?", str(pkg.get("pages", ""))):
-                errs.append(f"{where}: an extraction package names its pages (N or N-M)")
-        elif pkg.get("source") or pkg.get("pages"):
-            errs.append(f"{where}: only an extraction package names a source and pages")
-        above.add(pid)
-    used = {p.get("initiative") for p in work.get("packages") or [] if isinstance(p, dict)}
+    initiatives: dict[str, dict] = {}
+    for path in sorted((WORK / "initiatives").glob("*.md")) if (WORK / "initiatives").is_dir() else []:
+        fm, _ = frontmatter(path)
+        rel = str(path.relative_to(ROOT))
+        if fm is None or fm.get("id") != path.stem or not fm.get("title"):
+            errs.append(f"{rel}: an initiative has frontmatter with id (= file name) and title")
+        initiatives[path.stem] = fm or {}
+    packages: dict[str, int] = {}
+    numbers: dict[int, str] = {}
+    for path in sorted(WORK.glob("[0-9][0-9][0-9][0-9]-*.md")):
+        rel = str(path.relative_to(ROOT))
+        number, _, slug = path.stem.partition("-")
+        n = int(number)
+        if n in numbers:
+            errs.append(f"{rel}: number {number} is also {numbers[n]} — numbers are never reused")
+        numbers[n] = path.name
+        fm, body = frontmatter(path)
+        if fm is None:
+            errs.append(f"{rel}: no frontmatter"); continue
+        if fm.get("id") != slug:
+            errs.append(f"{rel}: id {fm.get('id')!r} must equal the file name after its number")
+        if set(fm) - WORK_KEYS:
+            errs.append(f"{rel}: unknown keys {sorted(set(fm) - WORK_KEYS)}")
+        if fm.get("kind") not in WORK_KINDS:
+            errs.append(f"{rel}: kind must be one of {', '.join(WORK_KINDS)}")
+        if fm.get("initiative") not in initiatives:
+            errs.append(f"{rel}: initiative {fm.get('initiative')!r} has no file under docs/work/initiatives/")
+        for dep in fm.get("depends_on") or []:
+            if dep not in packages:
+                errs.append(f"{rel}: depends_on {dep}, which is not a registered package with a lower number (a done package is removed — drop the dependency with it)")
+        if fm.get("kind") == "extraction":
+            if fm.get("source") not in ids:
+                errs.append(f"{rel}: an extraction package names a source entity")
+            if not re.fullmatch(r"\d+(-\d+)?", str(fm.get("pages", ""))):
+                errs.append(f"{rel}: an extraction package names its pages (N or N-M)")
+        elif fm.get("source") or fm.get("pages"):
+            errs.append(f"{rel}: only an extraction package names a source and pages")
+        headings = {m.group(1).strip() for m in re.finditer(r"^## (.+)$", body, re.M)}
+        for sec in WORK_SECTIONS:
+            if sec not in headings:
+                errs.append(f"{rel}: missing section '## {sec}'")
+        for slug_ in re.findall(r"open-questions\.md` → ([a-z0-9-]+)", body):
+            if f"## {slug_}" not in (ROOT / "docs" / "open-questions.md").read_text(encoding="utf-8"):
+                errs.append(f"{rel}: names open question {slug_}, which docs/open-questions.md does not have")
+        if isinstance(fm.get("id"), str):
+            packages[fm["id"]] = n
+    used = set()
+    for path in WORK.glob("[0-9][0-9][0-9][0-9]-*.md"):
+        fm, _ = frontmatter(path)
+        if fm:
+            used.add(fm.get("initiative"))
     for name in initiatives:
         if name not in used:
-            errs.append(f"WORK.yaml: initiative {name} has no package left; remove it with its last package")
+            errs.append(f"docs/work/initiatives/{name}.md: no package left; remove the initiative with its last package")
     return errs
 
 

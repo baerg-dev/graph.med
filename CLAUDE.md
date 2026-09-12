@@ -11,7 +11,7 @@ The repository is at inception: it currently contains `README.md`, `LICENSE`, th
 file, the design documentation under `docs/`, the one schema for the data pool
 (`schema/schema.yaml`), the validator that enforces it (`tools/validate.py`) with the
 CI workflow that runs it (`.github/workflows/validate.yml`), the pool itself under
-`data/` (layout in `data/README.md`), the registry of work packages (`WORK.yaml`), the
+`data/` (layout in `data/README.md`), the register of work packages (`docs/work/`), the
 site build (`tools/build.py`, see "Build"), and the `.claude/` directory described
 below. There is no source tree beyond these two scripts.
 Project-specific guidance — data sources and their licenses, setup and test
@@ -82,7 +82,17 @@ provenance, attestations, review — with `schema/schema.yaml` as the authority 
 syntax; `docs/publication.md` is the authority on how the pool is shown — the site
 at `graph.med`, views as pages, a graph-and-sheet page read on a phone first; and
 `docs/open-questions.md`
-carries what is not yet decided: the handover between sessions. How an agent is expected to operate
+carries what is not yet decided, and `docs/work/` what is agreed and not yet
+done — together with the pull request, the handover between sessions.
+
+## Work
+
+Start a session with the `next-work-package` skill. It takes the lowest-numbered
+package in `docs/work/` whose dependencies are gone and whose branch `feat/<id>`
+does not exist on `origin`, claims it by pushing that branch, does it, deletes the
+package file and opens a pull request. The convention — what a package is, how
+one is registered, claimed and removed — is `docs/work/README.md`; the `handover`
+skill maintains `docs/open-questions.md` at the end of any session. How an agent is expected to operate
 lives in `.claude/`, filed by level, so that each piece loads when it is relevant
 rather than all of it, always:
 
@@ -123,10 +133,10 @@ it is reviewed and shared rather than private to one machine.
 or skill that automates nothing would be guidance pretending to be capability — the
 validator is a check, not a task to automate — and each exception earned its place
 as a real, repeated task. `handover` ends a session by maintaining
-`docs/open-questions.md`. `next-work-package` does the first package registered in
-`WORK.yaml` — an extraction, a linking pass, a schema change, a build feature, a
-docs change, tooling — one per session, ending with the package removed from the
-registry and a pull request.
+`docs/open-questions.md`. `next-work-package` does the next open package in
+`docs/work/` — an extraction, a linking pass, a schema change, a build feature, a
+docs change, tooling — one per session, ending with the package's file removed
+and a pull request.
 `screenshot` renders a view page in a browser container so a build change is looked
 at, not only built. Add another only for another such task — then say in the pull request what it
 does and what it is allowed to touch.

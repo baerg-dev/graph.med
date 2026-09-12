@@ -39,8 +39,8 @@ Rules that bind everything here:
 - **Only current sources.** An expired guideline (AWMF: renamed with an
   `-abgelaufen` suffix, banner "wird aktuell überarbeitet") is not parsed — its
   successor will be, when published.
-- **One work package per session**, then a handover: the package removed from
-  `WORK.yaml`, a pull request opened. The `next-work-package` skill runs this
+- **One work package per session**, then a handover: the package's file removed
+  from `docs/work/`, a pull request opened. The `next-work-package` skill runs this
   loop; a package is an extraction, a linking pass, a schema change, a build
   feature, a docs change or tooling, registered with its instruction.
 - **Document structure is provenance.** A claim's `section` and a source's
