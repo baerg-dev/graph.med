@@ -1,5 +1,5 @@
 ---
-title: "Nothing overlaps: every node and answer readable"
+id: WP-0002
 title: "Nothing overlaps: every node and answer readable"
 status: open
 created: 2026-09-12
