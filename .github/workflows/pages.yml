@@ -1,33 +1,98 @@
-# Publishes the site to GitHub Pages on every push to main (docs/publication.md §6).
-# Validate first, then build, then deploy — nothing invalid is ever published.
+# Publishes the site to GitHub Pages (docs/publication.md §6): the root from main, and
+# one preview per open pull request under preview/pr<N>/. Every deployment is composed
+# from scratch — nothing is accumulated — so a closed pull request simply disappears
+# from the next deployment, and a pull request whose pool fails validation has no
+# preview until it passes. Runs on a push to main and after each run of the validation
+# workflow on a pull request; always from main's workflow file, in main's context, so
+# that a branch can change what its preview shows and never what the root shows.
+# Nothing here writes to the repository: previews are built in one job each, with the
+# read-only token, and handed over as artifacts; only the deploy job may deploy.
 name: pages
 
 on:
   push:
     branches: [main]
+  workflow_run:
+    workflows: [validate]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
+  plan:
+    name: list open pull requests
+    # a push to main deploys; a validation run deploys only when it was a pull request's
+    if: >-
+      github.event_name != 'workflow_run'
+      || (github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled')
+    runs-on: ubuntu-latest
+    outputs:
+      prs: ${{ steps.list.outputs.prs }}
+    steps:
+      - id: list
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # branches of this repository only: a fork's head is not built here
+        run: |
+          prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 \
+            --json number,headRefOid,isCrossRepository \
+            --jq '[.[] | select(.isCrossRepository | not) | {number, sha: .headRefOid}]')
+          echo "prs=$prs" >> "$GITHUB_OUTPUT"
+          echo "$prs"
+
+  preview:
+    name: preview of pull request ${{ matrix.pr.number }}
+    needs: plan
+    if: needs.plan.outputs.prs != '[]'
+    runs-on: ubuntu-latest
+    continue-on-error: true   # one pull request that does not build holds up neither the others nor the root
+    strategy:
+      fail-fast: false
+      matrix:
+        pr: ${{ fromJSON(needs.plan.outputs.prs) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.pr.sha }}
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run --frozen tools/validate.py
+      - run: uv run --frozen tools/build.py --base /preview/pr${{ matrix.pr.number }}/ --preview ${{ matrix.pr.number }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr${{ matrix.pr.number }}
+          path: site
+          retention-days: 1
+
   build:
-    name: validate and build
+    name: validate, build and compose
+    needs: [plan, preview]
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
       - run: uv sync --frozen
       - run: uv run --frozen tools/validate.py
       - run: uv run --frozen tools/build.py --cname graph.med
+      - name: place the previews under preview/
+        if: needs.plan.outputs.prs != '[]'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: pr[0-9]*
+          path: site/preview
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
@@ -36,6 +101,9 @@ jobs:
     name: deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
