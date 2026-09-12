@@ -13,6 +13,5 @@ no schema change. Every package is checked in a browser on desktop and phone (th
 `screenshot` skill), and its pull request links the preview at
 `graph.med/preview/pr<N>/`.
 
-**Out of scope,** listed in `LATER.md`: how structural and organisational
-recommendations are told apart (needs data), grouping axes and specialised views,
-extraction quality, review and feedback.
+**Out of scope:** the other initiatives — `groupings`, `extraction-quality`,
+`review` — whose site packages depend on packages here.

@@ -5,13 +5,9 @@ package (`README.md`) when they decide it is next; a session may add an entry he
 when it finds work it cannot do, stated as the durable shape of the work, not as a
 log. Remove an entry when its package is registered.
 
-- structural and organisational recommendations (the specialised nurse in mPOM, box 8.7, is the example given): the physician's point is that a recommendation a physician on the ward cannot act on should be told apart — in the tree with a marker, or outside it. Needs a marker in the data (a facet value on the action concept, or a statement property) before the site can show it; open-questions → structural-recommendations. Initiative: extraction quality.
 
-- grouping axes and specialised views: the physician asks for the broader hierarchy to be defined rather than emerge, for groupings to choose families by — the outline, the anatomical region, the operative phase — and for views that hide aspects ("show me every node that …"), which is the query-language question again; open-questions → grouping-axes and view-filter-language. Initiative: views and groupings; schema and linking packages, then build packages.
 
-- extraction quality: the body-text relations (refines, supplements, limits) are read heterogeneously across chapters, and contextual criteria are sometimes incomplete — the amylase criterion refining 6.7 (p. 64) lacks the alternatives the text gives beside it (day 1 and 3 with the drain volume, or three times the serum concentration on day 3). Linking packages with a written rule per relation, chapter by chapter, checked against the quotes. Initiative: extraction quality.
 
-- review and feedback: a way for an expert reading the site to say "this box should be one recommendation, not three" (the granularity is settled per sentence — memory box-granularity-per-sentence — but an expert may want a different split for a given box) and for that to reach the pool as a reviewable proposal — an affordance in the detail section that opens a prefilled issue is the smallest form; and "LLM as a judge", an automated review of extractions against the source, so far only a heading. Initiative: review and feedback.
 
 - codes_as: no terminology namespace is imported yet. Rule once one is, by facet — procedure → OPS, patient_state → ICD-10-GM, outcome and finding → SNOMED CT where available; first candidates concepts/pankreasresektion → ops-2026/5-52 and the codes C18/C20 in QI 1's denominator (p. 122). A concept without a code must be shown as uncoded, not as unchecked.
 
