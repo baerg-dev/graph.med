@@ -46,8 +46,13 @@ the hooks `tools/site/static/graph.js` exposes as `window.graphmed`:
 `toggle=<concept id>` folds or unfolds a patient group, `open=<entity id>` is a
 deep link (unfold and select), `section=<number>` sets the chapter filter,
 `search=<text>` and `facet=<kind>` set the search, `chapters` opens the chapter
-panel, `wait=<ms>` waits. The runner prints how many graph elements were shown
-and any page error.
+panel, `all` opens every patient group one tap at a time (the physician's
+extreme state), `fit` fits what is open, `wait=<ms>` waits. The runner prints how
+many graph elements were shown, any page error, and **what overlaps**: every pair
+of nodes and answers whose boxes intersect, and every edge drawn across a node or
+an answer it does not touch — the mechanical half of "nothing overlaps"
+(`docs/publication.md` §3). It cannot see what a hand does on a phone, such as a
+pan that pushes nodes under the floating controls; look for that yourself.
 
 Output goes under `/tmp/graph.med/screenshots/` by default — a neutral path,
 never one derived from a home directory (`conventions/no-personal-information.md`).
@@ -58,7 +63,8 @@ can open; it does not belong in the repository.
 
 Before the pull request: capture the folded start on desktop and on a phone, and
 one state that exercises what the package changed (a family unfolded, a box
-selected, a filter, a search). Say in the PR description which captures you
+selected, a filter, a search), and run `--do all --do fit`: a build package ends
+with 0 overlapping pairs with everything open. Say in the PR description which captures you
 took and what you saw — including what is wrong, so the reviewer does not have
 to find it. "Not opened in a browser" is no longer an acceptable line in a PR.
 Link the preview the reviewer will open as a complete, clickable URL

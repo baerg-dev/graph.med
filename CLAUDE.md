@@ -54,8 +54,9 @@ uv run tools/build.py --base /preview/pr12/ --preview 12   # as the preview of p
 Open `site/index.html` in a browser to see a change. Templates and the client script
 live in `tools/site/`. Inside the sandbox, where there is no browser,
 `uv run tools/screenshot.py <view-id>` renders a view page in a Chromium container
-on the sandbox's Docker daemon and writes a PNG under `/tmp/graph.med/screenshots/`
-(the `screenshot` skill describes the actions it can take first). Deployment to
+on the sandbox's Docker daemon, writes a PNG under `/tmp/graph.med/screenshots/`
+and reports what overlaps (the `screenshot` skill describes the actions it can
+take first). Deployment to
 GitHub Pages is a workflow file, committed by a person
 (`.github/workflows/pages.yml`): validate, build, deploy on every push to `main`,
 and one preview per open pull request at `graph.med/preview/pr<N>/`, rebuilt from
