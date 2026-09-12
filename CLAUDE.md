@@ -11,7 +11,7 @@ The repository is at inception: it currently contains `README.md`, `LICENSE`, th
 file, the design documentation under `docs/`, the one schema for the data pool
 (`schema/schema.yaml`), the validator that enforces it (`tools/validate.py`) with the
 CI workflow that runs it (`.github/workflows/validate.yml`), the pool itself under
-`data/` (layout in `data/README.md`, parsing progress in `data/PROGRESS.yaml`), the
+`data/` (layout in `data/README.md`), the registry of work packages (`WORK.yaml`), the
 site build (`tools/build.py`, see "Build"), and the `.claude/` directory described
 below. There is no source tree beyond these two scripts.
 Project-specific guidance — data sources and their licenses, setup and test
@@ -107,7 +107,7 @@ rather than all of it, always:
 ├── agents/                      subagent definitions — empty; add one .md per agent
 └── skills/
     ├── handover/                end a session: update docs/open-questions.md
-    ├── parse-next-chunk/        do the next registered chunk of work: one, then hand over
+    ├── next-work-package/       do the next registered work package: one, then hand over
     └── screenshot/              look at a view page in a real browser before proposing it
 ```
 
@@ -123,9 +123,10 @@ it is reviewed and shared rather than private to one machine.
 or skill that automates nothing would be guidance pretending to be capability — the
 validator is a check, not a task to automate — and each exception earned its place
 as a real, repeated task. `handover` ends a session by maintaining
-`docs/open-questions.md`. `parse-next-chunk` does the next chunk registered in
-`data/PROGRESS.yaml` — an extraction, a linking pass, a schema change or a build
-feature — one per session, ending with an updated registry and a pull request.
+`docs/open-questions.md`. `next-work-package` does the first package registered in
+`WORK.yaml` — an extraction, a linking pass, a schema change, a build feature, a
+docs change, tooling — one per session, ending with the package removed from the
+registry and a pull request.
 `screenshot` renders a view page in a browser container so a build change is looked
 at, not only built. Add another only for another such task — then say in the pull request what it
 does and what it is allowed to touch.

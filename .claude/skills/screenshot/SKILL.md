@@ -5,7 +5,7 @@ description: Capture a view page of the built site in a real browser — Chromiu
 
 # Screenshot the site
 
-A build chunk is not checked by building alone: the graph is laid out by a
+A build package is not checked by building alone: the graph is laid out by a
 library in the browser, and a headless run in Node cannot see overlapping
 labels, a box drawn too narrow, or a control that runs into another on a phone.
 Look at the page before proposing it.
@@ -54,10 +54,10 @@ never one derived from a home directory (`conventions/no-personal-information.md
 Read the PNG to look at it. To show it to the maintainer, put it on a page they
 can open; it does not belong in the repository.
 
-## For a build chunk
+## For a build package
 
 Before the pull request: capture the folded start on desktop and on a phone, and
-one state that exercises what the chunk changed (a family unfolded, a box
+one state that exercises what the package changed (a family unfolded, a box
 selected, a filter, a search). Say in the PR description which captures you
 took and what you saw — including what is wrong, so the reviewer does not have
 to find it. "Not opened in a browser" is no longer an acceptable line in a PR.

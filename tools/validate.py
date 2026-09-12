@@ -12,7 +12,9 @@ rules a document schema cannot state because they span files:
   - edges are unique per (from, kind, to, discriminator);
   - a view id is not a namespace name (views are served at the site root);
   - a claim's `section` names an entry of its source's `outline` (spec §6.7);
-  - `broader` edges form no cycle (spec §5).
+  - `broader` edges form no cycle (spec §5);
+  - WORK.yaml, the registry of work packages, is well-formed: ids unique,
+    `depends` name packages earlier in the list, initiatives and sources resolve.
 
 With --verify-quotes it also downloads each source (hash-checked, cached) and
 verifies every quote is a verbatim substring of `pdftotext -layout` on the cited
@@ -137,6 +139,8 @@ def main(argv=None) -> int:
     for cycle in cycles(broader):
         errors.append(f"broader edges form a cycle: {' -> '.join(cycle)}")
 
+    errors += check_work(set(ids))
+
     n_entities, n_edges = len(ids), len(seen_edges)
     print(f"checked {n_entities} entities and {n_edges} edges against schema {schema.get('x-version')}")
 
@@ -152,6 +156,67 @@ def main(argv=None) -> int:
         print(f"error: {line}")
     print(f"{len(errors)} error(s)" if errors else "ok")
     return 1 if errors else 0
+
+
+WORK = ROOT / "WORK.yaml"
+WORK_KINDS = ("extraction", "linking", "schema", "build", "docs", "tooling")
+
+
+def check_work(ids: set[str]) -> list[str]:
+    """WORK.yaml (the registry of work packages) is a list a session takes the first
+    entry of, so its order has to be sound: every package has an id, a kind, an
+    initiative that exists and an instruction; `depends` names packages above it
+    (a done package is removed, so a dependency still listed below would never be
+    satisfied); an extraction package names a source entity and its pages."""
+    if not WORK.exists():
+        return []
+    errs: list[str] = []
+    try:
+        work = load(WORK) or {}
+    except yaml.YAMLError as exc:
+        return [f"WORK.yaml: YAML error: {exc}"]
+    if set(work) - {"initiatives", "packages", "later"}:
+        errs.append(f"WORK.yaml: unknown top-level keys {sorted(set(work) - {'initiatives', 'packages', 'later'})}")
+    initiatives = work.get("initiatives") or {}
+    for name, ini in initiatives.items():
+        if not isinstance(ini, dict) or not ini.get("title") or not ini.get("scope"):
+            errs.append(f"WORK.yaml: initiative {name} needs a title and a scope")
+    if not all(isinstance(x, str) and x.strip() for x in (work.get("later") or [])):
+        errs.append("WORK.yaml: every entry under later is a non-empty string")
+    above: set[str] = set()
+    for i, pkg in enumerate(work.get("packages") or []):
+        where = f"WORK.yaml package {i}"
+        if not isinstance(pkg, dict) or not pkg.get("id"):
+            errs.append(f"{where}: needs an id"); continue
+        pid = pkg["id"]; where = f"WORK.yaml package {pid}"
+        if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", pid):
+            errs.append(f"{where}: id is not kebab-case")
+        if pid in above:
+            errs.append(f"{where}: duplicate id")
+        if set(pkg) - {"id", "initiative", "kind", "depends", "does", "source", "pages"}:
+            errs.append(f"{where}: unknown keys {sorted(set(pkg) - {'id', 'initiative', 'kind', 'depends', 'does', 'source', 'pages'})}")
+        if pkg.get("kind") not in WORK_KINDS:
+            errs.append(f"{where}: kind must be one of {', '.join(WORK_KINDS)}")
+        if pkg.get("initiative") not in initiatives:
+            errs.append(f"{where}: initiative {pkg.get('initiative')!r} is not declared")
+        if not isinstance(pkg.get("does"), str) or not pkg["does"].strip():
+            errs.append(f"{where}: needs a does")
+        for dep in pkg.get("depends") or []:
+            if dep not in above:
+                errs.append(f"{where}: depends on {dep}, which is not a package above it (done packages are removed — drop the dependency with them)")
+        if pkg.get("kind") == "extraction":
+            if pkg.get("source") not in ids:
+                errs.append(f"{where}: an extraction package names a source entity")
+            if not re.fullmatch(r"\d+(-\d+)?", str(pkg.get("pages", ""))):
+                errs.append(f"{where}: an extraction package names its pages (N or N-M)")
+        elif pkg.get("source") or pkg.get("pages"):
+            errs.append(f"{where}: only an extraction package names a source and pages")
+        above.add(pid)
+    used = {p.get("initiative") for p in work.get("packages") or [] if isinstance(p, dict)}
+    for name in initiatives:
+        if name not in used:
+            errs.append(f"WORK.yaml: initiative {name} has no package left; remove it with its last package")
+    return errs
 
 
 def cycles(graph: dict[str, list[str]]) -> list[list[str]]:

@@ -11,7 +11,7 @@ belongs (usually the spec), and the why becomes a memory under
 `.claude/memory/design/`. The `handover` skill
 (`.claude/skills/handover/SKILL.md`) maintains this file at the end of a
 session; editing it by hand is just as valid. What the current pass of work is,
-and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
+and which package is next, is not a question and lives in `WORK.yaml`.
 
 ---
 
@@ -39,7 +39,7 @@ and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
 **Leaning:** fixed forms, extended one proven need at a time — a query language is a dependency and an injection surface the data model should not commit to before it is needed, and filters must stay declarative data so cuts are reproducible. The first proven need arrived: a `section` form for selection views (spec §4, §6.7), so a chapter of a source can be a view. The physician has since asked for "specialised looks that hide aspects" and a query language that answers in the browser ("show me every node that …"); the leaning holds, because those are two different things — a *view* is data and needs a form, an *interactive* narrowing is the search and the facet filters in the page, which can grow (a facet, a group, a direction) without a language — and the grouping axes (→ grouping-axes) will say which forms are needed next. (2026-09-11)
 **Settled by:** the first view a fixed form cannot express.
 
-## evidence-profiles  (data/PROGRESS.yaml deferred; schema `claim`)
+## evidence-profiles  (WORK.yaml later; schema `claim`)
 **Question:** How are the per-outcome GRADE evidence tables of evidence-based recommendation boxes modelled — the ⊕-symbol ratings per outcome with effect sizes that justify a claim's grade?
 **Options:** not at all (the grade plus the locator suffice; the reader follows the link) · a structured `evidence_profile` property on the claim (outcome, rating, effect, CI) · each outcome row as its own claim (kind: fact) with a `refines` edge to the recommendation claim
 **Leaning:** none yet. The third option fits the model best (rows are source-anchored, quotable, individually verifiable) but multiplies claims roughly fivefold per box; decide when a consumer (a view, the site, grade-derivation) actually needs the profiles rather than on principle. (2026-09-05)
@@ -51,7 +51,7 @@ and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
 **Leaning:** the fourth — the gap is *about a concept*, not a proposition, and an edge to the concept keeps it findable from the topic without inventing a statement nobody can contest. The gap claims are extracted and unlinked, so nothing is lost. Whatever shape gap notices take must let a recommendation stand *inside* a gap's scope: 4.7 ("in der Pankreas- und Leberchirurgie kann … erwogen werden") is the exception carved out of 4.6's gap. The site's *Lücke* direction (publication.md §3) will need this. (2026-09-05)
 **Settled by:** the first pathway or view that has to render "the guideline declines to recommend here".
 
-## quality-indicators  (graph-representation.md §3.1, §5; schema `claim.kind`, edge kinds; data/PROGRESS.yaml deferred)
+## quality-indicators  (graph-representation.md §3.1, §5; schema `claim.kind`, edge kinds; WORK.yaml later)
 **Question:** How do a guideline's quality indicators — POMGAT chapter 9 defines four (Tabelle 7): each a numerator/denominator measure with a Qualitätsziel, derived from one "soll" recommendation it restates as Referenz-Empfehlung — enter the pool? They are source-anchored and quotable like claims, but no claim kind names what they are, and `supports`/`contests` misdescribe the relation: a QI is not evidence for its statement, it is a measure *of adherence to* it.
 **Options:** a claim kind `quality_indicator` plus a new edge kind (`measures`: claim → statement) · model the QI as a statement of its own that the QI text `supports`, linked to the underlying statement by `complements` · leave QIs out of the pool entirely
 **Leaning:** the first, once a consumer asks — a hospital-facing view wants "this one is audited, target 0%" next to the recommendation, and a dedicated kind plus edge keeps a QI a claim (verbatim, hashed, verifiable) without pretending it is evidence. Two scope mismatches await a modelling pass: QI 3's denominator spans three organ groups whose recommendations are three statements, and QI 4's is narrower (Kolonresektion) than the box it references. (2026-09-05)
@@ -79,7 +79,7 @@ and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
 **Question:** What should a box's colour say? Today it says the grade (A · B · 0 · EK, the guideline's own scale). The physician finds this unintuitive: the colours track the soll/sollte/kann gradation and expert consensus at once, and the reader confuses strength with answer.
 **Options:** colour by direction — für, gegen, abwägen, Lücke — with the grade written in the box after the glyph · colour by verb (soll, sollte, kann) with the evidence grade written in · keep colour by grade and make the direction glyph larger
 **Leaning:** by direction. The direction is what the reader asks first ("what should I do?"), it already has the glyph and the banner, and the four colours are the banner's, so colour and section would agree. The second option is the first in disguise: under the AWMF scheme A↔soll, B↔sollte, 0↔kann, so colouring by verb is colouring by grade with EK as the odd one out. Colour by direction also settles EK: an EK box is coloured by its direction like every other recommendation — the physician argues it is a clear recommendation with a clear direction — and carries "EK" as its grade text, so it is marked and not demoted. The cost is that strength moves from colour to a letter; the box has room for one. (2026-09-11)
-**Settled by:** the maintainer's decision on this entry; chunk `site-colour-by-direction` in `data/PROGRESS.yaml` implements what is decided.
+**Settled by:** the maintainer's decision on this entry; package `site-colour-by-direction` in `WORK.yaml` implements what is decided.
 
 ## structural-recommendations  (graph-representation.md §3.2; schema `concept.facet`, `statement`)
 **Question:** How are recommendations of a structural or organisational kind — those a physician on the ward cannot act on, such as the specialised nurse in mPOM (box 8.7) — told apart from the rest, and shown? The physician's point is that they play no part in a ward decision.
@@ -89,8 +89,8 @@ and which chunk is next, is not a question and lives in `data/PROGRESS.yaml`.
 
 ## chapter-search  (publication.md §3 "Chapters and search")
 **Question:** Should the chapter tree be searchable? The physician found nodes through the chapter tree that the search box missed, and asked whether a search in the table of contents should exist.
-**Options:** no — fix the search box (chunk `site-search-recall`) and keep one search · the one search box also highlights the sections whose statements match, in the chapter tree · a second search field inside the chapter panel
-**Leaning:** the second, after the first: one query, two places it shows — the counter already reads "n matches in m sections", and lighting those sections in the tree is the same fact drawn where the reader is looking. A second field would be two searches to explain. Decide after `site-search-recall` has fixed the misses that prompted the question. (2026-09-11)
+**Options:** no — fix the search box (package `site-search-recall`) and keep one search · the one search box also highlights the sections whose statements match, in the chapter tree · a second search field inside the chapter panel
+**Leaning:** the second, after the first: one query, two places it shows — the counter already reads "n matches in m sections", and lighting those sections in the tree is the same fact drawn where the reader is looking. A second field would be two searches to explain. Decide after package `site-search-recall` has fixed the misses that prompted the question. (2026-09-11)
 **Settled by:** the physician's next read of the site with the search fixed.
 
 ## grouping-axes  (graph-representation.md §5 `broader`; memory concept-hierarchy-depth; schema `source.structure`)

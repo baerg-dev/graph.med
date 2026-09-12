@@ -125,6 +125,12 @@ it. Three choices keep the tree readable at ninety recommendations:
   tapping "Welche Population?" folds the whole tree back to the root and the
   question, tapping "Welche Bedingung?" folds its group's conditions and
   recommendations, and tapping the question again restores what was open below it.
+- **Every branching is a question.** Wherever the tree forks, the reader passes a
+  diamond: an opened family asks "Welche Population?" again before its member
+  groups, so that a fork is never a bare fan of answers without the decision they
+  answer. The family's own recommendations hang from its junction as before,
+  through "Welche Bedingung?" where they have a condition. The question folds with
+  the family and adds no text the build does not already have.
 - **Answers in order of weight, families first.** The patient groups are the
   population concepts and the families above them (`broader` edges,
   `graph-representation.md` §5): the first question's answers are the ten roots
