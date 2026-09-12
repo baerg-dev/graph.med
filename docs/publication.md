@@ -103,7 +103,9 @@ decision-graph-derivation):
   question, recommendation, aim; the answers are bold edge labels written at the end
   of their edge, beside the group or box they lead to, so that many answers from one
   question do not pile up mid-edge; the aim a dashed edge; the grade colours are the
-  guideline's own scale. Legend under the graph.
+  guideline's own scale. Legend under the graph. Whether colour should say the
+  grade or the direction is open again after the physician's review
+  (`open-questions.md` → box-colour).
   Claims are not nodes; they are the evidence and appear in the section.
 
 **Drawn by a library, left to right, folded.** The page uses Cytoscape.js with the
@@ -119,7 +121,10 @@ it. Three choices keep the tree readable at ninety recommendations:
   answers, one junction per patient group carrying the number of recommendations
   behind it. Tapping an answer or its junction unfolds that group's conditions and
   recommendations; tapping again folds it. Only what the reader opened takes space.
-  A deep link unfolds the group its target is in.
+  A deep link unfolds the group its target is in. Every question folds too:
+  tapping "Welche Population?" folds the whole tree back to the root and the
+  question, tapping "Welche Bedingung?" folds its group's conditions and
+  recommendations, and tapping the question again restores what was open below it.
 - **Answers in order of weight, families first.** The patient groups are the
   population concepts and the families above them (`broader` edges,
   `graph-representation.md` §5): the first question's answers are the ten roots
@@ -140,8 +145,18 @@ The data carries no positions; the layout is deterministic for a given set of op
 groups. This replaces the earlier hand-written renderer, whose fixed boxes could not
 fit the labels.
 
+**Everything readable.** Nothing overlaps: every node and every answer is fully
+visible in every state the reader can reach, including a large family open with
+all its members. Answers written at the end of their edges are part of the layout,
+not decoration laid over it; where many answers converge, the layout makes room,
+and if placing the text on the edge cannot hold, the answer becomes a node of its
+own rather than run into a box. The physician's test is a family with ten members
+open: each answer legible, each box clear of its neighbours.
+
 **The interaction.** Pan by one finger, pinch or wheel to zoom, a fit button for
-what is open. Tapping a node or an answer selects it: what leads to it and what
+what is open, and a **reset** button beside it that returns the page to its
+opening state — folded, no search, no facet, no chapter, nothing selected — so the
+way back from any search or filter is one tap. Tapping a node or an answer selects it: what leads to it and what
 follows it stay, everything else fades, and its details open in the **section
 below the graph** — on a wide screen, in a **column beside it**, the graph taking
 the full height; the graph stays where it is either way, so the reader keeps their
@@ -159,13 +174,19 @@ kind:
   and no edge is computed, the rest is simply not shown. Sections without a claim
   are listed greyed, so the reader sees what the pool has not extracted. The
   chapter tree is a control, not the graph: the graph stays the one decision tree,
-  and the tree of headings never becomes its shape.
-- **A search box** is a *soft highlight*: it matches the label, short label and
-  claim text of statements and concepts; matches keep their colour and everything
-  else fades without disappearing, so "Leber" shows every branch the liver occurs
-  in and, just as usefully, where it does not. A counter reads "n matches in m
-  sections". Hiding would destroy the overview the search exists to give; fading
-  keeps the structure.
+  and the tree of headings never becomes its shape. Its "all" row stays fixed at
+  the top of the panel while the sections scroll, so that after any narrowing the
+  whole tree is one tap away (whether the search also finds sections in this tree
+  is open: `open-questions.md` → chapter-search).
+- **A search box** is a *soft highlight*: it matches the label, short label,
+  slot concepts and claim text of statements, the labels of patient groups, and
+  the answers on the edges — a condition is an edge, not a node, and must be found
+  all the same — without regard to case or diacritics; matches keep their colour
+  and everything else fades without disappearing, so "Leber" shows every branch
+  the liver occurs in and, just as usefully, where it does not. A counter reads "n
+  matches in m sections". Hiding would destroy the overview the search exists to
+  give; fading keeps the structure. A node the chapter tree can reach and the
+  search cannot is a bug.
 
 Once concepts carry a `facet`, the search gets facet filters (only procedures,
 only outcomes). Everything here runs in the browser on the view's JSON.
@@ -182,17 +203,28 @@ details carry it; the legend lists the four words next to the grade colours. Tim
 
 **What the section shows.**
 
-- *statement*, in this order: the direction as a banner, so the clinical answer is
-  read in a second; the full label, in its source language; the slots with their
-  concepts and, on the same footing, the **source** of each supporting claim —
-  document, page, section, recommendation number, linked into the document —
-  because where a recommendation comes from is as much part of the answer as whom
-  it is for; then every claim linked to it by `supports` or `contests` — each with
-  **its own grade** highlighted, then verb, direction and consensus, its
-  recommendation number, page and section, the verbatim quote, and a link to the
-  cited page of the source (§5); last, what the body text adds, grouped by
-  relation — *refines*, *supplements*, *limits* — each with its page. The order
-  goes from the answer to its evidence to its limits.
+- *statement*: the section is organised by the six questions a physician brings to
+  a recommendation, in this order, each a heading in the chrome language:
+  1. **What should I do?** — the direction as a banner, so the clinical answer is
+     read in a second, then the full label in its source language.
+  2. **Does this apply to my patient?** — the population with the family it
+     belongs to, and the condition, each linked to its concept.
+  3. **How binding and how well supported is it?** — every claim linked by
+     `supports` or `contests`, each with **its own grade** highlighted, then verb,
+     direction and consensus; an EK claim is marked as such and otherwise shown
+     like any other. Grades are shown, never composed (below).
+  4. **What could change the answer?** — what the body text adds, grouped by
+     relation — *refines*, *supplements*, *limits* — each with its page and section.
+  5. **Where exactly is it written?** — for each claim: document, recommendation
+     number, page, section, the verbatim quote with its copy button, and the link
+     into the cited page of the source (§5). Where a recommendation comes from is
+     as much part of the answer as whom it is for.
+  6. **Would the answer be different in a neighbouring situation?** — the
+     statements under the same group and condition, the same action recommended
+     for other groups, and the statements linked by `specializes`, `complements`
+     or `conflicts`, each a link that moves the graph there.
+  The order goes from the answer to its applicability, its evidence, its limits,
+  its source, and its neighbours. The entity page (§4) renders the same section.
 - *concept*: the label and definition, the statements that use it and in which slot,
   and its codes (`codes_as`) once terminology imports exist.
 - *structural node*: its label, its branches or outcomes, and the statements it is

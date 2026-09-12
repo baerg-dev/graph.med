@@ -173,7 +173,11 @@ that place — a recommendation's grade, verb and direction, a criterion's
 threshold, a definition. Claims are **immutable** once extracted (a correction
 is an edit with history, §7; the source said what it said), their identity is
 deterministic (§2), and they are **never merged**. A claim asserts nothing on
-its own about what is true; it asserts what a source states at a location.
+its own about what is true; it asserts what a source states at a location. Its
+unit is the **recommendation sentence**, not the box: a box holding several
+sentences with their own verbs and directions becomes several claims sharing
+the box's `recommendation_no`, each with the one grade its verb maps to under
+the source's grading scheme (memory `box-granularity-per-sentence`).
 
 ### 3.2 The semantic layer
 
