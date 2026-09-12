@@ -204,11 +204,16 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     def edge(a, b, kind, label=None, ref=None):
         e = {"from": a, "to": b, "kind": kind}
         if label: e["label"] = label
-        if ref: e["ref"] = ref
+        if ref:
+            e["ref"] = ref
+            if kind == "answer": e["text"] = text_of(ref)   # an answer is searchable by what it names, the way a node is
         edges.append(e)
     label = lambda cid: members[cid]["label"] if cid in members else cid
     short = lambda cid: members[cid].get("short_label") or members[cid]["label"] if cid in members else cid   # boxes and answers show the short form
     facet = lambda cid: members[cid].get("facet") if cid in members else None
+    # what the search matches on a group, an aim, an answer: the concept's label and short label
+    # (docs/publication.md §3; the browser folds case and diacritics)
+    text_of = lambda cid: " ".join(filter(None, [label(cid), members[cid].get("short_label")])) if cid in members else cid
     sources = [members[s] for s in view["filter"]["sources"]]
     root = add(view["id"], ref=sources[0]["id"], type="root", lang=sources[0]["lang"], label=sources[0]["title"])
     lang = sources[0]["lang"]
@@ -242,8 +247,7 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     def junction(c, parent):
         j = f"j:{c}"
         if j not in seen:
-            add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [],
-                text=" ".join(filter(None, [label(c), members[c].get("short_label")])).lower())
+            add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [], text=text_of(c))
         edge(parent, j, "answer", short(c), ref=c)
         for k in sorted(children.get(c, []), key=lambda k: (-weight[k], short(k))):
             junction(k, j)
@@ -265,9 +269,10 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
                   contested=any(c["edge"] == "contests" for c in claims),
                   no=min((c["recommendation_no"] for c in claims if c.get("recommendation_no")), default=None),
                   sections=sorted({c["section"] for c in claims if c.get("section")}, key=natural),
-                  # what the search matches: the statement, its short form, its slot concepts, its claims (spec §6.7)
-                  text=" ".join(filter(None, [st["label"], st.get("short_label")] + [label(c) for c in slots.values() if c in members]
-                                              + [c.get("label") for c in claims])).lower())
+                  # what the search matches: the statement, its short form, its slot concepts (label and short
+                  # label), its claims' sentences and quotes (docs/publication.md §3)
+                  text=" ".join(filter(None, [st["label"], st.get("short_label")] + [text_of(c) for c in slots.values() if c in members]
+                                              + [c.get("label") for c in claims] + [c.get("quote") for c in claims])))
         at = f"j:{pop}" if pop in members else q0   # the statement hangs from its own group's junction, never from a family's
         if cond in members:  # a further question, asked within the patient group
             q = f"q:{at}"
@@ -278,8 +283,7 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
         else:
             edge(at, sid, "flow")
         if outc in members:
-            add(outc, ref=outc, type="aim", lang=members[outc]["lang"], label=short(outc), full=label(outc), facets=[facet(outc)] if facet(outc) else [],
-                text=" ".join(filter(None, [label(outc), members[outc].get("short_label")])).lower())
+            add(outc, ref=outc, type="aim", lang=members[outc]["lang"], label=short(outc), full=label(outc), facets=[facet(outc)] if facet(outc) else [], text=text_of(outc))
             edge(sid, outc, "aim")
         for kind, to, _ in pool.out.get(st["id"], []):
             if kind in STATEMENT_EDGES and to in members:
