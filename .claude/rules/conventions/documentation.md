@@ -19,7 +19,11 @@ Each level has a home: Environment in `README.md` (the contributor half) and
 `.claude/rules/environment/` (the agent half); Conventions in
 `.claude/rules/conventions/`; Design in `docs/`. Memory (`.claude/memory/`) is not a
 level — it is a mechanism, and each fact it stores is filed under the level it
-belongs to.
+belongs to. Neither is the work-package convention (`docs/work/`, `docs/HANDOFF.md`,
+`docs/LOG.md`, `AGENTS.md`): it records what is to be done, where the last session
+stopped and what each session did, at no level — `docs/work/README.md` defines it.
+`docs/adr/` holds decisions about the repository itself and is Conventions-level
+content that lives under `docs/` because a person reads it there.
 
 The levels classify **content, not files**. A file lives at its dominant level, and a
 stray sentence of another level does not split one topic into two files —
@@ -29,9 +33,9 @@ What each level owes the reader:
 
 - **Environment and Conventions describe what exists.** Present tense, verified. Do
   not document tooling that does not exist. What exists is listed in `CLAUDE.md`
-  ("Checks"): the validator and the `uv` manifest — no build system or test suite
-  beyond that. A stale description of the environment is worse than none, because
-  it gets trusted.
+  ("Checks", "Build", "Work"): the validator, the site build, the work-package
+  check and the `uv` manifest — no test suite beyond that. A stale description of
+  the environment is worse than none, because it gets trusted.
 - **Design describes intent.** Describing what is not yet built is its purpose — and
   for exactly that reason a design document states its status at the top, so it can
   never be mistaken for a description of current behaviour.

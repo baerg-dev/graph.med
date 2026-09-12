@@ -40,6 +40,7 @@ pre-emptively.
 | `design/relations-are-edges-not-fields.md` | A relation is an edge with provenance (`broader`, `codes_as`), never a field; `broader` inherits nothing. |
 | `design/short-label-limit.md` | `short_label` is at most 60 characters (schema), target 55; concepts get one only above about 45. |
 | `design/direction-legend.md` | The four-word direction (für, gegen, abwägen, Lücke) is derived from claims; kann → abwägen with a lean; facts have none. |
+| `design/box-granularity-per-sentence.md` | A claim is one recommendation sentence, not a box; a box with several sentences is several claims sharing its `recommendation_no`. |
 | `design/concept-hierarchy-depth.md` | `broader` goes as deep as subsumption does (three levels in POMGAT); families are concepts without a parent; the site folds recursively. |
 
 ## Writing one
@@ -67,7 +68,9 @@ Link related memories with `[[their-name]]`. Add a row to the index above in the
 commit — a memory absent from the index is a memory nobody will open.
 
 What does **not** belong here: anything the code, the git history, `README.md` or a rule
-already states; anything true only of today's session, such as a current outage or a
-failure you are in the middle of debugging. Record the durable shape of a problem, not
+already states; a decision about the repository itself — its tooling, conventions or
+process — which is an ADR under `docs/adr/`; anything true only of today's session,
+such as a current outage or a failure you are in the middle of debugging (the
+session's record is a `docs/LOG.md` entry). Record the durable shape of a problem, not
 its current instance. If a fact turns out to be wrong, delete the file rather than
 leaving it to be trusted.

@@ -228,10 +228,13 @@ beside a quote is for viewers that cannot highlight the search from the link.
 
 ### How the pool grows
 
-Work is registered as **passes** of **chunks** in `data/PROGRESS.yaml`, one chunk
-per session, each ending in a pull request a person reviews. A chunk extracts a
-chapter (claims first, mechanical; then linking, judgment), or changes the schema,
-or adds a site feature. The rules an agent follows are short and worth reading
+Work is registered as **work packages**, one file each under `docs/work/`,
+grouped by initiative (`docs/work/README.md`); a session claims the next open one
+in a commit of its own, does it, and ends with a log entry (`docs/LOG.md`), a
+rewritten handoff (`docs/HANDOFF.md`) and a pull request a person reviews;
+finished packages move to `docs/work/done/`. `AGENTS.md` is the short form. A package extracts pages of a source (claims
+first, mechanical; then linking, judgment), or changes the schema, or adds a site
+feature, or changes the documentation or the tooling. The rules an agent follows are short and worth reading
 once: read before writing; extract first, link second; search before minting;
 contest, never overwrite; every statement needs provenance; underestimate, never
 upgrade; prefer an explicit gap to an invented answer.
@@ -254,7 +257,7 @@ current leaning, so that nobody re-derives it. What was decided, and why, lives 
 | **view** | a named filter over the pool; a page on the site. A **cut** is a frozen view |
 | **modelling** | provenance meaning "no document says this; we asserted it" |
 | **direction** | für / gegen / abwägen / Lücke, derived from the claims |
-| **chunk**, **pass** | one session's registered unit of work; an ordered list of them |
+| **work package**, **initiative** | one session's registered unit of work; the scope a set of them serves |
 
 ## Development environment (sbx)
 

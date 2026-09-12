@@ -4,12 +4,13 @@ paths:
   - .claude/**
   - .github/**
   - CLAUDE.md
+  - AGENTS.md
   - CODEOWNERS
 ---
 
 # You are editing a file that governs agents
 
-`.github/`, `.claude/` and `CLAUDE.md` decide what an agent is told and what CI runs.
+`.github/`, `.claude/`, `CLAUDE.md` and `AGENTS.md` decide what an agent is told and what CI runs.
 A change here is the highest-leverage change available to you and the least likely to be
 read carefully. (`CODEOWNERS` is in this rule's scope so that creating one is treated the
 same way; no such file exists today.)

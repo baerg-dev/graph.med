@@ -12,7 +12,9 @@ rules a document schema cannot state because they span files:
   - edges are unique per (from, kind, to, discriminator);
   - a view id is not a namespace name (views are served at the site root);
   - a claim's `section` names an entry of its source's `outline` (spec §6.7);
-  - `broader` edges form no cycle (spec §5).
+  - `broader` edges form no cycle (spec §5);
+  - the work-package convention holds (scripts/check-work.py: ids, statuses,
+    dependencies, done/, stale claims, HANDOFF.md against LOG.md).
 
 With --verify-quotes it also downloads each source (hash-checked, cached) and
 verifies every quote is a verbatim substring of `pdftotext -layout` on the cited
@@ -137,6 +139,8 @@ def main(argv=None) -> int:
     for cycle in cycles(broader):
         errors.append(f"broader edges form a cycle: {' -> '.join(cycle)}")
 
+    errors += check_work(set(ids))
+
     n_entities, n_edges = len(ids), len(seen_edges)
     print(f"checked {n_entities} entities and {n_edges} edges against schema {schema.get('x-version')}")
 
@@ -152,6 +156,18 @@ def main(argv=None) -> int:
         print(f"error: {line}")
     print(f"{len(errors)} error(s)" if errors else "ok")
     return 1 if errors else 0
+
+
+def check_work(ids: set[str]) -> list[str]:
+    """The work-package convention (docs/work/README.md) has its own check,
+    scripts/check-work.py; running it here means CI covers it on every pull
+    request without a workflow change."""
+    script = ROOT / "scripts" / "check-work.py"
+    if not script.exists():
+        return []
+    run = subprocess.run([sys.executable, str(script)], capture_output=True, text=True, cwd=ROOT)
+    return [line[len("error: "):] for line in run.stdout.splitlines() if line.startswith("error: ")] + \
+           ([f"scripts/check-work.py failed: {run.stderr.strip()}"] if run.returncode and not run.stdout.startswith("error") and run.stderr else [])
 
 
 def cycles(graph: dict[str, list[str]]) -> list[list[str]]:

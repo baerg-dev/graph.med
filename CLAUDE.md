@@ -11,9 +11,10 @@ The repository is at inception: it currently contains `README.md`, `LICENSE`, th
 file, the design documentation under `docs/`, the one schema for the data pool
 (`schema/schema.yaml`), the validator that enforces it (`tools/validate.py`) with the
 CI workflow that runs it (`.github/workflows/validate.yml`), the pool itself under
-`data/` (layout in `data/README.md`, parsing progress in `data/PROGRESS.yaml`), the
-site build (`tools/build.py`, see "Build"), and the `.claude/` directory described
-below. There is no source tree beyond these two scripts.
+`data/` (layout in `data/README.md`), the site build (`tools/build.py`, see "Build"),
+the work packages, handoff and log under `docs/` with the script that checks them
+(`scripts/check-work.py`, see "Work"), `AGENTS.md`, and the `.claude/` directory
+described below. There is no source tree beyond these three scripts.
 Project-specific guidance — data sources and their licenses, setup and test
 instructions — belongs in this file once it exists. Do not document tooling that does
 not exist.
@@ -21,7 +22,8 @@ not exist.
 ## Checks
 
 Python tooling is managed with `uv` (`pyproject.toml`, `uv.lock`); never pip. The one
-check is the validator. `schema/schema.yaml` is a JSON Schema (draft 2020-12); the
+check is the validator, which also runs the work-package check (`scripts/check-work.py`,
+see "Work"). `schema/schema.yaml` is a JSON Schema (draft 2020-12); the
 validator applies it to every file under `data/` with the `jsonschema` library, then
 checks what a document schema cannot say — references resolve, claim ids hash
 correctly, edges are unique:
@@ -82,9 +84,22 @@ provenance, attestations, review — with `schema/schema.yaml` as the authority 
 syntax; `docs/publication.md` is the authority on how the pool is shown — the site
 at `graph.med`, views as pages, a graph-and-sheet page read on a phone first; and
 `docs/open-questions.md`
-carries what is not yet decided: the handover between sessions. How an agent is expected to operate
-lives in `.claude/`, filed by level, so that each piece loads when it is relevant
-rather than all of it, always:
+carries what is not yet decided; `docs/work/` what is agreed and not yet done;
+`docs/HANDOFF.md` where the last session left things; `docs/LOG.md` what each
+session did; `docs/adr/` what was decided about the repository itself.
+
+## Work
+
+`AGENTS.md` at the root says how a session picks up work: read `docs/HANDOFF.md`,
+claim the next open package in `docs/work/`, end with a log entry, a rewritten
+handoff and a pull request. The convention is `docs/work/README.md`; the
+`next-work-package` skill is the procedure; the `handover` skill maintains
+`docs/open-questions.md`; decisions about the repository are `docs/adr/`.
+`uv run scripts/check-work.py` checks all of it (ids, statuses, dependencies,
+`done/`, stale claims, the handoff against the log); the validator runs it too.
+
+How an agent is expected to operate lives in `.claude/`, filed by level, so that
+each piece loads when it is relevant rather than all of it, always:
 
 ```
 .claude/
@@ -106,8 +121,8 @@ rather than all of it, always:
 │   └── design/
 ├── agents/                      subagent definitions — empty; add one .md per agent
 └── skills/
-    ├── handover/                end a session: update docs/open-questions.md
-    ├── parse-next-chunk/        do the next registered chunk of work: one, then hand over
+    ├── handover/                end a session: open questions, log entry, handoff
+    ├── next-work-package/       do the next registered work package: one, then hand over
     └── screenshot/              look at a view page in a real browser before proposing it
 ```
 
@@ -123,9 +138,10 @@ it is reviewed and shared rather than private to one machine.
 or skill that automates nothing would be guidance pretending to be capability — the
 validator is a check, not a task to automate — and each exception earned its place
 as a real, repeated task. `handover` ends a session by maintaining
-`docs/open-questions.md`. `parse-next-chunk` does the next chunk registered in
-`data/PROGRESS.yaml` — an extraction, a linking pass, a schema change or a build
-feature — one per session, ending with an updated registry and a pull request.
+`docs/open-questions.md`. `next-work-package` claims and does the next open
+package in `docs/work/` — an extraction, a linking pass, a schema change, a build
+feature, a docs change, tooling — one per session, ending with a log entry, a
+rewritten handoff and a pull request.
 `screenshot` renders a view page in a browser container so a build change is looked
 at, not only built. Add another only for another such task — then say in the pull request what it
 does and what it is allowed to touch.

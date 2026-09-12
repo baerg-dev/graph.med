@@ -17,7 +17,7 @@ do is worse than none, because it gets trusted.
 | `rules/conventions/` | How work is done in this repository. One `.md` per topic. |
 | `memory/` | Durable facts about this project, filed by level. One `.md` per fact. |
 | `agents/` | Subagent definitions, one `.md` each. Currently empty. |
-| `skills/` | Skills, one `<skill-name>/SKILL.md` each: `handover/`, `parse-next-chunk/`, `screenshot/`. |
+| `skills/` | Skills, one `<skill-name>/SKILL.md` each: `handover/`, `next-work-package/`, `screenshot/`. |
 | `settings.json` | Claude Code project settings: the plugins enabled for every session in this repository. One so far, `frontend-design`, for work on the site's look (`docs/publication.md` §6). |
 
 The levels — environment, conventions, design — and what each owes the reader are
@@ -40,7 +40,7 @@ it loads always or conditionally is decided by one frontmatter key:
 | `environment/git-identity.md` | — always |
 | `conventions/contribution-workflow.md` | — always |
 | `conventions/documentation.md` | `**/*.md` |
-| `conventions/governed-files.md` | `.claude/**`, `.github/**`, `CLAUDE.md`, `CODEOWNERS` |
+| `conventions/governed-files.md` | `.claude/**`, `.github/**`, `CLAUDE.md`, `AGENTS.md`, `CODEOWNERS` |
 | `conventions/memory.md` | — always |
 | `conventions/no-personal-information.md` | — always |
 
