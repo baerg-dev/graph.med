@@ -21,7 +21,8 @@ dependencies. Check `git ls-remote --heads origin 'agent/*'` first.
 - WP-0014 — waits on `docs/open-questions.md` → structural-recommendations.
 
 **Watch out.** `uv run tools/screenshot.py <view> --do all --do fit` prints the
-overlapping pairs; a build package ends with 0 in the fully open state. Question
-ids are now `q:<junction>:population` and `q:<junction>:condition`; only
-`q:population` is special to the client. Every pull request links its preview
-as a complete clickable URL (`https://graph.med/preview/pr<N>/<view-id>/`).
+overlapping pairs — nodes and answers on each other, and edges drawn across
+either; a build package ends with 0 in the fully open state. The reviewer tests
+on a phone; what the driver cannot see (the floating controls after a pan) is
+still yours to look at. Every pull request links its preview as a complete
+clickable URL (`https://graph.med/preview/pr<N>/<view-id>/`).

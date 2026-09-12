@@ -37,11 +37,22 @@ Out: any new question text — "Welche Population?" is reused; a different wordi
 
 ## Decisions
 
-- 2026-09-12 (agent): the question is a node of the build, not of the browser:
-  `decision_tree_of` inserts `q:<junction>:population` (a `question` node with
-  the view's own "Welche Population?") between a junction and its member groups
-  whenever it has any; the condition question is `q:<junction>:condition` for
-  symmetry (it was `q:<junction>`). No id of a question is linked from anywhere.
+- 2026-09-12 (agent): the question is a node of the build, not of the browser,
+  and one rule makes every one of them: `branch(parent, groups)` asks "Welche
+  Population?" and hangs a junction from each answer, called for the root with
+  the families and for a junction with its members. Ids are
+  `q:<parent>:population` and `q:<junction>:condition`; the client treats no id
+  as special (the frame is the root and its outgoing question). The maintainer
+  asked why the family question had not emerged on its own: the rule had been
+  written for the root only, and the member level as a shortcut past it.
+- 2026-09-12 (agent): the reviewer's overlap on a phone was edges, not boxes:
+  a taxi edge turned 24 px after its source, inside the source's own rank, so an
+  edge fanning from a question to a far answer ran through the boxes stacked
+  below the question, and a line to a shared aim left one box through its bottom
+  into the next. Every edge now turns 20 px right of the widest node in its
+  source's column, set after each layout (`route()`), since a column's width is
+  known only then; aim and relation edges turn the same way. The screenshot
+  driver reports an edge drawn across a node or an answer it does not touch.
 - 2026-09-12 (agent): a junction is built once and its question and members
   with it; a group with two parents gets a second answer edge into the same
   junction, never a second question or subtree.

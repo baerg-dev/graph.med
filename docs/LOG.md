@@ -6,10 +6,12 @@ entries to `docs/LOG-ARCHIVE.md`, newest first there too; never delete.
 ## 2026-09-12 — agent
 Packages touched: WP-0002 (review → done), WP-0003 (open → claimed → review)
 Branch: agent/2026-09-12-site-question-at-every-branch
-Notable: the first session to close a merged package under the new rule. The
-family question is built into the view JSON (12 new question nodes); the client
-only learned not to unfold past a question whose answers are groups. 0
-overlapping pairs in every state checked, 333 elements with everything open.
+Notable: the first session to close a merged package under the new rule. One
+rule now builds every question, root and family alike. The review found edges
+drawn through boxes on a phone — the vertical run of a taxi edge sat inside its
+source's rank; it is now placed after each layout in the gap between columns,
+and the screenshot driver reports edges across nodes and answers. 0 in every
+state checked, 333 elements with everything open.
 
 ## 2026-09-12 — agent
 Packages touched: WP-0002 (open → claimed → review)
