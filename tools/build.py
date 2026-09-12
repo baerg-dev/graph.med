@@ -219,8 +219,6 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     lang = sources[0]["lang"]
     if lang not in QUESTIONS:
         raise SystemExit(f"{view['id']}: no question words for language {lang!r} — add a row to QUESTIONS in tools/build.py")
-    q0 = add("q:population", type="question", lang=lang, label=QUESTIONS[lang]["population"])
-    edge(root, q0, "flow")
     statements = sorted((m for m in members.values() if m["type"] == "statement"),
                         key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")) + [s["id"]])
     own: dict = defaultdict(list)          # statements whose population is exactly this concept
@@ -244,20 +242,24 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
             return set()
         return {st["id"] for st in own.get(c, [])} | {sid for k in children.get(c, []) for sid in below(k, seen + (c,))}
     weight = {c: len(below(c)) for c in concepts}
+    def branch(parent, groups):
+        """Every branching is a question (docs/publication.md §3): whatever forks into patient groups —
+        the root into the families, a family into its members — asks "Welche Population?" first, and
+        each answer leads to a group's junction. One rule for every level of the tree."""
+        q = add(f"q:{parent}:population", type="question", lang=lang, label=QUESTIONS[lang]["population"])
+        edge(parent, q, "flow")
+        for c in sorted(groups, key=lambda c: (-weight[c], short(c))):
+            junction(c, q)
+        return q
     def junction(c, parent):
         j = f"j:{c}"
         edge(parent, j, "answer", short(c), ref=c)
         if j in seen:   # a group with two parents appears under both, built once
             return
         add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [], text=text_of(c))
-        kids = sorted(children.get(c, []), key=lambda k: (-weight[k], short(k)))
-        if kids:   # every branching is a question: a family asks "Welche Population?" again before its member groups (docs/publication.md §3)
-            q = add(f"q:{j}:population", type="question", lang=lang, label=QUESTIONS[lang]["population"])
-            edge(j, q, "flow")
-            for k in kids:
-                junction(k, q)
-    for c in sorted(concepts - parents, key=lambda c: (-weight[c], short(c))):
-        junction(c, q0)
+        if children.get(c):
+            branch(j, children[c])
+    q0 = branch(root, concepts - parents)
     statements.sort(key=lambda s: (-weight.get((s.get("slots") or {}).get("population"), 0), label((s.get("slots") or {}).get("population") or ""),
                                    natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")), s["id"]))
     for st in statements:

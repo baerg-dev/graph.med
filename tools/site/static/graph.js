@@ -22,7 +22,8 @@
 
   /* the search compares folded text: no case, no diacritics ("osophagus" finds Ösophagus), ß as ss */
   function fold(s) { return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ß/g, "ss").toLowerCase(); }
-  var elements = [];
+  var elements = [], types = {};
+  data.nodes.forEach(function (n) { types[n.id] = n.type; });
   data.nodes.forEach(function (n) {
     elements.push({ data: { id: n.id, ref: n.ref || "", type: n.type, label: n.label || "", group: n.group || "",
       fill: n.grade ? css(GRADE[n.grade] || "--line") : css("--bg"), against: n.against ? 1 : 0, contested: n.contested ? 1 : 0,
@@ -36,7 +37,7 @@
        before the arrow and, with the rank separation below, never reaches the rank before */
     var width = Math.min(170, 6.2 * (e.label || "").length);
     elements.push({ data: { id: "e" + i, source: e.from, target: e.to, kind: e.kind, label: e.label || "", ref: e.ref || "", text: fold(e.text),
-      lm: -(width / 2 + 10) } });
+      lm: -(width / 2 + 10), turn: -200 } });   /* turn: where the edge's vertical run lies, set by route() after every layout */
   });
 
   var cy = cytoscape({
@@ -67,11 +68,15 @@
       /* answers fan out of one question orthogonally — a short trunk, then a horizontal run into each
          group or box — so that an answer, written on its own run, is crossed by no other edge */
       { selector: "edge[kind = 'answer']", style: { "line-color": css("--fg"), "target-arrow-color": css("--fg"), "font-weight": 600,
-          "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": 24, "taxi-turn-min-distance": 8,
+          "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": "data(turn)", "taxi-turn-min-distance": 8,
           "label": "", "target-label": "data(label)", "target-text-offset": 0, "target-text-margin-x": "data(lm)", "target-text-rotation": "none" } },
-      { selector: "edge[kind = 'flow']", style: { "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": 24, "taxi-turn-min-distance": 8 } },
-      { selector: "edge[kind = 'aim']", style: { "line-style": "dashed", "target-arrow-shape": "none" } },
-      { selector: "edge[kind = 'relation']", style: { "line-style": "dotted", "line-color": css("--statement"), "target-arrow-color": css("--statement") } },
+      { selector: "edge[kind = 'flow']", style: { "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": "data(turn)", "taxi-turn-min-distance": 8 } },
+      /* an aim or a relation leaves its box by the right edge and turns like the others, so that a line
+         to a shared aim never leaves through the bottom of one box into the top of the next */
+      { selector: "edge[kind = 'aim']", style: { "line-style": "dashed", "target-arrow-shape": "none",
+          "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": "data(turn)", "taxi-turn-min-distance": 8 } },
+      { selector: "edge[kind = 'relation']", style: { "line-style": "dotted", "line-color": css("--statement"), "target-arrow-color": css("--statement"),
+          "curve-style": "taxi", "taxi-direction": "rightward", "taxi-turn": "data(turn)", "taxi-turn-min-distance": 8 } },
       { selector: "edge.dup", style: { "target-label": "" } },   /* a group reached from two open parents names its answer once */
       { selector: ".folded", style: { "display": "none" } },
       { selector: ".dim", style: { "opacity": 0.12 } },
@@ -98,6 +103,21 @@
   var counts = {};
   junctions.forEach(function (j) { counts[j.id()] = j.data("label"); });
 
+  /* an edge runs right, turns, runs down or up, turns, runs right into its target. Its vertical run
+     must lie in the gap after its source's rank — never inside the rank, where it would cut through
+     the boxes stacked above or below the source — and before the answers written in front of the next
+     rank. A rank is a column of nodes sharing a centre x, and its width is known only once laid out
+     (a rank of junctions is 30 px wide, one with a box 240), so the turn is set after every layout:
+     20 px right of the widest node in the source's column, measured back from the target (negative) */
+  function route(eles) {
+    var right = {};
+    eles.nodes().forEach(function (n) { var k = Math.round(n.position("x")), b = n.boundingBox({ includeLabels: false }); right[k] = Math.max(right[k] || -Infinity, b.x2); });
+    eles.edges().forEach(function (e) {
+      var s = e.source(), t = e.target(), x = right[Math.round(s.position("x"))] + 20, turn = x - t.boundingBox({ includeLabels: false }).x1;
+      e.data("turn", turn < -8 ? Math.round(turn) : 24);   /* a target beside or behind its source (a relation) turns just after the source */
+    });
+  }
+
   /* fit what is open into the part of the canvas the controls do not cover: the search row floats
      over its top and the legend over its bottom, so a plain fit would put nodes under them */
   var tools = document.querySelector(".tools.left");
@@ -113,7 +133,7 @@
      shown; an open junction shows what hangs directly from it: its own recommendations
      (with their conditions and aims) and, behind a "Welche Population?" of its own, the
      junctions of its member groups, each folded until opened in turn */
-  var frame = cy.nodes("[type = 'root'], [type = 'question']").filter(function (n) { return n.id() === "q:population" || n.data("type") === "root"; });
+  var root = cy.nodes("[type = 'root']"), frame = root.union(root.outgoers("node[type = 'question']"));
   var families = junctions.filter(function (j) { return j.incomers("node").intersection(frame).nonempty(); });
   var always = frame.union(cy.nodes("[type = 'root']").connectedEdges()).union(families).union(families.incomers("edge"));
   function relayout(fitTo) {
@@ -145,7 +165,7 @@
     shown.nodes().forEach(function (n) { n.boundingBox({ includeLabels: true }); });
     var lay = shown.layout({ name: "dagre", rankDir: "LR", nodeSep: 18, rankSep: 230, edgeSep: 10, align: "UL", nodeDimensionsIncludeLabels: true,
                              animate: true, animationDuration: 250, fit: false });
-    lay.one("layoutstop", function () { if (fitTo) fit(fitTo.not(".folded"), 30); });
+    lay.one("layoutstop", function () { route(shown); if (fitTo) fit(fitTo.not(".folded"), 30); });
     lay.run();
     highlight();
   }
@@ -257,7 +277,7 @@
     cy.elements().removeClass("faded");
     if (!query && !facet) { count.hidden = true; return; }
     var m = matches().not(".folded");
-    cy.elements().not(".folded").not(m).not(m.connectedEdges()).not("node[type = 'root'], node[type = 'question']").addClass("faded");   /* the frame stays for orientation */
+    cy.elements().not(".folded").not(m).not(m.connectedEdges()).not(frame).addClass("faded");   /* the frame stays for orientation */
     var st = m.filter("[type = 'statement']").union(m.not("[type = 'statement']").neighborhood("node[type = 'statement']")), secs = {};
     st.forEach(function (n) { n.data("sections").forEach(function (s) { secs[s] = 1; }); });
     var n = m.length, k = Object.keys(secs).length;
