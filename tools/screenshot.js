@@ -52,6 +52,34 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       const w = Math.min(a.x2, b.x2) - Math.max(a.x1, b.x1), h = Math.min(a.y2, b.y2) - Math.max(a.y1, b.y1);
       if (w > 1 && h > 1) pairs.push(`${a.name} × ${b.name} (${Math.round(w)}×${Math.round(h)})`);
     }
+    /* and every edge drawn across a node it does not touch: a taxi edge as its three runs, any other
+       as the straight line between its endpoints (a bezier bows a little, a segment is the least it covers) */
+    const nodes = cy.nodes().not(".folded");
+    const labels = boxes.filter(b => b.name.startsWith("answer "));
+    function cuts(p, q, b) {   /* does segment p–q cross box b, shrunk by a pixel */
+      const x1 = b.x1 + 1, y1 = b.y1 + 1, x2 = b.x2 - 1, y2 = b.y2 - 1;
+      let t0 = 0, t1 = 1; const dx = q.x - p.x, dy = q.y - p.y;
+      for (const [pp, qq] of [[-dx, p.x - x1], [dx, x2 - p.x], [-dy, p.y - y1], [dy, y2 - p.y]]) {
+        if (pp === 0) { if (qq < 0) return false; continue; }
+        const r = qq / pp;
+        if (pp < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; }
+      }
+      return t0 <= t1;
+    }
+    cy.edges().not(".folded").forEach(e => {
+      const s = e.sourceEndpoint(), t = e.targetEndpoint(), runs = [];
+      if (e.style("curve-style") === "taxi") { const turn = Number(e.data("turn")) || 24, x = turn < 0 ? t.x + turn : s.x + turn; runs.push([s, { x, y: s.y }], [{ x, y: s.y }, { x, y: t.y }], [{ x, y: t.y }, t]); }
+      else runs.push([s, t]);
+      const name = `edge ${e.source().data("label") || e.source().id()} → ${e.target().data("label") || e.target().id()}`;
+      nodes.forEach(n => {
+        if (n.same(e.source()) || n.same(e.target())) return;
+        const b = n.boundingBox({ includeLabels: true, includeOverlays: false });
+        if (runs.some(([p, q]) => cuts(p, q, b))) pairs.push(`${name} across ${n.data("label") || n.id()}`);
+      });
+      /* the answer before a target is written on the final run of every edge into it: not an obstacle for those */
+      const own = new Set(e.target().incomers("edge").map(f => f.id()));
+      labels.forEach(b => { if (!own.has(b.id) && runs.some(([p, q]) => cuts(p, q, b))) pairs.push(`${name} across ${b.name}`); });
+    });
     return pairs;
   });
   console.log(`${shown} elements shown, ${overlaps.length} overlapping pairs` + (errors.length ? `; page errors: ${errors.join(" | ")}` : ""));
