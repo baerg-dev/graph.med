@@ -1,12 +1,12 @@
 ---
 id: WP-0001
 title: The search finds every node the chapter tree finds
-status: open
+status: claimed
 created: 2026-09-12
 updated: 2026-09-12
 depends_on: []
 blocks: []
-owner: unassigned
+owner: agent
 initiative: ui
 kind: build
 slug: site-search-recall
