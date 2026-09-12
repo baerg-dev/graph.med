@@ -18,8 +18,9 @@ form); this file is the procedure.
    otherwise). For each: `status: done`, `updated: <today>`, `git mv` into
    `docs/work/done/`, one commit per package ("close WP-NNNN") — the first
    commits of your session, on the branch you are about to claim on (so branch
-   first, from `main`; the claim commit follows). Do not wait to be asked and do
-   not leave it for the handoff to mention.
+   first, from `main`; the claim commit follows), fused into that session's
+   pull request — never a pull request of its own. Do not wait to be asked and
+   do not leave it for the handoff to mention.
 3. **Pick.** Among `docs/work/WP-*.md` with `status: open`, those whose every
    `depends_on` is in `docs/work/done/`; the lowest id wins. Skip `claimed`,
    `review` and `blocked`. Also skip a package whose slug already has a branch
