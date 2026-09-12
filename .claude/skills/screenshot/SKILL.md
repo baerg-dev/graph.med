@@ -61,3 +61,6 @@ one state that exercises what the package changed (a family unfolded, a box
 selected, a filter, a search). Say in the PR description which captures you
 took and what you saw — including what is wrong, so the reviewer does not have
 to find it. "Not opened in a browser" is no longer an acceptable line in a PR.
+Link the preview the reviewer will open as a complete, clickable URL
+(`https://graph.med/preview/pr<N>/<view-id>/`, a markdown link on its own line),
+never as a bare `graph.med/preview/pr<N>/`.

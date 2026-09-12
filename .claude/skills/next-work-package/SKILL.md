@@ -75,7 +75,13 @@ leaves the data valid.
 **build** — changes `tools/build.py` and `tools/site/`, checked by building
 (`CLAUDE.md`, "Build"), reading the result, and looking at the page in a browser
 on desktop and phone (the `screenshot` skill); the PR says what you saw and links
-its preview at `graph.med/preview/pr<N>/`.
+its preview as a **clickable, complete URL** on its own line — scheme and view
+page included, `https://graph.med/preview/pr<N>/<view-id>/`, as a markdown link.
+The number exists only after `gh pr create`: create with a placeholder, then patch
+the body (`gh api -X PATCH repos/<owner>/<repo>/pulls/<N> -F body=@<file>`; `gh pr
+edit` can fail on a deprecated project-cards query). Put the same full URL in your
+final message to the maintainer; `graph.med/preview/pr<N>/` without the scheme is
+not clickable in a terminal.
 
 **docs** and **tooling** — the package's Outcome says what is true when it is
 done; the documentation levels (`.claude/rules/conventions/documentation.md`)

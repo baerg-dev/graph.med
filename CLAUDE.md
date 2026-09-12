@@ -60,7 +60,9 @@ GitHub Pages is a workflow file, committed by a person
 (`.github/workflows/pages.yml`): validate, build, deploy on every push to `main`,
 and one preview per open pull request at `graph.med/preview/pr<N>/`, rebuilt from
 the pull request's head after each run of its checks (`docs/publication.md` §6).
-Link the preview from a pull request that changes what a page shows.
+Link the preview from a pull request that changes what a page shows, as a
+complete clickable URL (`https://graph.med/preview/pr<N>/<view-id>/`), never a
+bare path.
 
 ## Where this runs
 
