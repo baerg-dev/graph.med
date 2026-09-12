@@ -13,7 +13,14 @@ form); this file is the procedure.
 
 1. `git fetch origin`. Read `docs/HANDOFF.md` first, then `docs/LOG.md`'s newest
    entry.
-2. **Pick.** Among `docs/work/WP-*.md` with `status: open`, those whose every
+2. **Close what has merged.** A package whose file on `origin/main` says
+   `status: review` has been reviewed and merged (nothing reaches `main`
+   otherwise). For each: `status: done`, `updated: <today>`, `git mv` into
+   `docs/work/done/`, one commit per package ("close WP-NNNN") — the first
+   commits of your session, on the branch you are about to claim on (so branch
+   first, from `main`; the claim commit follows). Do not wait to be asked and do
+   not leave it for the handoff to mention.
+3. **Pick.** Among `docs/work/WP-*.md` with `status: open`, those whose every
    `depends_on` is in `docs/work/done/`; the lowest id wins. Skip `claimed`,
    `review` and `blocked`. Also skip a package whose slug already has a branch
    `agent/*-<slug>` on `origin` (`git ls-remote --heads origin 'agent/*-<slug>'`):
@@ -21,14 +28,14 @@ form); this file is the procedure.
    report "nothing open" — which packages are claimed, blocked or waiting on
    dependencies — and stop.** Never take work from `docs/work/LATER.md`; a human
    registers a package from it.
-3. **Claim.** `git checkout -b agent/YYYY-MM-DD-<slug>` from `main`. In the
+4. **Claim.** On `agent/YYYY-MM-DD-<slug>` from `main` (created in step 2 if a package was closed). In the
    package: `status: claimed`, `owner: agent`, `updated: <today>`. Commit that
    alone ("claim WP-NNNN"), push with `-u` at once. Only then write code.
-4. **Read the package** in full and its initiative
+5. **Read the package** in full and its initiative
    (`docs/work/initiatives/<initiative>.md`), then what it points at: the spec
    (`docs/graph-representation.md`), `schema/schema.yaml`, `docs/publication.md`
    for a build package, and the entries of `docs/open-questions.md` it names.
-5. If the package reads a source (`kind: extraction`, with `source` and `pages`):
+6. If the package reads a source (`kind: extraction`, with `source` and `pages`):
    fetch it — URL and expected sha256 are on the source entity under
    `data/sources/`. **Verify the hash.** On mismatch or an unreachable URL, stop:
    fix the source entity if the document merely moved (AWMF renames expired
@@ -113,6 +120,5 @@ package; a decision you had to make goes under its Decisions, appended.
    (`https://graph.med/preview/pr<N>/<view-id>/`, see **build**). The PR description: what was
    done, what you were unsure of, what went to `LATER.md`, and any change to the
    schema, the validator or agent-governing files, named explicitly.
-6. Stop. After approval, the last commit on the branch sets `status: done` and
-   `git mv`-s the package into `docs/work/done/`; a person merges. Do that
-   commit only when asked to.
+6. Stop. A person reviews and merges the pull request as it is; the package
+   reaches `done/` through step 2 of the next session that sees it merged.
