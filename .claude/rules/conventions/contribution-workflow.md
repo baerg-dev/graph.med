@@ -61,6 +61,9 @@ working correctly.
 - **Anything you deliberately did not do**, and why — out-of-scope fixes you noticed,
   cases you left unhandled on purpose.
 - **Any change to configuration, CI, or agent-governing files**, named explicitly.
+- **The preview, in every pull request** — whatever the diff touches, the site is
+  built for it — as a complete clickable URL
+  (`https://graph.med/preview/pr<N>/<view-id>/`) on its own line.
 
 ### After the PR is open
 
