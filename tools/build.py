@@ -219,8 +219,6 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     lang = sources[0]["lang"]
     if lang not in QUESTIONS:
         raise SystemExit(f"{view['id']}: no question words for language {lang!r} — add a row to QUESTIONS in tools/build.py")
-    q0 = add("q:population", type="question", lang=lang, label=QUESTIONS[lang]["population"])
-    edge(root, q0, "flow")
     statements = sorted((m for m in members.values() if m["type"] == "statement"),
                         key=lambda s: natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")) + [s["id"]])
     own: dict = defaultdict(list)          # statements whose population is exactly this concept
@@ -244,15 +242,24 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
             return set()
         return {st["id"] for st in own.get(c, [])} | {sid for k in children.get(c, []) for sid in below(k, seen + (c,))}
     weight = {c: len(below(c)) for c in concepts}
+    def branch(parent, groups):
+        """Every branching is a question (docs/publication.md §3): whatever forks into patient groups —
+        the root into the families, a family into its members — asks "Welche Population?" first, and
+        each answer leads to a group's junction. One rule for every level of the tree."""
+        q = add(f"q:{parent}:population", type="question", lang=lang, label=QUESTIONS[lang]["population"])
+        edge(parent, q, "flow")
+        for c in sorted(groups, key=lambda c: (-weight[c], short(c))):
+            junction(c, q)
+        return q
     def junction(c, parent):
         j = f"j:{c}"
-        if j not in seen:
-            add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [], text=text_of(c))
         edge(parent, j, "answer", short(c), ref=c)
-        for k in sorted(children.get(c, []), key=lambda k: (-weight[k], short(k))):
-            junction(k, j)
-    for c in sorted(concepts - parents, key=lambda c: (-weight[c], short(c))):
-        junction(c, q0)
+        if j in seen:   # a group with two parents appears under both, built once
+            return
+        add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [], text=text_of(c))
+        if children.get(c):
+            branch(j, children[c])
+    q0 = branch(root, concepts - parents)
     statements.sort(key=lambda s: (-weight.get((s.get("slots") or {}).get("population"), 0), label((s.get("slots") or {}).get("population") or ""),
                                    natural(min((c["recommendation_no"] for c in pool.claims_for(s["id"]) if c.get("recommendation_no")), default="")), s["id"]))
     for st in statements:
@@ -275,7 +282,7 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
                                               + [c.get("label") for c in claims] + [c.get("quote") for c in claims])))
         at = f"j:{pop}" if pop in members else q0   # the statement hangs from its own group's junction, never from a family's
         if cond in members:  # a further question, asked within the patient group
-            q = f"q:{at}"
+            q = f"q:{at}:condition"
             if q not in seen:
                 add(q, type="question", lang=lang, label=QUESTIONS[lang]["condition"])
                 edge(at, q, "flow")

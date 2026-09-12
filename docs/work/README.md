@@ -95,8 +95,10 @@ Anything with no other home. Not progress.
   merged — nothing reaches `main` otherwise. **The next agent that sees one
   closes it** without being asked: `status: done`, `updated:` today, `git mv` into
   `done/`, in its own commit ("close WP-NNNN") at the start of its session, on
-  its own branch before it claims anything. So a package's `depends_on` is
-  satisfied on that branch as soon as the dependency has merged.
+  the branch of whatever the session does next — the closure rides in that
+  session's pull request; no pull request exists just to close a package. So a
+  package's `depends_on` is satisfied on that branch as soon as the dependency
+  has merged.
 - A package that needs more than about one session is split, with `depends_on`.
 - `blocked` means a human decision is pending; the package names it.
 - Registering a package is a human decision, made in a pull request. Anyone may

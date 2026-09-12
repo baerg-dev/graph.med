@@ -1,7 +1,7 @@
 ---
 id: WP-0002
 title: "Nothing overlaps: every node and answer readable"
-status: review
+status: done
 created: 2026-09-12
 updated: 2026-09-12
 depends_on: []
