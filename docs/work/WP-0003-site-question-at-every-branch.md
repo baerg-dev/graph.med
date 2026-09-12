@@ -1,7 +1,7 @@
 ---
 id: WP-0003
 title: A question diamond at every branching of the tree
-status: claimed
+status: review
 created: 2026-09-12
 updated: 2026-09-12
 depends_on: [WP-0002]
@@ -37,7 +37,18 @@ Out: any new question text — "Welche Population?" is reused; a different wordi
 
 ## Decisions
 
-None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+- 2026-09-12 (agent): the question is a node of the build, not of the browser:
+  `decision_tree_of` inserts `q:<junction>:population` (a `question` node with
+  the view's own "Welche Population?") between a junction and its member groups
+  whenever it has any; the condition question is `q:<junction>:condition` for
+  symmetry (it was `q:<junction>`). No id of a question is linked from anywhere.
+- 2026-09-12 (agent): a junction is built once and its question and members
+  with it; a group with two parents gets a second answer edge into the same
+  junction, never a second question or subtree.
+- 2026-09-12 (agent): folding stops at a question whose answers are groups: an
+  open junction shows its own question with the member junctions folded behind
+  it, and follows a condition question through to its recommendations and aims
+  as before.
 
 ## Open questions
 

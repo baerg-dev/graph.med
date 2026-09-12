@@ -4,6 +4,14 @@ One entry per session, newest first. Past about 200 lines, move the oldest
 entries to `docs/LOG-ARCHIVE.md`, newest first there too; never delete.
 
 ## 2026-09-12 — agent
+Packages touched: WP-0002 (review → done), WP-0003 (open → claimed → review)
+Branch: agent/2026-09-12-site-question-at-every-branch
+Notable: the first session to close a merged package under the new rule. The
+family question is built into the view JSON (12 new question nodes); the client
+only learned not to unfold past a question whose answers are groups. 0
+overlapping pairs in every state checked, 333 elements with everything open.
+
+## 2026-09-12 — agent
 Packages touched: WP-0002 (open → claimed → review)
 Branch: agent/2026-09-12-site-layout-visibility
 Notable: the overlaps had a single cause — the answer's offset assumed the arrow
