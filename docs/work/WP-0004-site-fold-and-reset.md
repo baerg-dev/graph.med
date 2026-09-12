@@ -1,8 +1,15 @@
 ---
-id: site-fold-and-reset
+id: WP-0004
+title: Fold at every question, a reset button, a fixed "all" row
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0003]
+blocks: [WP-0010]
+owner: unassigned
 initiative: ui
 kind: build
-depends_on: [site-question-at-every-branch]
+slug: site-fold-and-reset
 ---
 
 ## Outcome
@@ -25,6 +32,14 @@ Out: the search, the panel content, the colours.
 
 `docs/publication.md` §3 "Folded by default", "The interaction", "Chapters and
 search". Touch targets stay at least 44 px on a phone.
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

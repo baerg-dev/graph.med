@@ -1,8 +1,15 @@
 ---
-id: grouping-axes-decision
+id: WP-0007
+title: Decide the grouping axes and their schema shape
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: []
+blocks: [WP-0008]
+owner: unassigned
 initiative: groupings
 kind: docs
-depends_on: []
+slug: grouping-axes-decision
 ---
 
 ## Outcome
@@ -37,6 +44,10 @@ Out: the schema, the validator, any edge — those are `schema-grouping-axes` an
 `docs/open-questions.md` → grouping-axes (this package settles it);
 → phase-vocabulary (settled with it if the phase becomes an axis);
 → view-filter-language (respected, not settled).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
 
 ## Verification
 

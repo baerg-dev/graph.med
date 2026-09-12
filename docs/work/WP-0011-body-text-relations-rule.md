@@ -1,8 +1,15 @@
 ---
-id: body-text-relations-rule
+id: WP-0011
+title: A written rule per body-text relation
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: []
+blocks: [WP-0012, WP-0016]
+owner: unassigned
 initiative: extraction-quality
 kind: docs
-depends_on: []
+slug: body-text-relations-rule
 ---
 
 ## Outcome
@@ -27,6 +34,14 @@ Out: any change under `data/` — that is `relink-body-text-a` and `-b`.
 Claims are immutable and never merged (spec §3.1); a wrong relation is fixed by
 a new edge and an edit with history, never by rewriting a claim. Underestimate,
 never upgrade (spec §11).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

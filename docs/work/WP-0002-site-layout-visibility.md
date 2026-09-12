@@ -1,8 +1,15 @@
 ---
-id: site-layout-visibility
+title: "Nothing overlaps: every node and answer readable"
+title: "Nothing overlaps: every node and answer readable"
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: []
+blocks: [WP-0003]
+owner: unassigned
 initiative: ui
 kind: build
-depends_on: []
+slug: site-layout-visibility
 ---
 
 ## Outcome
@@ -25,6 +32,14 @@ forms, the colours.
 - `docs/publication.md` §3 "Everything readable" and the memory
   `view-page-is-a-decision-tree`: the tree stays one tree; do not hand-write layout.
 - Cytoscape.js and dagre stay vendored and pinned.
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

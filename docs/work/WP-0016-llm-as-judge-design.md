@@ -1,8 +1,15 @@
 ---
-id: llm-as-judge-design
+id: WP-0016
+title: Design the automated review that lands as attestations
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0011]
+blocks: []
+owner: unassigned
 initiative: review
 kind: docs
-depends_on: [body-text-relations-rule]
+slug: llm-as-judge-design
 ---
 
 ## Outcome
@@ -27,6 +34,14 @@ Out: any code; any workflow file; any attestation.
 Review is a signed attestation (spec §8); a judge is one more agent with a
 recorded identity and no write access to the pool beyond attestations. The
 workflow's token stays read-only (`README.md`, "Checks").
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

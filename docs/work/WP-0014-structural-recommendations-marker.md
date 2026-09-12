@@ -1,8 +1,15 @@
 ---
-id: structural-recommendations-marker
+id: WP-0014
+title: A data marker for structural recommendations
+status: blocked
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: []
+blocks: []
+owner: unassigned
 initiative: extraction-quality
 kind: schema
-depends_on: []
+slug: structural-recommendations-marker
 ---
 
 ## Outcome
@@ -30,6 +37,10 @@ Out: how the site shows or hides them.
 ## Open questions
 
 `docs/open-questions.md` → structural-recommendations (gates this package).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
 
 ## Verification
 

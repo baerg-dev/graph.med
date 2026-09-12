@@ -1,8 +1,15 @@
 ---
-id: link-grouping-axes
+id: WP-0009
+title: Assert the second grouping axis on POMGAT
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0008]
+blocks: [WP-0010]
+owner: unassigned
 initiative: groupings
 kind: linking
-depends_on: [schema-grouping-axes]
+slug: link-grouping-axes
 ---
 
 ## Outcome
@@ -25,6 +32,14 @@ Spec §11 (search before minting, nothing inherited, no review status written);
 memory `concept-hierarchy-depth` (as deep as subsumption goes; families are
 concepts without a parent on that axis); short labels above ~45 characters
 (memory `short-label-limit`).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

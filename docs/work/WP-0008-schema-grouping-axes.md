@@ -1,8 +1,15 @@
 ---
-id: schema-grouping-axes
+id: WP-0008
+title: Schema and validator for grouping axes
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0007]
+blocks: [WP-0009]
+owner: unassigned
 initiative: groupings
 kind: schema
-depends_on: [grouping-axes-decision]
+slug: schema-grouping-axes
 ---
 
 ## Outcome
@@ -24,6 +31,14 @@ Out: asserting any edge; the site.
 - Additive: every existing `broader` edge remains valid, read as the anatomical
   axis or whatever the decision names as the default.
 - The schema commit lands before any data that uses it (spec §7).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

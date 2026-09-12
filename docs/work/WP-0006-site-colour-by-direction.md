@@ -1,8 +1,15 @@
 ---
-id: site-colour-by-direction
+id: WP-0006
+title: Boxes coloured by direction, grade as a letter
+status: blocked
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0005]
+blocks: []
+owner: unassigned
 initiative: ui
 kind: build
-depends_on: [site-panel-six-questions]
+slug: site-colour-by-direction
 ---
 
 ## Outcome
@@ -31,6 +38,10 @@ Out: the direction derivation itself (memory `direction-legend`).
 ## Open questions
 
 `docs/open-questions.md` → box-colour (gates this package).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
 
 ## Verification
 

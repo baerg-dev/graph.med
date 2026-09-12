@@ -1,8 +1,15 @@
 ---
-id: site-search-recall
+id: WP-0001
+title: The search finds every node the chapter tree finds
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: []
+blocks: []
+owner: unassigned
 initiative: ui
 kind: build
-depends_on: []
+slug: site-search-recall
 ---
 
 ## Outcome
@@ -26,6 +33,14 @@ inside the chapter tree (`docs/open-questions.md` → chapter-search).
   never hiding.
 - No data change: everything comes from labels, short labels and claim text
   already in the pool.
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

@@ -1,8 +1,15 @@
 ---
-id: site-grouping-views
+id: WP-0010
+title: Axis switch and the first specialised views on the site
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0009, WP-0004]
+blocks: []
+owner: unassigned
 initiative: groupings
 kind: build
-depends_on: [link-grouping-axes, site-fold-and-reset]
+slug: site-grouping-views
 ---
 
 ## Outcome
@@ -27,6 +34,14 @@ Out: a query language; the search and facet filters beyond what they do.
 Memory `view-page-is-a-decision-tree`: one tree, left to right, folded; the axis
 changes which concepts are families, never the shape. Views are data
 (memory `pool-and-views`).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

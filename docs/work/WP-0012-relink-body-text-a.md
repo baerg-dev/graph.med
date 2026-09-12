@@ -1,8 +1,15 @@
 ---
-id: relink-body-text-a
+id: WP-0012
+title: Relink body-text relations, chapters 4–6
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0011]
+blocks: [WP-0013]
+owner: unassigned
 initiative: extraction-quality
 kind: linking
-depends_on: [body-text-relations-rule]
+slug: relink-body-text-a
 ---
 
 ## Outcome
@@ -25,6 +32,14 @@ Out: chapters 7–9 (`relink-body-text-b`); the site.
 Every quote verbatim on its physical page (`uv run tools/validate.py
 --verify-quotes` must pass); claim ids hashed by script; every new edge
 `modelling` with a rationale; nothing the text does not state.
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

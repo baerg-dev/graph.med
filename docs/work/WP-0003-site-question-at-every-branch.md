@@ -1,8 +1,15 @@
 ---
-id: site-question-at-every-branch
+id: WP-0003
+title: A question diamond at every branching of the tree
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0002]
+blocks: [WP-0004]
+owner: unassigned
 initiative: ui
 kind: build
-depends_on: [site-layout-visibility]
+slug: site-question-at-every-branch
 ---
 
 ## Outcome
@@ -27,6 +34,14 @@ Out: any new question text — "Welche Population?" is reused; a different wordi
 - `docs/publication.md` §3 "Every branching is a question" and "The questions are
   ours; every answer is data".
 - The build adds no text it does not already have (`QUESTIONS` in `build.py`).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

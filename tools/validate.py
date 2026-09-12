@@ -13,9 +13,8 @@ rules a document schema cannot state because they span files:
   - a view id is not a namespace name (views are served at the site root);
   - a claim's `section` names an entry of its source's `outline` (spec §6.7);
   - `broader` edges form no cycle (spec §5);
-  - docs/work/, the registry of work packages, is sound: numbers unique, ids match
-    file names, `depends_on` name lower-numbered packages that still exist,
-    initiatives and sources resolve, the sections a session works from exist.
+  - the work-package convention holds (scripts/check-work.py: ids, statuses,
+    dependencies, done/, stale claims, HANDOFF.md against LOG.md).
 
 With --verify-quotes it also downloads each source (hash-checked, cached) and
 verifies every quote is a verbatim substring of `pdftotext -layout` on the cited
@@ -159,89 +158,16 @@ def main(argv=None) -> int:
     return 1 if errors else 0
 
 
-WORK = ROOT / "docs" / "work"
-WORK_KINDS = ("extraction", "linking", "schema", "build", "docs", "tooling")
-WORK_SECTIONS = ("Outcome", "Scope", "Constraints", "Verification")
-WORK_KEYS = {"id", "initiative", "kind", "depends_on", "source", "pages"}
-
-
-def frontmatter(path: Path) -> tuple[dict | None, str]:
-    """The YAML between the leading '---' lines, and the body after it."""
-    text = path.read_text(encoding="utf-8")
-    if not text.startswith("---\n"):
-        return None, text
-    end = text.find("\n---\n", 4)
-    if end < 0:
-        return None, text
-    return yaml.safe_load(text[4:end]) or {}, text[end + 5:]
-
-
 def check_work(ids: set[str]) -> list[str]:
-    """docs/work/ is the registry of work packages (docs/work/README.md): one file
-    NNNN-<id>.md per package, taken in number order, removed when done. So the
-    numbers must be unique, the id must match the file name, `depends_on` must name
-    packages with a lower number that still exist (a done package is removed, so a
-    dependency on a higher number would never be satisfied), the initiative must
-    exist and keep at least one package, an extraction package must name a source
-    entity and its pages, and the sections a session works from must be present."""
-    if not WORK.is_dir():
+    """The work-package convention (docs/work/README.md) has its own check,
+    scripts/check-work.py; running it here means CI covers it on every pull
+    request without a workflow change."""
+    script = ROOT / "scripts" / "check-work.py"
+    if not script.exists():
         return []
-    errs: list[str] = []
-    initiatives: dict[str, dict] = {}
-    for path in sorted((WORK / "initiatives").glob("*.md")) if (WORK / "initiatives").is_dir() else []:
-        fm, _ = frontmatter(path)
-        rel = str(path.relative_to(ROOT))
-        if fm is None or fm.get("id") != path.stem or not fm.get("title"):
-            errs.append(f"{rel}: an initiative has frontmatter with id (= file name) and title")
-        initiatives[path.stem] = fm or {}
-    packages: dict[str, int] = {}
-    numbers: dict[int, str] = {}
-    for path in sorted(WORK.glob("[0-9][0-9][0-9][0-9]-*.md")):
-        rel = str(path.relative_to(ROOT))
-        number, _, slug = path.stem.partition("-")
-        n = int(number)
-        if n in numbers:
-            errs.append(f"{rel}: number {number} is also {numbers[n]} — numbers are never reused")
-        numbers[n] = path.name
-        fm, body = frontmatter(path)
-        if fm is None:
-            errs.append(f"{rel}: no frontmatter"); continue
-        if fm.get("id") != slug:
-            errs.append(f"{rel}: id {fm.get('id')!r} must equal the file name after its number")
-        if set(fm) - WORK_KEYS:
-            errs.append(f"{rel}: unknown keys {sorted(set(fm) - WORK_KEYS)}")
-        if fm.get("kind") not in WORK_KINDS:
-            errs.append(f"{rel}: kind must be one of {', '.join(WORK_KINDS)}")
-        if fm.get("initiative") not in initiatives:
-            errs.append(f"{rel}: initiative {fm.get('initiative')!r} has no file under docs/work/initiatives/")
-        for dep in fm.get("depends_on") or []:
-            if dep not in packages:
-                errs.append(f"{rel}: depends_on {dep}, which is not a registered package with a lower number (a done package is removed — drop the dependency with it)")
-        if fm.get("kind") == "extraction":
-            if fm.get("source") not in ids:
-                errs.append(f"{rel}: an extraction package names a source entity")
-            if not re.fullmatch(r"\d+(-\d+)?", str(fm.get("pages", ""))):
-                errs.append(f"{rel}: an extraction package names its pages (N or N-M)")
-        elif fm.get("source") or fm.get("pages"):
-            errs.append(f"{rel}: only an extraction package names a source and pages")
-        headings = {m.group(1).strip() for m in re.finditer(r"^## (.+)$", body, re.M)}
-        for sec in WORK_SECTIONS:
-            if sec not in headings:
-                errs.append(f"{rel}: missing section '## {sec}'")
-        for slug_ in re.findall(r"open-questions\.md` → ([a-z0-9-]+)", body):
-            if f"## {slug_}" not in (ROOT / "docs" / "open-questions.md").read_text(encoding="utf-8"):
-                errs.append(f"{rel}: names open question {slug_}, which docs/open-questions.md does not have")
-        if isinstance(fm.get("id"), str):
-            packages[fm["id"]] = n
-    used = set()
-    for path in WORK.glob("[0-9][0-9][0-9][0-9]-*.md"):
-        fm, _ = frontmatter(path)
-        if fm:
-            used.add(fm.get("initiative"))
-    for name in initiatives:
-        if name not in used:
-            errs.append(f"docs/work/initiatives/{name}.md: no package left; remove the initiative with its last package")
-    return errs
+    run = subprocess.run([sys.executable, str(script)], capture_output=True, text=True, cwd=ROOT)
+    return [line[len("error: "):] for line in run.stdout.splitlines() if line.startswith("error: ")] + \
+           ([f"scripts/check-work.py failed: {run.stderr.strip()}"] if run.returncode and not run.stdout.startswith("error") and run.stderr else [])
 
 
 def cycles(graph: dict[str, list[str]]) -> list[list[str]]:

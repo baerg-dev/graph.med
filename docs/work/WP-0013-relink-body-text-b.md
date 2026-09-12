@@ -1,8 +1,15 @@
 ---
-id: relink-body-text-b
+id: WP-0013
+title: Relink body-text relations, chapters 7–9
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0012]
+blocks: []
+owner: unassigned
 initiative: extraction-quality
 kind: linking
-depends_on: [relink-body-text-a]
+slug: relink-body-text-b
 ---
 
 ## Outcome
@@ -20,6 +27,14 @@ Out: chapters 4–6; the site.
 ## Constraints
 
 As `relink-body-text-a`.
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

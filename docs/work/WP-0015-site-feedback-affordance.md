@@ -1,8 +1,15 @@
 ---
-id: site-feedback-affordance
+id: WP-0015
+title: A "suggest a change" link opening a prefilled issue
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: [WP-0005]
+blocks: []
+owner: unassigned
 initiative: review
 kind: build
-depends_on: [site-panel-six-questions]
+slug: site-feedback-affordance
 ---
 
 ## Outcome
@@ -27,6 +34,14 @@ Out: accounts, comments, anything that writes to the pool.
 No third-party request from the page; the link is a plain GitHub URL. No
 personal information in the template (`.claude/rules/conventions/
 no-personal-information.md`).
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

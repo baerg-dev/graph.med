@@ -1,45 +1,35 @@
 ---
 name: next-work-package
-description: Do the next registered work package — one per session, ending with a complete handover (the package removed from docs/work/, a pull request opened). Invoke at the start of a session to pick up where the last one stopped; it reports "nothing registered" when docs/work/ holds no package, and "all claimed" when every open package is taken.
+description: Pick up the next open work package from docs/work/ — one per session — claim it, do it, and hand over (LOG entry, HANDOFF rewritten, status review, pull request). Invoke at the start of a session; it reports "nothing open" when no package can be claimed.
 ---
 
 # Do the next work package
 
-One session does **one work package** — a registered unit of work: pages of a
-source to extract, a linking pass over existing entities, a schema change, a
-build feature, a docs change, a piece of tooling — and ends with a complete
-handover. Do not start a second package; the value of this loop is that every
-session ends reviewable. The convention itself, written for humans, is
-`docs/work/README.md`; this file is the agent's procedure.
+One session does **one work package** and ends with a complete handover. The
+convention is `docs/work/README.md` (for people) and `AGENTS.md` (the short
+form); this file is the procedure.
 
 ## Before working
 
-1. **Find your package.** `git fetch origin`. The packages are the files
-   `docs/work/NNNN-<id>.md`, in number order. Yours is the lowest-numbered one
-   that is *open*: every id in its `depends_on` no longer has a file (done
-   packages are removed), and no branch `feat/<id>` exists on `origin`
-   (`git ls-remote --heads origin feat/<id>` prints nothing) — a branch is the
-   claim. Skip claimed ones — but a claim with no pull request behind it
-   (`gh pr list --head feat/<id>` is empty) and no commit beyond `main` is a
-   session that never got to work: report it as a stale claim and let a
-   human delete the branch; do not take it over on your own. **If
-   `docs/work/` holds no package, report
-   "nothing registered" and stop. If every open package is claimed, report
-   "all claimed" and stop.** Do not look for work elsewhere: an entry in
-   `docs/work/LATER.md` becomes a package only when a human registers it.
-2. **Claim it before writing code:** `git checkout -b feat/<id>` from `main`,
-   then `git push -u origin feat/<id>` at once, so that the branch exists on
-   `origin` before anything else happens. (`docs/…` or `chore/…` where that
-   fits better; the claim check looks for `feat/<id>` first, so prefer it.)
-3. **Read the package** in full — Outcome, Scope, Constraints, Verification — and
-   its initiative (`docs/work/initiatives/<initiative>.md`), then what it points
-   at: the spec (`docs/graph-representation.md`), `schema/schema.yaml`,
-   `docs/publication.md` for a build package, and the entries of
-   `docs/open-questions.md` it names. A package whose Open questions gate it
-   (box-colour gates `site-colour-by-direction`) is not open until the entry is
-   settled; skip it and say so.
-4. If the package reads a source (kind `extraction`, with `source` and
-   `pages`): fetch it — URL and expected sha256 are on the source entity under
+1. `git fetch origin`. Read `docs/HANDOFF.md` first, then `docs/LOG.md`'s newest
+   entry.
+2. **Pick.** Among `docs/work/WP-*.md` with `status: open`, those whose every
+   `depends_on` is in `docs/work/done/`; the lowest id wins. Skip `claimed`,
+   `review` and `blocked`. Also skip a package whose slug already has a branch
+   `agent/*-<slug>` on `origin` (`git ls-remote --heads origin 'agent/*-<slug>'`):
+   someone claimed it and the claim has not merged yet. **If nothing qualifies,
+   report "nothing open" — which packages are claimed, blocked or waiting on
+   dependencies — and stop.** Never take work from `docs/work/LATER.md`; a human
+   registers a package from it.
+3. **Claim.** `git checkout -b agent/YYYY-MM-DD-<slug>` from `main`. In the
+   package: `status: claimed`, `owner: agent`, `updated: <today>`. Commit that
+   alone ("claim WP-NNNN"), push with `-u` at once. Only then write code.
+4. **Read the package** in full and its initiative
+   (`docs/work/initiatives/<initiative>.md`), then what it points at: the spec
+   (`docs/graph-representation.md`), `schema/schema.yaml`, `docs/publication.md`
+   for a build package, and the entries of `docs/open-questions.md` it names.
+5. If the package reads a source (`kind: extraction`, with `source` and `pages`):
+   fetch it — URL and expected sha256 are on the source entity under
    `data/sources/`. **Verify the hash.** On mismatch or an unreachable URL, stop:
    fix the source entity if the document merely moved (AWMF renames expired
    assets with an `-abgelaufen` suffix), and hand that over instead. **Never
@@ -52,7 +42,7 @@ its own commit **before** the data commit (spec §7) — and is named in the PR.
 
 **extraction** — phase one, claims, mechanical: for every recommendation box
 (and any criterion the box text depends on), a claim in
-`data/claims/<source-id>/<package-id>.yaml`:
+`data/claims/<source-id>/<slug>.yaml`:
 
 - id `claims/<source-id>/<hash8>` where `hash8` = first 8 hex of
   sha256(`<locator>|<quote>`) — script it, never hand-compute;
@@ -73,7 +63,7 @@ Phase two, linking, judgment, all `modelling`: for each claim, search
 referencing concepts. For each slot, search `data/concepts/` and the
 terminology namespaces before minting a concept; a new concept gets its
 `facet`. Criteria claims attach with `refines` to the claim they qualify. Edges
-go to `data/edges/<source-id>/<package-id>.yaml`.
+go to `data/edges/<source-id>/<slug>.yaml`.
 
 **linking** — edits existing entities or adds edges under spec §11: every change
 `modelling` or sourced, search before minting, nothing inherited, no review
@@ -89,29 +79,32 @@ its preview at `graph.med/preview/pr<N>/`.
 
 **docs** and **tooling** — the package's Outcome says what is true when it is
 done; the documentation levels (`.claude/rules/conventions/documentation.md`)
-say where a change goes; a change to a workflow file is handed over in the PR
-description (`.claude/rules/environment/git-identity.md`).
+say where a change goes; a workflow file is handed over in the PR description
+(`.claude/rules/environment/git-identity.md`).
 
-Do not widen the package: what its Scope lists as out stays out, and a question
-under its Open questions is answered by a human in `docs/open-questions.md`,
-never silently by you.
+Stay inside the package's Scope. Do not answer its Open questions yourself: a
+human answers them in `docs/open-questions.md`. Do not write progress into the
+package; a decision you had to make goes under its Decisions, appended.
 
 ## The handover
 
-1. **Remove your package:** `git rm docs/work/NNNN-<id>.md`, and delete its id
-   from every other package's `depends_on`. If it was its initiative's last
-   package, `git rm` the initiative file too. What you consciously skipped, or
-   found and could not do, goes into `docs/work/LATER.md`, stated as the durable
-   shape of the work, not as a log; never register a package on your own. What
-   the next session must know goes into the PR, into a memory if it is durable,
-   or into `docs/open-questions.md` if it is undecided — not into the registry.
-2. If a design question surfaced, add it to `docs/open-questions.md`; if the
-   package settled one it names, apply the decision, delete the entry, and
-   record the why as a memory (the `handover` skill describes both).
-3. Run the validator (it checks `docs/work/` too); for a build package also the
-   build. Commit (schema commit first if any, then data or tooling), push, open
-   a PR. The PR description is part of the handover: what was done, what you
-   were unsure of, what went into `LATER.md`, and any change to the schema, the
-   validator or agent-governing files, named explicitly.
-4. Stop. The merged PR removes the package and frees the branch name; that plus
-   `docs/work/` is everything the next session needs.
+1. **The package:** `status: review`, `updated: <today>`; append to Decisions
+   what you decided and why. Do not move it to `done/` yet.
+2. **The log:** a new entry at the top of `docs/LOG.md` — date, `agent`, the
+   packages touched with their status change, the branch, one notable thing.
+   Rotate to `docs/LOG-ARCHIVE.md` if the file passes 200 lines.
+3. **The handoff:** rewrite `docs/HANDOFF.md` (its `updated:` today): where we
+   are, what is claimed, the next agent's first move, what is blocked and why.
+   Ids only; no package content.
+4. If a design question surfaced, add it to `docs/open-questions.md`; if the
+   package settled one, apply the decision, delete the entry, and record the
+   why — a memory under `.claude/memory/design/` for the knowledge model, an
+   ADR under `docs/adr/` for the repository (the `handover` skill describes the
+   former). Work you found and could not do goes into `docs/work/LATER.md`.
+5. Run `uv run tools/validate.py` (it runs `scripts/check-work.py`); for a build
+   package also the build. Commit, push, open a PR. The PR description: what was
+   done, what you were unsure of, what went to `LATER.md`, and any change to the
+   schema, the validator or agent-governing files, named explicitly.
+6. Stop. After approval, the last commit on the branch sets `status: done` and
+   `git mv`-s the package into `docs/work/done/`; a person merges. Do that
+   commit only when asked to.

@@ -1,8 +1,15 @@
 ---
-id: site-panel-six-questions
+id: WP-0005
+title: The detail section organised by the reader's six questions
+status: open
+created: 2026-09-12
+updated: 2026-09-12
+depends_on: []
+blocks: [WP-0006, WP-0015]
+owner: unassigned
 initiative: ui
 kind: build
-depends_on: []
+slug: site-panel-six-questions
 ---
 
 ## Outcome
@@ -28,6 +35,14 @@ Out: an evidence level per claim — the schema has none; it arrives only with
 `docs/publication.md` §3 "What the section shows" is the specification, item by
 item; grades are shown per claim, never composed. Chrome is English, content stays
 in its source language with `lang` set.
+
+## Decisions
+
+None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+
+## Open questions
+
+None.
 
 ## Verification
 

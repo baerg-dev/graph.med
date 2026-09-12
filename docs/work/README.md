@@ -1,99 +1,143 @@
 # Work packages
 
-This directory is the register of work that is agreed and not yet done. It is
-written for a person joining the repository cold; the agent's step-by-step
-procedure is `.claude/skills/next-work-package/SKILL.md`.
+How work is registered, picked up, handed over and finished in this repository.
+Written for a person joining cold. The short version every agent reads is
+`AGENTS.md` at the root; the agent's step-by-step procedure is
+`.claude/skills/next-work-package/SKILL.md`.
 
-## What is here
+## Three layers, kept apart
+
+| Layer | File | Granularity | Lifetime |
+|---|---|---|---|
+| Register | `docs/work/WP-*.md` | one per work package, spans sessions | until done, then `done/` |
+| Handover | `docs/HANDOFF.md` | current state, one screen | rewritten every session |
+| History | `docs/LOG.md` | one entry per session | append-only, rotated |
+
+A **work package** outlives many sessions and says what is to be done. A
+**handoff** is a brief for the next session and says where we are. The **log**
+says what happened. Collapsing them into one file is the mistake this layout
+exists to avoid.
 
 ```
-docs/work/
-├── README.md                 this file — the convention
-├── LATER.md                  work that is named but not registered
-├── initiatives/<id>.md       one file per initiative: title and scope
-└── NNNN-<id>.md              one file per work package, in number order
+AGENTS.md                      pointer, read every session
+docs/
+  HANDOFF.md                   current state, rewritten each session
+  LOG.md                       history, newest first (LOG-ARCHIVE.md when rotated)
+  adr/NNNN-<slug>.md           decisions about the repository itself
+  work/
+    README.md                  this file
+    LATER.md                   work that is named but not registered
+    initiatives/<id>.md        one per initiative: title and scope
+    WP-NNNN-<slug>.md          one per work package
+    done/WP-NNNN-<slug>.md     finished packages
 ```
 
-A **work package** is one session's work for one agent, with a clear end: pages
-of a guideline to extract, a linking pass over the semantic layer, a schema
-change, a feature of the site, a change to the documentation or the tooling.
-An **initiative** is the scope a set of packages serves — what is in, what is
-out — so that each package can stay short. **Later** holds what is known but
-not agreed as a package yet.
+## A package
 
-## How a package moves
-
-1. **Registered** — a person adds `NNNN-<id>.md` in a pull request. The number is
-   the next unused one and is never reused; the order of numbers is the order
-   of work. Anyone may draft a package; it counts once the pull request is
-   merged.
-2. **Claimed** — an agent creates and pushes the branch `feat/<id>` before it
-   writes a line. The branch on the remote *is* the claim; there is no status
-   field to keep in sync. Two agents can work at once as long as their packages
-   do not depend on each other.
-3. **Done** — the pull request that finishes the package **deletes its file**,
-   and a person merges it. Done work is not archived here: git holds what was
-   done, the pull request holds what was learned. If a session cannot finish,
-   the branch stays as the claim and the pull request says what is left.
-
-The registry therefore lists only what is still to do, and a reader of the
-directory sees the backlog and nothing else. The validator
-(`uv run tools/validate.py`, run by CI on every pull request) checks that the
-registry is sound: numbers unique, ids matching file names, dependencies pointing
-at lower-numbered packages that still exist, initiatives that still have a
-package, extraction packages naming a real source, and the sections below
-present.
-
-## A package file
+`docs/work/WP-<4 digits>-<kebab-slug>.md`. Ids are never reused; the next id is
+one more than the highest in `docs/work/` and `done/` together.
 
 ```markdown
 ---
-id: site-search-recall            # = the file name after its number; also the branch name
-initiative: ui                    # a file under initiatives/
-kind: build                       # extraction | linking | schema | build | docs | tooling
-depends_on: []                    # ids of lower-numbered packages that must land first
-# source: sources/<id>            # extraction only: the source entity …
-# pages: 26-39                    # … and its physical pages
+id: WP-0042
+title: Refresh auth tokens before expiry
+status: open              # open | claimed | blocked | review | done
+created: 2026-09-12
+updated: 2026-09-12       # touched only when status changes
+depends_on: [WP-0031]     # must be in done/ before this starts
+blocks: []                # the inverse of depends_on, kept in sync
+owner: unassigned         # unassigned | agent | a handle a person writes for themselves
+initiative: ui            # a file under initiatives/
+kind: build               # extraction | linking | schema | build | docs | tooling
+slug: refresh-auth-tokens # = the file name after the id; the branch and data-file name
+# source: sources/<id>    # extraction only …
+# pages: 26-39            # … with its physical pages
 ---
 
 ## Outcome
-What is true when this is done — observable, not "implement X".
+What is true when this is done. Observable, not "implement X".
 
 ## Scope
-In: what the package touches.
+In:  what the package touches.
 Out: what it must not widen into, said explicitly.
 
 ## Constraints
-What the work must not violate: the spec sections, the memories, the rules.
+What the implementation must not violate: spec sections, memories, rules.
 
-## Open questions            (optional)
-Entries of docs/open-questions.md the package waits on or must respect —
-named, never restated. A human answers them there; an agent never does.
+## Decisions
+Decisions already made and why. Append only; never rewrite. Link `docs/adr/`
+for anything about the repository, `.claude/memory/design/` for the knowledge
+model.
+
+## Open questions
+Questions for a human, named as entries of docs/open-questions.md. An agent
+must not silently answer these; a package that waits on one is `blocked`.
 
 ## Verification
 How to prove it works: commands, captures, acceptance criteria.
 
-## Notes                     (optional)
-Anything that has no other home. Not progress, not decisions.
+## Notes                 (optional)
+Anything with no other home. Not progress.
 ```
 
-Two things deliberately have **no** place in a package file:
+**Rules**
 
-- **Progress.** Git has it. A package is not edited while it is worked on.
-- **Decisions and history.** What was decided and why is a memory under
-  `.claude/memory/design/`; what is still undecided is an entry in
-  `docs/open-questions.md`; what a diff was unsure of is its pull request. A
-  package links to those; it does not copy them.
+- An agent claims a package by setting `status: claimed`, `owner: agent` and
+  `updated`, in its own commit, before writing code — on a branch
+  `agent/YYYY-MM-DD-<slug>` pushed at once, so the claim is visible to others.
+- At most one claimed package per agent at a time. Two agents may hold two
+  packages if neither depends on the other.
+- Progress is **not** written into the package. Git has it. Only decisions,
+  constraints and open questions go there — what a diff cannot recover.
+- A session ends with the package at `status: review` and a pull request. After
+  approval, the last commit on the branch sets `status: done` and `git mv`-s the
+  file into `done/`; a person merges. (The bot cannot merge, so "the same commit
+  as the merge" is the commit the merge takes.)
+- A package that needs more than about one session is split, with `depends_on`.
+- `blocked` means a human decision is pending; the package names it.
+- Registering a package is a human decision, made in a pull request. Anyone may
+  draft one. A session that finds work it cannot do writes it into `LATER.md`.
+- No personal names anywhere (`.claude/rules/conventions/no-personal-information.md`).
 
-## Where the rest of the handover lives
+## The handoff
+
+`docs/HANDOFF.md` is rewritten, not appended, at the end of every session. One
+screen at most. It answers only: where are we, what is claimed, what is the next
+agent's first move, what is blocked and why. It references packages by id and
+never duplicates their content. Its `updated:` date must not be older than the
+newest log entry — a stale handoff is worse than none.
+
+## The log
+
+`docs/LOG.md`, newest entry first, one per session:
+
+```markdown
+## 2026-09-12 — agent
+Packages touched: WP-0042 (claimed → review)
+Branch: agent/2026-09-12-refresh-auth-tokens
+Notable: chose refresh-on-401 over a background timer, see ADR-0007.
+```
+
+Past about 200 lines, move the oldest entries to `docs/LOG-ARCHIVE.md`, newest
+first there too. Never delete.
+
+## Validation
+
+`uv run scripts/check-work.py` — also run by `uv run tools/validate.py`, and so
+by CI on every pull request — fails on: a duplicate or missing id; an id or slug
+not matching the file name; `depends_on` or `blocks` naming a package that does
+not exist, or not mirroring each other; a package in `done/` whose status is not
+`done`, or the reverse; a claimed package not updated for 7 days; an unknown
+status, kind or initiative; a missing section; `docs/LOG.md` over 200 lines or
+out of order; `docs/HANDOFF.md` older than the newest log entry, over one screen,
+or naming a package that does not exist.
+
+## Where the rest lives
 
 | What | Where |
 |---|---|
-| What is still to do | this directory |
-| What is undecided, with the options and the leaning | `docs/open-questions.md` |
-| What was decided, and why | `.claude/memory/design/` |
+| What is undecided, with options and leaning | `docs/open-questions.md` |
+| Decisions about the knowledge model, and why | `.claude/memory/design/` |
+| Decisions about the repository, and why | `docs/adr/` |
 | What a change was unsure of | its pull request |
-| What was done | git history |
-
-The pull request is the handover between sessions; no session-snapshot file is
-kept, because a stale one would be trusted.
+| What was done, line by line | git |

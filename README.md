@@ -228,11 +228,11 @@ beside a quote is for viewers that cannot highlight the search from the link.
 
 ### How the pool grows
 
-Work is registered as **work packages**, one file each under `docs/work/`, in
-number order and grouped by initiative (`docs/work/README.md`); a session claims
-the next open one by pushing its branch, does it, deletes its file, and ends in a
-pull request a person reviews — git keeps what was done, the register lists only
-what is still to do. A package extracts pages of a source (claims
+Work is registered as **work packages**, one file each under `docs/work/`,
+grouped by initiative (`docs/work/README.md`); a session claims the next open one
+in a commit of its own, does it, and ends with a log entry (`docs/LOG.md`), a
+rewritten handoff (`docs/HANDOFF.md`) and a pull request a person reviews;
+finished packages move to `docs/work/done/`. `AGENTS.md` is the short form. A package extracts pages of a source (claims
 first, mechanical; then linking, judgment), or changes the schema, or adds a site
 feature, or changes the documentation or the tooling. The rules an agent follows are short and worth reading
 once: read before writing; extract first, link second; search before minting;
