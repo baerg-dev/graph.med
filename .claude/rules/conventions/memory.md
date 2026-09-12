@@ -68,7 +68,9 @@ Link related memories with `[[their-name]]`. Add a row to the index above in the
 commit — a memory absent from the index is a memory nobody will open.
 
 What does **not** belong here: anything the code, the git history, `README.md` or a rule
-already states; anything true only of today's session, such as a current outage or a
-failure you are in the middle of debugging. Record the durable shape of a problem, not
+already states; a decision about the repository itself — its tooling, conventions or
+process — which is an ADR under `docs/adr/`; anything true only of today's session,
+such as a current outage or a failure you are in the middle of debugging (the
+session's record is a `docs/LOG.md` entry). Record the durable shape of a problem, not
 its current instance. If a fact turns out to be wrong, delete the file rather than
 leaving it to be trusted.

@@ -11,9 +11,10 @@ The repository is at inception: it currently contains `README.md`, `LICENSE`, th
 file, the design documentation under `docs/`, the one schema for the data pool
 (`schema/schema.yaml`), the validator that enforces it (`tools/validate.py`) with the
 CI workflow that runs it (`.github/workflows/validate.yml`), the pool itself under
-`data/` (layout in `data/README.md`), the work packages, handoff and log under `docs/` (`AGENTS.md`), the
-site build (`tools/build.py`, see "Build"), and the `.claude/` directory described
-below. There is no source tree beyond these two scripts.
+`data/` (layout in `data/README.md`), the site build (`tools/build.py`, see "Build"),
+the work packages, handoff and log under `docs/` with the script that checks them
+(`scripts/check-work.py`, see "Work"), `AGENTS.md`, and the `.claude/` directory
+described below. There is no source tree beyond these three scripts.
 Project-specific guidance — data sources and their licenses, setup and test
 instructions — belongs in this file once it exists. Do not document tooling that does
 not exist.
@@ -21,7 +22,8 @@ not exist.
 ## Checks
 
 Python tooling is managed with `uv` (`pyproject.toml`, `uv.lock`); never pip. The one
-check is the validator. `schema/schema.yaml` is a JSON Schema (draft 2020-12); the
+check is the validator, which also runs the work-package check (`scripts/check-work.py`,
+see "Work"). `schema/schema.yaml` is a JSON Schema (draft 2020-12); the
 validator applies it to every file under `data/` with the `jsonschema` library, then
 checks what a document schema cannot say — references resolve, claim ids hash
 correctly, edges are unique:
@@ -92,9 +94,12 @@ session did; `docs/adr/` what was decided about the repository itself.
 claim the next open package in `docs/work/`, end with a log entry, a rewritten
 handoff and a pull request. The convention is `docs/work/README.md`; the
 `next-work-package` skill is the procedure; the `handover` skill maintains
-`docs/open-questions.md`; decisions about the repository are `docs/adr/`. How an agent is expected to operate
-lives in `.claude/`, filed by level, so that each piece loads when it is relevant
-rather than all of it, always:
+`docs/open-questions.md`; decisions about the repository are `docs/adr/`.
+`uv run scripts/check-work.py` checks all of it (ids, statuses, dependencies,
+`done/`, stale claims, the handoff against the log); the validator runs it too.
+
+How an agent is expected to operate lives in `.claude/`, filed by level, so that
+each piece loads when it is relevant rather than all of it, always:
 
 ```
 .claude/
@@ -116,7 +121,7 @@ rather than all of it, always:
 │   └── design/
 ├── agents/                      subagent definitions — empty; add one .md per agent
 └── skills/
-    ├── handover/                end a session: update docs/open-questions.md
+    ├── handover/                end a session: open questions, log entry, handoff
     ├── next-work-package/       do the next registered work package: one, then hand over
     └── screenshot/              look at a view page in a real browser before proposing it
 ```
