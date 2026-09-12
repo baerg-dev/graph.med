@@ -1,12 +1,12 @@
 ---
 id: WP-0003
 title: A question diamond at every branching of the tree
-status: open
+status: claimed
 created: 2026-09-12
 updated: 2026-09-12
 depends_on: [WP-0002]
 blocks: [WP-0004]
-owner: unassigned
+owner: agent
 initiative: ui
 kind: build
 slug: site-question-at-every-branch
