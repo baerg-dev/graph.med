@@ -89,10 +89,14 @@ Anything with no other home. Not progress.
   packages if neither depends on the other.
 - Progress is **not** written into the package. Git has it. Only decisions,
   constraints and open questions go there — what a diff cannot recover.
-- A session ends with the package at `status: review` and a pull request. After
-  approval, the last commit on the branch sets `status: done` and `git mv`-s the
-  file into `done/`; a person merges. (The bot cannot merge, so "the same commit
-  as the merge" is the commit the merge takes.)
+- A session ends with the package at `status: review` and a pull request. A
+  person reviews and merges it as it is.
+- A package whose file on `main` says `status: review` has been reviewed and
+  merged — nothing reaches `main` otherwise. **The next agent that sees one
+  closes it** without being asked: `status: done`, `updated:` today, `git mv` into
+  `done/`, in its own commit ("close WP-NNNN") at the start of its session, on
+  its own branch before it claims anything. So a package's `depends_on` is
+  satisfied on that branch as soon as the dependency has merged.
 - A package that needs more than about one session is split, with `depends_on`.
 - `blocked` means a human decision is pending; the package names it.
 - Registering a package is a human decision, made in a pull request. Anyone may

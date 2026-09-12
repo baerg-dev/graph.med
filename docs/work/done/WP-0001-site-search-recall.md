@@ -1,7 +1,7 @@
 ---
 id: WP-0001
 title: The search finds every node the chapter tree finds
-status: review
+status: done
 created: 2026-09-12
 updated: 2026-09-12
 depends_on: []
