@@ -1,7 +1,7 @@
 ---
 id: WP-0002
 title: "Nothing overlaps: every node and answer readable"
-status: claimed
+status: review
 created: 2026-09-12
 updated: 2026-09-12
 depends_on: []
@@ -35,7 +35,23 @@ forms, the colours.
 
 ## Decisions
 
-None yet. Append only; architectural ones go to `docs/adr/`, knowledge-model ones to `.claude/memory/design/`.
+- 2026-09-12 (agent): the answers stay on the edges; the fallback of answers as
+  nodes of their own was not needed. The overlaps had one cause: the answer is
+  anchored where the arrow meets the target's boundary, but its offset was
+  computed as if anchored at the target's centre, so every answer sat 130 px too
+  far left, over the rank before. The offset is now half the label's estimated
+  width plus a 10 px gap, so the label ends just before the arrow and, with the
+  rank separation of 230 px, never reaches the previous rank.
+- 2026-09-12 (agent): a group reached from two open parents (Minimalinvasive
+  kolorektale Resektion) names its answer once; the second edge's label is blank
+  while both are shown, since both would sit on the same spot.
+- 2026-09-12 (agent): "fit" fits into the part of the canvas the floating
+  controls do not cover — below the search row, above the legend — so no node
+  sits under a control after a fit, on the phone in particular.
+- 2026-09-12 (agent): "nothing overlaps" is checked mechanically: the screenshot
+  driver reports every pair of shown nodes and answers whose boxes intersect, and
+  gained `all` (every group open, one tap at a time) and `fit` actions to reach
+  the extreme states.
 
 ## Open questions
 
