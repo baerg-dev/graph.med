@@ -14,7 +14,9 @@ built into a temporary directory with base path /site/ and copied into the conta
 nothing is installed in the sandbox and nothing is mounted. Actions run in order
 before the capture: toggle=<concept id> (fold or unfold that patient group),
 open=<entity id> (deep link: unfold and select), section=<number> (chapter filter),
-search=<text>, facet=<kind>, chapters (open the chapter panel), wait=<ms>.
+search=<text>, facet=<kind>, chapters (open the chapter panel), all (every patient group
+open), fit (fit what is open), wait=<ms>. The runner prints how many elements are shown and
+how many pairs of nodes and answers overlap — the mechanical half of "nothing overlaps".
 """
 
 from __future__ import annotations

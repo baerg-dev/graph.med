@@ -16,6 +16,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await sleep(900);
   for (const [action, value] of spec.actions) {
     if (action === "wait") { await sleep(Number(value) || 500); continue; }
+    if (action === "all") {   /* every patient group open, one tap at a time as a reader would */
+      const ids = await page.evaluate(() => window.graphmed.cy.nodes("[type = 'junction']").map(j => j.id()));
+      for (const id of ids) { await page.evaluate(id => window.graphmed.toggle(window.graphmed.cy.getElementById(id), true), id); await sleep(400); }
+      await sleep(900); continue;
+    }
     await page.evaluate((action, value) => {
       const g = window.graphmed;
       if (action === "toggle") g.toggle(g.cy.getElementById("j:" + value));
@@ -24,12 +29,32 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       else if (action === "search") g.search(value);
       else if (action === "facet") g.search(document.getElementById("search").value, value);
       else if (action === "chapters") document.getElementById("chapters-toggle").click();
+      else if (action === "fit") document.getElementById("fit").click();
       else throw new Error("unknown action " + action);
     }, action, value);
     await sleep(900);
   }
   await page.screenshot({ path: "/tmp/shot.png" });
   const shown = await page.evaluate(() => window.graphmed.cy.elements().not(".folded").length);
-  console.log(`${shown} elements shown` + (errors.length ? `; page errors: ${errors.join(" | ")}` : ""));
+  /* what overlaps: every pair of shown nodes (with their labels) and edge labels whose boxes
+     intersect by more than a pixel — the mechanical half of "nothing overlaps" (docs/publication.md §3) */
+  const overlaps = await page.evaluate(() => {
+    const cy = window.graphmed.cy, boxes = [];
+    cy.nodes().not(".folded").forEach(n => { const b = n.boundingBox({ includeLabels: true, includeOverlays: false }); boxes.push({ id: n.id(), name: n.data("label") || n.id(), ...b }); });
+    cy.edges().not(".folded").forEach(e => {
+      if (!e.data("label")) return;
+      const b = e.boundingBox({ includeEdges: false, includeLabels: true, includeOverlays: false });
+      if (b.w > 0 && b.h > 0) boxes.push({ id: e.id(), name: "answer " + e.data("label"), ...b });
+    });
+    const pairs = [];
+    for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+      const a = boxes[i], b = boxes[j];
+      const w = Math.min(a.x2, b.x2) - Math.max(a.x1, b.x1), h = Math.min(a.y2, b.y2) - Math.max(a.y1, b.y1);
+      if (w > 1 && h > 1) pairs.push(`${a.name} × ${b.name} (${Math.round(w)}×${Math.round(h)})`);
+    }
+    return pairs;
+  });
+  console.log(`${shown} elements shown, ${overlaps.length} overlapping pairs` + (errors.length ? `; page errors: ${errors.join(" | ")}` : ""));
+  overlaps.slice(0, 40).forEach(p => console.log("  " + p));
   await browser.close();
 })().catch(e => { console.error("screenshot failed: " + e.message); process.exit(1); });
