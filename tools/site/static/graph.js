@@ -111,8 +111,8 @@
 
   /* folding: the root, the first question and its answers — the families — are always
      shown; an open junction shows what hangs directly from it: its own recommendations
-     (with their conditions and aims) and the junctions of its member groups, each folded
-     until opened in turn */
+     (with their conditions and aims) and, behind a "Welche Population?" of its own, the
+     junctions of its member groups, each folded until opened in turn */
   var frame = cy.nodes("[type = 'root'], [type = 'question']").filter(function (n) { return n.id() === "q:population" || n.data("type") === "root"; });
   var families = junctions.filter(function (j) { return j.incomers("node").intersection(frame).nonempty(); });
   var always = frame.union(cy.nodes("[type = 'root']").connectedEdges()).union(families).union(families.incomers("edge"));
@@ -126,7 +126,10 @@
         done[j.id()] = true; grew = true;
         var out = j.outgoers();
         shown = shown.union(out);
-        out.nodes().not("[type = 'junction']").forEach(function (n) { shown = shown.union(n.successors()); });
+        out.nodes().not("[type = 'junction']").forEach(function (n) {
+          var members = n.outgoers("node[type = 'junction']");   /* the family's own question: its answers are groups, shown folded */
+          shown = shown.union(members.nonempty() ? n.outgoers() : n.successors());
+        });
       });
     }
     shown = shown.intersection(inScope);

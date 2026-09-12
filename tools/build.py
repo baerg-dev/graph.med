@@ -246,11 +246,16 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
     weight = {c: len(below(c)) for c in concepts}
     def junction(c, parent):
         j = f"j:{c}"
-        if j not in seen:
-            add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [], text=text_of(c))
         edge(parent, j, "answer", short(c), ref=c)
-        for k in sorted(children.get(c, []), key=lambda k: (-weight[k], short(k))):
-            junction(k, j)
+        if j in seen:   # a group with two parents appears under both, built once
+            return
+        add(j, ref=c, type="junction", label=str(weight[c]), lang=members[c]["lang"], group=short(c), facets=[facet(c)] if facet(c) else [], text=text_of(c))
+        kids = sorted(children.get(c, []), key=lambda k: (-weight[k], short(k)))
+        if kids:   # every branching is a question: a family asks "Welche Population?" again before its member groups (docs/publication.md §3)
+            q = add(f"q:{j}:population", type="question", lang=lang, label=QUESTIONS[lang]["population"])
+            edge(j, q, "flow")
+            for k in kids:
+                junction(k, q)
     for c in sorted(concepts - parents, key=lambda c: (-weight[c], short(c))):
         junction(c, q0)
     statements.sort(key=lambda s: (-weight.get((s.get("slots") or {}).get("population"), 0), label((s.get("slots") or {}).get("population") or ""),
@@ -275,7 +280,7 @@ def decision_tree_of(view: dict, members: dict[str, dict], pool: Pool) -> dict:
                                               + [c.get("label") for c in claims] + [c.get("quote") for c in claims])))
         at = f"j:{pop}" if pop in members else q0   # the statement hangs from its own group's junction, never from a family's
         if cond in members:  # a further question, asked within the patient group
-            q = f"q:{at}"
+            q = f"q:{at}:condition"
             if q not in seen:
                 add(q, type="question", lang=lang, label=QUESTIONS[lang]["condition"])
                 edge(at, q, "flow")
