@@ -335,7 +335,11 @@ JSON document per entity, read on a phone first — as designed in
 `docs/publication.md`. The tree is drawn by Cytoscape.js with the dagre layout,
 vendored under `tools/site/static/vendor/` (MIT, pinned; see its `LICENSES.md`). The command is in [`CLAUDE.md`](CLAUDE.md) under "Build"; run
 it locally and open `site/index.html`. Deployment to GitHub Pages is a workflow, and
-like every workflow file it is committed by a person (see "Checks").
+like every workflow file it is committed by a person (see "Checks"). The same
+workflow serves every open pull request at `graph.med/preview/pr<N>/`, built from
+the pull request's head once its checks have run, so that a change to a page is
+reviewed as the page it produces; a preview says which pull request it is and asks
+not to be indexed.
 
 ## Source documents
 

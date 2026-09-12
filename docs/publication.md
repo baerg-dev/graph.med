@@ -5,9 +5,9 @@
 > graph-and-sheet page with patient groups folded by family, the chapter tree and
 > the search with facet filters, short labels, direction glyphs, legend and banner,
 > the order of the detail section (§3), entity pages and JSON (§4), source links
-> (§5). Not built and not registered: the deploy workflow until a person commits
-> it (§6), cuts (§7), pathway views, and everything under §8. The domain
-> `graph.med` points at GitHub Pages. This document fixes what the site is *meant*
+> (§5), and the deploy workflow with one preview per open pull request (§6). Not
+> built and not registered: cuts (§7), pathway views, and everything under §8. The
+> domain `graph.med` points at GitHub Pages. This document fixes what the site is *meant*
 > to be so that the build is written to it, not the other way round. It is the
 > design-level counterpart of `graph-representation.md`: that file says how
 > knowledge is stored; this one says how it is shown.
@@ -252,12 +252,29 @@ offline, needs nothing beyond the dependencies in `pyproject.toml`, and is
 deterministic. A contributor runs it locally and opens `site/index.html` to see a
 change before proposing it — the same habit as the validator.
 
-Publication is a workflow: on every push to `main`, validate, build, deploy to
-GitHub Pages. The deploy step never runs on a pool that fails validation. Workflow
-files are human-only (`.claude/rules/environment/git-identity.md`), so the build
-tooling arrives in a pull request and the workflow that calls it is committed by a
-person from the pull request's description. The build emits the `CNAME` file for the
-domain and a `.nojekyll` marker so that paths are served untouched.
+Publication is a workflow (`.github/workflows/pages.yml`): on every push to `main`,
+validate, build, deploy to GitHub Pages. The deploy step never runs on a pool that
+fails validation. Workflow files are human-only
+(`.claude/rules/environment/git-identity.md`), so the build tooling arrives in a
+pull request and the workflow that calls it is committed by a person from the pull
+request's description. The build emits the `CNAME` file for the domain and a
+`.nojekyll` marker so that paths are served untouched.
+
+**Previews.** Every open pull request from a branch of the repository is served at
+`graph.med/preview/pr<N>/`, built from its head with `--base /preview/pr<N>/
+--preview <N>`, so that a reviewer reads the page a change produces, not its diff.
+A preview page carries a strip above the header naming the pull request, and a
+`robots` hint not to be indexed. GitHub Pages serves one deployment per repository
+and every deployment replaces the last, so the site is composed on every deploy from
+what is true at that moment: the root from `main`, `preview/pr<N>/` from each open
+pull request. Nothing is accumulated and nothing needs cleaning up — a pull request
+that closes is simply absent from the next composition, and a pull request whose
+pool fails validation has no preview until it passes. The same workflow does this
+work: it runs on a push to `main` and after each run of the validation workflow
+on a pull request, always from `main`'s own workflow file, in `main`'s context, so
+that a branch can change what its preview shows and never what the root shows. It
+needs no write access to the repository: previews are built in one job per pull
+request, handed over as artifacts, and placed under `preview/` by the composing job.
 
 ---
 

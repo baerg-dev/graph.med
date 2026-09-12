@@ -44,6 +44,7 @@ def main(argv=None) -> int:
     ap.add_argument("--phone", action="store_true", help="390x844 at device scale 2, touch")
     ap.add_argument("--do", action="append", default=[], metavar="ACTION", help="an action before the capture; repeatable, in order")
     ap.add_argument("--name", default="shot", help="container name (default shot)")
+    ap.add_argument("--preview", type=int, default=None, metavar="N", help="build as the preview of pull request N (the strip above the header)")
     args = ap.parse_args(argv)
 
     if shutil.which("docker") is None:
@@ -61,7 +62,8 @@ def main(argv=None) -> int:
 
     with tempfile.TemporaryDirectory(prefix="graph.med-site-") as tmp:
         site = Path(tmp) / "site"
-        subprocess.run([sys.executable, str(ROOT / "tools" / "build.py"), "--base", "/site/", "--out", str(site)], check=True, capture_output=True)
+        build = [sys.executable, str(ROOT / "tools" / "build.py"), "--base", "/site/", "--out", str(site)]
+        subprocess.run(build + (["--preview", str(args.preview)] if args.preview else []), check=True, capture_output=True)
         if not (site / args.view / "index.html").exists():
             print(f"error: no view {args.view!r} in the built site", file=sys.stderr)
             return 1

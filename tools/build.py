@@ -4,6 +4,7 @@
     uv run tools/build.py                      # site/ for the domain (base path "/")
     uv run tools/build.py --base /graph.med/   # for graph-med.github.io/graph.med/
     uv run tools/build.py --cname graph.med    # also emit the CNAME file for Pages
+    uv run tools/build.py --base /preview/pr12/ --preview 12   # the preview of pull request 12
 
 Every view becomes <view-id>/index.html — one decision tree (which patient group? →
 which condition? → recommendation → aim; answers on the edges; laid out left to right
@@ -33,6 +34,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMA = ROOT / "schema" / "schema.yaml"
 SITE_SRC = Path(__file__).resolve().parent / "site"
+REPO = "https://github.com/graph-med/graph.med"
 
 SLOTS = ("population", "action", "condition", "outcome")
 EVIDENCE = ("supports", "contests")
@@ -292,6 +294,8 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, default=ROOT / "site")
     ap.add_argument("--base", default="/", help="base path every link starts with (default: /)")
     ap.add_argument("--cname", default=None, help="emit a CNAME file with this domain")
+    ap.add_argument("--preview", type=int, default=None, metavar="N",
+                    help="build the preview of pull request N: every page says so and asks not to be indexed")
     args = ap.parse_args(argv)
     base = args.base if args.base.endswith("/") else args.base + "/"
 
@@ -301,7 +305,8 @@ def main(argv=None) -> int:
     env = Environment(loader=FileSystemLoader(SITE_SRC / "templates"), autoescape=select_autoescape(["html"]),
                       trim_blocks=True, lstrip_blocks=True)
     env.globals.update(base=base, commit=commit, built=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                       version=schema.get("x-version"))
+                       version=schema.get("x-version"), repo=REPO,
+                       preview={"number": args.preview, "url": f"{REPO}/pull/{args.preview}"} if args.preview else None)
     env.filters["short"] = lambda eid: eid.split("/", 1)[-1]
 
     out = args.out
@@ -375,7 +380,7 @@ def main(argv=None) -> int:
         views.append({"vid": vid, "title": title, "sources": sources, "counts": counts})
 
     (out / "index.html").write_text(env.get_template("index.html").render(views=views, sources=sorted(pool.of_type("source"), key=lambda s: s["id"])), encoding="utf-8")
-    print(f"built {len(views)} view(s) and {len(pool.entities) - len(views)} entity pages into {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out} (base {base})")
+    print(f"built {len(views)} view(s) and {len(pool.entities) - len(views)} entity pages into {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out} (base {base}{', preview of pull request ' + str(args.preview) if args.preview else ''})")
     return 0
 
 

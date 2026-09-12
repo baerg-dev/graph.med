@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{% block title %}graph.med{% endblock %}</title>
 <link rel="stylesheet" href="{{ base }}assets/site.css?v={{ commit }}">
-{% block head %}{% endblock %}
+{% if preview %}<meta name="robots" content="noindex, nofollow">
+{% endif %}{% block head %}{% endblock %}
 </head>
 <body>
+{% if preview %}
+<div class="preview">preview of <a href="{{ preview.url }}" rel="noopener">pull request #{{ preview.number }}</a> · not the published site · <a href="https://graph.med/">graph.med</a></div>
+{% endif %}
 <header class="top">
   <a class="brand" href="{{ base }}">graph.med</a>
   {% block crumbs %}{% endblock %}
@@ -17,7 +21,7 @@
 </main>
 <footer class="foot">
   built from <code>{{ commit }}</code> on {{ built }} · schema {{ version }} ·
-  <a href="https://github.com/baerg-dev/graph.med">repository</a> ·
+  <a href="{{ repo }}">repository</a> ·
   PolyForm Noncommercial 1.0.0
 </footer>
 <script>

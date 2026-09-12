@@ -46,15 +46,19 @@ JSON per entity, the schema at its `$id`. Offline and deterministic; two seconds
 ```bash
 uv run tools/build.py                       # site/ for graph.med (base path /)
 uv run tools/build.py --base /graph.med/    # for graph-med.github.io/graph.med/
+uv run tools/build.py --base /preview/pr12/ --preview 12   # as the preview of pull request 12
 ```
 
 Open `site/index.html` in a browser to see a change. Templates and the client script
 live in `tools/site/`. Inside the sandbox, where there is no browser,
 `uv run tools/screenshot.py <view-id>` renders a view page in a Chromium container
 on the sandbox's Docker daemon and writes a PNG under `/tmp/graph.med/screenshots/`
-(the `screenshot` skill describes the actions it can take first). Deployment to GitHub Pages is a workflow file, committed by a
-person (`.github/workflows/pages.yml` once it exists): validate, build, deploy on
-every push to `main`.
+(the `screenshot` skill describes the actions it can take first). Deployment to
+GitHub Pages is a workflow file, committed by a person
+(`.github/workflows/pages.yml`): validate, build, deploy on every push to `main`,
+and one preview per open pull request at `graph.med/preview/pr<N>/`, rebuilt from
+the pull request's head after each run of its checks (`docs/publication.md` §6).
+Link the preview from a pull request that changes what a page shows.
 
 ## Where this runs
 
