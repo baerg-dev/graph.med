@@ -1,6 +1,6 @@
 ---
 name: view-page-is-a-decision-tree
-description: The view page is one decision tree — which patient group? (families, then members) → which condition? → recommendation (coloured by grade, a direction glyph) → aim, answers on the edges — drawn left to right by Cytoscape.js + dagre, folded by default; not chapters as the shape, not an outline, not an all-at-once drawing.
+description: The view page is one decision tree — which patient group? (families, then members, a question at every fork) → which condition? → recommendation (coloured by grade, a direction glyph) → aim, answers on the edges — drawn left to right by Cytoscape.js + dagre, folded by default, nothing overlapping; not chapters as the shape, not an outline, not an all-at-once drawing.
 metadata:
   type: project
 ---
@@ -12,6 +12,16 @@ by the guideline's grade, aims as tags. Drawn top-down by Cytoscape.js with the
 dagre layout, self-hosted; a node's details in the section below the graph.
 Decided 2026-09-06 after three rejected forms; applied in `docs/publication.md`
 §3 and `tools/build.py`.
+
+Refined 2026-09-12 from the physician's review of the live site (2026-09-11):
+**every fork passes a question** — an opened family asks the population question
+again before its member groups, because a bare fan of answers read as "a branch
+without a decision" — built by one rule for the root and every family alike
+(`branch()` in `tools/build.py`; the maintainer asked why the family question
+had not emerged on its own: the rule had been written for the root only). And
+**nothing overlaps**: an answer is written at the end of its edge, anchored where
+the arrow meets its target; every edge's vertical run lies in the gap after its
+source's column, set after each layout; the `screenshot` skill measures both.
 
 **Why:** The maintainer read the earlier forms on a phone. The force-directed
 drawing of everything was "too dense"; the outline tree was "more like a table of

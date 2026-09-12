@@ -292,7 +292,12 @@ change before proposing it — the same habit as the validator.
 
 Publication is a workflow (`.github/workflows/pages.yml`): on every push to `main`,
 validate, build, deploy to GitHub Pages. The deploy step never runs on a pool that
-fails validation. Workflow files are human-only
+fails validation. The deploy job carries an explicit condition
+(`!cancelled() && needs.build.result == 'success'`): the preview job is skipped
+whenever no pull request is open, and GitHub skips every job downstream of a
+skipped one unless told otherwise, so without the condition a push to `main`
+with no open pull request built the site and never deployed it — as it did
+until 2026-09-12. Workflow files are human-only
 (`.claude/rules/environment/git-identity.md`), so the build tooling arrives in a
 pull request and the workflow that calls it is committed by a person from the pull
 request's description. The build emits the `CNAME` file for the domain and a
