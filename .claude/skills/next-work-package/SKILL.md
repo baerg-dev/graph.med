@@ -108,7 +108,9 @@ package; a decision you had to make goes under its Decisions, appended.
    ADR under `docs/adr/` for the repository (the `handover` skill describes the
    former). Work you found and could not do goes into `docs/work/LATER.md`.
 5. Run `uv run tools/validate.py` (it runs `scripts/check-work.py`); for a build
-   package also the build. Commit, push, open a PR. The PR description: what was
+   package also the build. Commit, push, open a PR — every PR, of every kind,
+   links its preview as a complete clickable URL
+   (`https://graph.med/preview/pr<N>/<view-id>/`, see **build**). The PR description: what was
    done, what you were unsure of, what went to `LATER.md`, and any change to the
    schema, the validator or agent-governing files, named explicitly.
 6. Stop. After approval, the last commit on the branch sets `status: done` and

@@ -63,4 +63,5 @@ took and what you saw — including what is wrong, so the reviewer does not have
 to find it. "Not opened in a browser" is no longer an acceptable line in a PR.
 Link the preview the reviewer will open as a complete, clickable URL
 (`https://graph.med/preview/pr<N>/<view-id>/`, a markdown link on its own line),
-never as a bare `graph.med/preview/pr<N>/`.
+never as a bare `graph.med/preview/pr<N>/` — and every other pull request links
+its preview the same way, whether or not it changes a page.
