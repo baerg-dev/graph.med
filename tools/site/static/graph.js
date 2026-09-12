@@ -20,19 +20,21 @@
   if (typeof cytoscape !== "function") throw new Error("library missing");
   if (typeof cytoscapeDagre === "function") cytoscape.use(cytoscapeDagre);
 
+  /* the search compares folded text: no case, no diacritics ("osophagus" finds Ösophagus), ß as ss */
+  function fold(s) { return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ß/g, "ss").toLowerCase(); }
   var elements = [], types = {};
   data.nodes.forEach(function (n) { types[n.id] = n.type; });
   data.nodes.forEach(function (n) {
     elements.push({ data: { id: n.id, ref: n.ref || "", type: n.type, label: n.label || "", group: n.group || "",
       fill: n.grade ? css(GRADE[n.grade] || "--line") : css("--bg"), against: n.against ? 1 : 0, contested: n.contested ? 1 : 0,
-      sections: n.sections || [], text: n.text || "", facets: n.facets || [] } });
+      sections: n.sections || [], text: fold(n.text), facets: n.facets || [] } });
   });
   data.edges.forEach(function (e, i) {
     /* an answer is written at the end of its edge, beside the group or box it leads to, so that
        ten answers fanning out of one question do not pile up at the edges' midpoints; the margin
        moves the label's centre left of the target by half the label plus the target's half width */
     var width = Math.min(170, 6.2 * (e.label || "").length), half = types[e.to] === "junction" ? 24 : 130;
-    elements.push({ data: { id: "e" + i, source: e.from, target: e.to, kind: e.kind, label: e.label || "", ref: e.ref || "",
+    elements.push({ data: { id: "e" + i, source: e.from, target: e.to, kind: e.kind, label: e.label || "", ref: e.ref || "", text: fold(e.text),
       lm: -(width / 2 + half) } });
   });
 
@@ -228,8 +230,9 @@
   facetSel.hidden = !(data.facets || []).length;
   function matches() {   /* the search text and the facet filter compose; either alone is a query */
     if (!query && !facet) return cy.collection();
-    return scope().nodes().filter(function (n) {
-      return n.data("text") && (!query || n.data("text").indexOf(query) >= 0) && (!facet || n.data("facets").indexOf(facet) >= 0);
+    return scope().nodes().filter(function (n) {   /* a node matches by its own text or by the answer that leads to it — a condition is an edge */
+      if (!n.data("text") || (facet && n.data("facets").indexOf(facet) < 0)) return false;
+      return !query || n.data("text").indexOf(query) >= 0 || n.incomers("edge[kind = 'answer']").some(function (e) { return e.data("text").indexOf(query) >= 0; });
     });
   }
   function highlight() {
@@ -244,7 +247,7 @@
     count.hidden = false;
   }
   function research() {
-    query = search.value.trim().toLowerCase(); facet = facetSel.value;
+    query = fold(search.value.trim()); facet = facetSel.value;
     var m = matches(), changed = false;
     m.predecessors("node[type = 'junction']").forEach(function (j) { if (!open[j.id()]) { open[j.id()] = true; changed = true; } });
     if (changed) relayout(m.union(m.predecessors())); else highlight();
