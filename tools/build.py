@@ -2,7 +2,7 @@
 """Build the site under site/ from data/ and schema/schema.yaml (docs/publication.md).
 
     uv run tools/build.py                      # site/ for the domain (base path "/")
-    uv run tools/build.py --base /graph.med/   # for baerg-dev.github.io/graph.med/
+    uv run tools/build.py --base /graph.med/   # for graph-med.github.io/graph.med/
     uv run tools/build.py --cname graph.med    # also emit the CNAME file for Pages
 
 Every view becomes <view-id>/index.html — one decision tree (which patient group? →

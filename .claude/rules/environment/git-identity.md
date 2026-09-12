@@ -7,15 +7,15 @@ description: The bot identity commits are made under, and why the GitHub credent
 Commits and pull requests are authored by a GitHub App bot, not by a human:
 
 ```
-user.name   baerg-dev-agentic-coding-bot[bot]
-user.email  321302308+baerg-dev-agentic-coding-bot[bot]@users.noreply.github.com
+user.name   graph-med-agent[bot]
+user.email  321302308+graph-med-agent[bot]@users.noreply.github.com
 ```
 
 Set these before your first commit if they are not already set:
 
 ```bash
-git config --global user.name  "baerg-dev-agentic-coding-bot[bot]"
-git config --global user.email "321302308+baerg-dev-agentic-coding-bot[bot]@users.noreply.github.com"
+git config --global user.name  "graph-med-agent[bot]"
+git config --global user.email "321302308+graph-med-agent[bot]@users.noreply.github.com"
 ```
 
 A grey silhouette instead of the bot avatar on GitHub means the email is wrong. Fix it

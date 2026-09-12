@@ -47,7 +47,7 @@ this adds to the data model: **a view id must not equal a namespace name**
 `attestations`, `schema`, or a terminology namespace). The validator enforces it.
 
 **Base path.** The site can also be served without the domain, at
-`baerg-dev.github.io/graph.med/`. The build takes the base path as a parameter and
+`graph-med.github.io/graph.med/`. The build takes the base path as a parameter and
 generates every internal link from it, so moving between the two is configuration,
 never a content change.
 

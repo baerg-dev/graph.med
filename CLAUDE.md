@@ -45,7 +45,7 @@ JSON per entity, the schema at its `$id`. Offline and deterministic; two seconds
 
 ```bash
 uv run tools/build.py                       # site/ for graph.med (base path /)
-uv run tools/build.py --base /graph.med/    # for baerg-dev.github.io/graph.med/
+uv run tools/build.py --base /graph.med/    # for graph-med.github.io/graph.med/
 ```
 
 Open `site/index.html` in a browser to see a change. Templates and the client script
